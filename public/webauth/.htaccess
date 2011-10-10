@@ -1,0 +1,6 @@
+<Files iframe.html>
+  Header set Vary "*"
+  Header set Expires "0"
+  Header set Pragma "no-cache"
+  Header set Cache-Control "no-store, no-cache, private, must-revalidate, max-age=0"
+</Files>
