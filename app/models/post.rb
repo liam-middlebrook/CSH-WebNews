@@ -45,16 +45,20 @@ class Post < ActiveRecord::Base
     Newsgroup.find_by_name(headers[/^Followup-To: (.*)/i, 1])
   end
   
+  def all_newsgroups
+    headers[/^Newsgroups: (.*)/i, 1].
+      split(',').
+      map(&:strip).
+      map{ |name| Newsgroup.find_by_name(name) }.
+      reject(&:nil?)
+  end
+  
   def in_newsgroup(newsgroup)
     newsgroup.posts.find_by_message_id(message_id)
   end
   
   def in_all_newsgroups
-    headers[/^Newsgroups: (.*)/i, 1].
-      split(',').
-      map(&:strip).
-      map{ |name| Newsgroup.find_by_name(name) }.
-      reject(&:nil?).
+    all_newsgroups.
       map{ |newsgroup| in_newsgroup(newsgroup) }.
       reject(&:nil?)
   end
@@ -97,13 +101,15 @@ class Post < ActiveRecord::Base
   end
   
   def mark_read_for_user(user)
-    entry = unread_post_entries.where(:user_id => user.id).first
-    if entry
-      entry.destroy
-      return true
-    else
-      return false
+    was_unread = false
+    in_all_newsgroups.each do |post|
+      entry = post.unread_post_entries.where(:user_id => user.id).first
+      if entry
+        entry.destroy
+        was_unread = true
+      end
     end
+    return was_unread
   end
   
   def thread_unread_for_user?(user)

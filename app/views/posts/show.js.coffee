@@ -45,17 +45,20 @@ else
 
 <% if @post_was_unread %>
 reset_check_timeout()
-group = $('#groups_list li[data-name="<%= @newsgroup.name %>"]')
-selected = group.hasClass('selected')
-group.removeClass()
-unread = <%= raw @newsgroup.unread_for_user(@current_user).to_json %>
+<% @post.all_newsgroups.each do |group| %>
+group_li = $('#groups_list li[data-name="<%= group.name %>"]')
+selected = group_li.hasClass('selected')
+group_li.removeClass()
+unread = <%= raw group.unread_for_user(@current_user).to_json %>
 
 if unread.count > 0
-  group.addClass('unread').addClass(unread.hclass)
-  group.find('.unread_count').text(' (' + unread.count + ')')
+  group_li.addClass('unread').addClass(unread.hclass)
+  group_li.find('.unread_count').text(' (' + unread.count + ')')
 else
-  group.find('.unread_count').remove()
-group.addClass('selected') if selected
+  group_li.find('.unread_count').remove()
+
+group_li.addClass('selected') if selected
+<% end %>
 <% end %>
 
 $('#next_unread').attr('href', '<%= next_unread_href %>')
