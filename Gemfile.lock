@@ -36,13 +36,13 @@ GEM
     bcrypt-ruby (3.0.1)
     builder (3.0.0)
     chronic (0.6.4)
+    coffee-rails (3.1.1)
+      coffee-script (>= 2.2.0)
+      railties (~> 3.1.0)
     coffee-script (2.2.0)
       coffee-script-source
       execjs
     coffee-script-source (1.1.2)
-    coffeebeans (1.0.1)
-      actionpack (>= 3.0.0)
-      coffee-script
     erubis (2.7.0)
     execjs (1.2.9)
       multi_json (~> 1.0)
@@ -120,8 +120,7 @@ PLATFORMS
 DEPENDENCIES
   andand
   chronic
-  coffee-script
-  coffeebeans
+  coffee-rails
   jquery-rails
   mysql2
   rails (= 3.1.0)

@@ -11,7 +11,6 @@ group :production do
 end
 
 gem 'rails_autolink'
-gem 'coffeebeans'
 gem 'chronic'
 gem 'andand'
 
@@ -20,7 +19,7 @@ gem 'therubyracer'
 
 # Asset template engines
 gem 'sass-rails'
-gem 'coffee-script'
+gem 'coffee-rails'
 gem 'uglifier'
 
 gem 'jquery-rails'
