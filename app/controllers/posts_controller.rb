@@ -10,7 +10,11 @@ class PostsController < ApplicationController
     
     if params[:showing]
       @showing = @newsgroup.posts.find_by_number(params[:showing])
-      @showing_thread = @showing.thread_parent
+      if @current_user.thread_mode == :flat
+        @showing_thread = @showing
+      else
+        @showing_thread = @showing.thread_parent
+      end
       @from_older = @showing_thread.date
       @from_newer = @showing_thread.date
     end
@@ -22,16 +26,28 @@ class PostsController < ApplicationController
     end
     
     if @from_older
-      @posts_older = @newsgroup.posts.
-        where('parent_id = ? and date < ?', '', @from_older).
-        order('date DESC').limit(limit)
+      if @current_user.thread_mode == :flat
+        @posts_older = @newsgroup.posts.
+          where('date < ?', @from_older).
+          order('date DESC').limit(limit * 2)
+      else
+        @posts_older = @newsgroup.posts.
+          where('parent_id = ? and date < ?', '', @from_older).
+          order('date DESC').limit(limit)
+      end
     end
     
     if @from_newer
-      @from_newer = @newsgroup.posts.where(:date => @from_newer).first.thread_parent.date
-      @posts_newer = @newsgroup.posts.
-        where('parent_id = ? and date > ?', '', @from_newer).
-        order('date').limit(limit)
+      if @current_user.thread_mode == :flat
+        @posts_newer = @newsgroup.posts.
+          where('date > ?', @from_newer).
+          order('date').limit(limit * 2)
+      else
+        @from_newer = @newsgroup.posts.where(:date => @from_newer).first.thread_parent.date
+        @posts_newer = @newsgroup.posts.
+          where('parent_id = ? and date > ?', '', @from_newer).
+          order('date').limit(limit)
+      end
     end
     
     if @posts_older

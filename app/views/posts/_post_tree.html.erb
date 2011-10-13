@@ -1,5 +1,13 @@
 <%
-children = post.children
+if @current_user.thread_mode == :hybrid
+  if level == 1
+    children = post.thread_children
+  else
+    children = []
+  end
+else
+  children = post.children
+end
 
 # If level != 1, mine_in_thread is provided by the next recursion level up
 mine_in_thread = post.user_in_thread?(@current_user) if level == 1

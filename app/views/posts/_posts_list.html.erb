@@ -1,5 +1,5 @@
 <% posts.each do |post| %>
-  <% if @search_mode %>
+  <% if @search_mode or @current_user.thread_mode == :flat %>
     <%= render :partial => 'post_row', :locals => { :post => post, :level => 1 } %>
   <% else %>
     <%= render :partial => 'post_tree',

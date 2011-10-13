@@ -34,7 +34,7 @@ end
       href="#?<%= new_post_path(:newsgroup => @newsgroup.name, :number => post.number) %>">Post Reply</a>
   <% end %>
   <% if @search_mode %>
-    <a class="button" href="#!<%= post_path(@newsgroup.name, post.number) %>">View in Thread</a>
+    <a class="button" href="#!<%= post_path(@newsgroup.name, post.number) %>">View in Newsgroup</a>
   <% end %>
   <a class="button" href="#" onclick="$('#post_view .headers').toggle()">Show Headers</a>
   <% if not @search_mode and post.authored_by?(@current_user) and post.children.count == 0 and @newsgroup.posting_allowed? %>
@@ -59,7 +59,8 @@ end
         <% end %>
       </span>
     </div>
-    <% if post.is_reparented? %>
+    <% if post.is_reparented? and
+        not (@current_user.thread_mode == :flat and not post.is_orphaned?) %>
       <div class="notice">
         <span class="icon">!</span>
         <% if post.is_orphaned? %>
@@ -70,7 +71,7 @@ end
           <% else %>
             This message is orphaned. It may be a reply to a canceled message or an off-group email.
           <% end %>
-        <% else %>
+        <% else # Flat-view users shouldn't see this %>
           This message was de-threaded. WebNews tried to guess where it belongs, but this may not be correct.
         <% end %>
       </div>

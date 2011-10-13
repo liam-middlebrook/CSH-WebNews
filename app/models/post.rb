@@ -75,6 +75,10 @@ class Post < ActiveRecord::Base
     Post.where(:message_id => thread_id, :newsgroup => newsgroup.name).first
   end
   
+  def thread_children
+    Post.where('thread_id = ? and parent_id != ?', thread_id, '').order('date')
+  end
+  
   def all_in_thread
     Post.where(:thread_id => thread_id, :newsgroup => newsgroup.name)
   end

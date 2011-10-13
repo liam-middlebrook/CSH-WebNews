@@ -13,6 +13,10 @@ class User < ActiveRecord::Base
     preferences[:time_zone] || 'Eastern Time (US & Canada)'
   end
   
+  def thread_mode
+    preferences[:thread_mode].andand.to_sym || :normal
+  end
+  
   def open_links_in_new?
     preferences[:open_links_in_new] ? (preferences[:open_links_in_new] == '1') : true
   end

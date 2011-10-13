@@ -10,6 +10,18 @@
       </div>
       
       <fieldset>
+        <legend>Newsgroup view</legend>
+        <div class="form_element">
+          <%= p.radio_button :thread_mode, 'normal', :checked => @current_user.thread_mode == :normal %>
+          <%= p.label :thread_mode, 'Threaded', :value => 'normal' %>
+          <%= p.radio_button :thread_mode, 'flat', :checked => @current_user.thread_mode == :flat %>
+          <%= p.label :thread_mode, 'Flat', :value => 'flat' %>
+          <%= p.radio_button :thread_mode, 'hybrid', :checked => @current_user.thread_mode == :hybrid %>
+          <%= p.label :thread_mode, 'Hybrid', :value => 'hybrid' %>
+          <p class="explain">Hybrid view flattens replies like Flat, but keeps them grouped under the original post like Threaded</p>
+      </fieldset>
+      
+      <fieldset>
         <legend>Unread post options</legend>
         <div class="form_element">
           <%= p.check_box :unread_in_test, :checked => @current_user.unread_in_test? %>

@@ -491,6 +491,11 @@ input[type="submit"] { margin-right: 0; }
   .form_element {
     margin-bottom: 1em;
   }
+  
+  p.explain {
+    margin-top: 0.5em;
+    margin-bottom: 1em;
+  }
 
   fieldset {
     border: 1px solid $border_light;
@@ -500,6 +505,11 @@ input[type="submit"] { margin-right: 0; }
     padding-top: 0.5em;
     .form_element { margin-bottom: 0.75em; }
     legend { color: $text_light; }
+  }
+  
+  input[type=radio] {
+    margin-left: 2em;
+    &:first-child { margin-left: 0; }
   }
   
   input[type=text], textarea {
