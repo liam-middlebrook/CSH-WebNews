@@ -11,12 +11,12 @@ window.draft_save_timer = false
 jQuery.fn.outerHTML = ->
   $('<div>').append(this.eq(0).clone()).html()
 
-@set_check_timeout = (retry = false) ->
+@set_check_timeout = (delay = check_new_interval) ->
   window.check_new_timeout = setTimeout (->
     window.active_check_new = $.getScript '/check_new?location=' + encodeURIComponent(location.hash) +
       '&newsgroup=' + encodeURIComponent($('#groups_list .selected').attr('data-name')) +
       '&number=' + encodeURIComponent($('#posts_list .selected').attr('data-number'))
-  ), (if retry then check_new_retry_interval else check_new_interval)
+  ), delay
 
 @clear_check_timeout = ->
   clearTimeout(window.check_new_timeout)
@@ -26,10 +26,10 @@ jQuery.fn.outerHTML = ->
     window.active_check_new.abort()
     window.active_check_new = false
 
-@reset_check_timeout = ->
+@reset_check_timeout = (delay = check_new_interval) ->
   clear_check_timeout()
   abort_active_check()
-  set_check_timeout()
+  set_check_timeout(delay)
 
 @abort_active_scroll = ->
   if window.active_scroll_load
@@ -198,6 +198,6 @@ $(document).ajaxError (event, jqxhr, settings, exception) ->
     if settings.url.match 'check_new'
       $('body').append(chunks.ajax_error.clone()) if $('#ajax_error').length == 0
       window.active_check_new = false
-      set_check_timeout(true)
+      set_check_timeout(check_new_retry_interval)
     else
       alert("An error occurred requesting #{settings.url}\n\nThis might be due to a connection issue on your end, or it might indicate a bug in WebNews. Check your connection and refresh the page. If this error persists, please file a bug report with the steps needed to reproduce it.")
