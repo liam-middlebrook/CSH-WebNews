@@ -59,7 +59,7 @@ class ApplicationController < ActionController::Base
     end
     
     def get_next_unread_post
-      if @post
+      if @post and @current_user.thread_mode != :flat
         order = "CASE newsgroup WHEN #{Post.sanitize(@post.newsgroup.name)} THEN 1 ELSE 2 END,
         CASE thread_id WHEN #{Post.sanitize(@post.thread_id)} THEN 1 ELSE 2 END, newsgroup, date"
       elsif @newsgroup
