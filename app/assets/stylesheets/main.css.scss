@@ -157,12 +157,13 @@ input[type="submit"] { margin-right: 0; }
   position: absolute;
   top: 40px;
   left: 0;
-  bottom: 0;
+  bottom: 40px;
   width: 230px;
   margin-top: 2px;
+  margin-right: 2px;
   padding: 10px;
-  border-right: 2px solid $border_pane;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
   white-space: nowrap;
   
   a {
@@ -180,18 +181,17 @@ input[type="submit"] { margin-right: 0; }
 }
 
 #external_links {
-  z-index: 1;
   position: absolute;
   left: 0;
   bottom: 0;
   width: 250px;
+  height: 40px;
   margin-right: 2px;
   color: $text_light;
   background-color: $bg_toolbar;
   border-top: 1px solid $border_button;
   text-align: center;
-  line-height: 1.5;
-  padding-bottom: 0.25em;
+  line-height: 19px;
   
   a {
     color: $text_normal;
@@ -254,7 +254,7 @@ input[type="submit"] { margin-right: 0; }
   right: 0;
   bottom: 50%;
   margin-top: 2px;
-  margin-left: 2px;
+  border-left: 2px solid $border_pane;
   border-bottom: 2px solid $border_pane;
   
   &>.spinner {
@@ -353,8 +353,7 @@ input[type="submit"] { margin-right: 0; }
   left: 250px;
   right: 0;
   bottom: 0;
-  margin-top: 1px;
-  margin-left: 2px;
+  border-left: 2px solid $border_pane;
   
   .buttons {
     z-index: 1;
@@ -372,6 +371,9 @@ input[type="submit"] { margin-right: 0; }
     left: 0;
     right: 0;
     bottom: 0;
+    /* Needed because Chrome bumps the top of the scrollbar
+       up by one pixel, overlapping the border... why? */
+    margin-top: 1px;
   }
   
   .info {
