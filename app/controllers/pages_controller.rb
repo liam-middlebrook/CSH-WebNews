@@ -22,9 +22,11 @@ class PagesController < ApplicationController
   end
   
   def about
+    render 'shared/dialog'
   end
   
   def new_user
+    render 'shared/dialog'
   end
   
   def check_new

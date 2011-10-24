@@ -1,5 +1,6 @@
 class UsersController < ApplicationController
   def edit
+    render 'shared/dialog'
   end
   
   def update

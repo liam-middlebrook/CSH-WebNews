@@ -100,6 +100,7 @@ class PostsController < ApplicationController
   end
   
   def search_entry
+    render 'shared/dialog'
   end
   
   def show
@@ -118,6 +119,7 @@ class PostsController < ApplicationController
       @new_post.subject = 'Re: ' + @post.subject.sub(/^Re: ?/, '')
       @new_post.body = @post.quoted_body
     end
+    render 'shared/dialog'
   end
   
   def create
@@ -200,6 +202,7 @@ class PostsController < ApplicationController
   end
   
   def destroy_confirm
+    render 'shared/dialog'
   end
   
   private
