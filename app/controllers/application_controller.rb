@@ -42,8 +42,19 @@ class ApplicationController < ActionController::Base
       end
     end
     
-    def get_newsgroups
+    def get_newsgroups_for_nav
+      @newsgroups = Newsgroup.all
+      @newsgroups_writable = @newsgroups.select{ |n| n.posting_allowed? }
+      @newsgroups_readonly = @newsgroups.select{ |n| not n.posting_allowed? and not n.is_control? }
+      @newsgroups_control = @newsgroups.select{ |n| n.is_control? }
+    end
+    
+    def get_newsgroups_for_search
       @newsgroups = Newsgroup.unscoped.order('status DESC, name')
+    end
+    
+    def get_newsgroups_for_posting
+      @newsgroups = Newsgroup.where_posting_allowed
     end
     
     def get_newsgroup

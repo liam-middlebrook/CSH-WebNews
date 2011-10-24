@@ -5,6 +5,10 @@ class Newsgroup < ActiveRecord::Base
   default_scope :order => 'name'
   scope :where_posting_allowed, where(:status => 'y')
   
+  def is_control?
+    true if name[/^control\./]
+  end
+  
   def posting_allowed?
     status == 'y'
   end

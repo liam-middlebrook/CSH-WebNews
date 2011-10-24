@@ -1,5 +1,5 @@
 class PagesController < ApplicationController
-  before_filter :get_newsgroups, :only => [:home, :check_new]
+  before_filter :get_newsgroups_for_nav, :only => [:home, :check_new]
   before_filter :get_newsgroup, :only => :check_new
   before_filter :get_post, :only => :check_new
 

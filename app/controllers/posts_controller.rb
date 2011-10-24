@@ -1,7 +1,7 @@
 class PostsController < ApplicationController
   before_filter :get_newsgroup, :only => [:index, :search, :search_entry, :show, :new]
   before_filter :get_post, :only => [:show, :new, :destroy, :destroy_confirm]
-  before_filter :get_newsgroups, :only => :search_entry
+  before_filter :get_newsgroups_for_search, :only => :search_entry
   before_filter :get_newsgroups_for_posting, :only => [:new, :create]
   before_filter :set_list_layout_and_offset, :only => [:index, :search]
 
@@ -203,10 +203,6 @@ class PostsController < ApplicationController
   end
   
   private
-    
-    def get_newsgroups_for_posting
-      @newsgroups = Newsgroup.where_posting_allowed
-    end
     
     def set_list_layout_and_offset
       if params[:from_older] or params[:from_newer]
