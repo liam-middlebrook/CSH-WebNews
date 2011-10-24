@@ -11,6 +11,9 @@ window.draft_save_timer = false
 jQuery.fn.outerHTML = ->
   $('<div>').append(this.eq(0).clone()).html()
 
+@target_external_links = ->
+  $('a[href^="http"]:not([href*="' + window.location.host + '"])').attr('target', '_blank')
+
 @set_check_timeout = (delay = check_new_interval) ->
   window.check_new_timeout = setTimeout (->
     window.active_check_new = $.getScript '/check_new?location=' + encodeURIComponent(location.hash) +
@@ -86,6 +89,7 @@ $(document).ready ->
   chunks.ajax_error = $('#loader #ajax_error').clone()
   $('#loader').remove()
   
+  target_external_links()
   $('a.resume_draft').hide() if not localStorage['draft_form']
   
   if $('#new_user').length > 0
@@ -192,6 +196,9 @@ $(window).resize ->
 
 $('a, input').live 'mousedown', -> this.style.outlineStyle = 'none'
 $('a, input').live 'blur', -> this.style.outlineStyle = ''
+
+$(document).ajaxComplete ->
+  target_external_links()
 
 $(document).ajaxError (event, jqxhr, settings, exception) ->
   if jqxhr.readyState != 0

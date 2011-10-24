@@ -17,10 +17,6 @@ class User < ActiveRecord::Base
     preferences[:thread_mode].andand.to_sym || :normal
   end
   
-  def open_links_in_new?
-    preferences[:open_links_in_new] ? (preferences[:open_links_in_new] == '1') : true
-  end
-  
   def unread_in_test?
     (preferences[:unread_in_test] == '1') || false
   end

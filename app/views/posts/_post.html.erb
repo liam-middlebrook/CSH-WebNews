@@ -13,12 +13,7 @@ post.body.each_line do |line|
   html_body += line + "\n"
 end
 
-if @current_user.open_links_in_new?
-  html_body = auto_link(html_body, :link => :urls, :sanitize => false, :html => {:target => '_blank'})
-  html_body.gsub!(/(<a href="https?:\/\/#{Regexp.escape(request.host)}.*?") target="_blank"/, '\\1')
-else
-  html_body = auto_link(html_body, :link => :urls, :sanitize => false)
-end
+html_body = auto_link(html_body, :link => :urls, :sanitize => false)
 
 other_groups = []
 if post.is_crossposted?
@@ -50,9 +45,9 @@ end
         <%= post.author_name %>
         <% if post.author_is_local? %>
           <%= ' (' + post.author_username + ')' %>
-          <a target="_blank" href="<%= PROFILES_URL + post.author_username %>"
+          <a href="<%= PROFILES_URL + post.author_username %>"
             title="Go to this user's profile page">Profile</a>
-          <a target="_blank" href="<%= WIKI_URL + post.author_username.capitalize %>"
+          <a href="<%= WIKI_URL + post.author_username.capitalize %>"
             title="Go to this user's wiki page">Wiki</a>
         <% else %>
           <%= ' <' + post.author_email + '>' if post.author_email %>

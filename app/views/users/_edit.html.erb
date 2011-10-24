@@ -4,11 +4,6 @@
       :url => update_user_path, :html => { :method => 'put'}, :remote => true do |f| %>
     
     <%= f.fields_for :preferences do |p| %>
-      <div class="form_element">
-        <%= p.check_box :open_links_in_new, :checked => @current_user.open_links_in_new? %>
-        <%= p.label :open_links_in_new, 'Open external links from posts in a new window/tab' %>
-      </div>
-      
       <fieldset>
         <legend>Newsgroup view</legend>
         <div class="form_element">
@@ -44,7 +39,7 @@
       </div>
     <% end %>
     
-    <p>Your &quot;real name&quot; is taken from the Common Name (CN) field in the CSH LDAP database. You can change this field using <a target="_blank" href="<%= PROFILES_URL + @current_user.username %>">Member Profiles</a>. This may also change your displayed &quot;real name&quot; on other CSH services.</p>
+    <p>Your &quot;real name&quot; is taken from the Common Name (CN) field in the CSH LDAP database. You can change this field using <a href="<%= PROFILES_URL + @current_user.username %>">Member Profiles</a>. This may also change your displayed &quot;real name&quot; on other CSH services.</p>
     
     <div class="buttons">
       <%= f.submit 'Save', :class => 'button green' %>
