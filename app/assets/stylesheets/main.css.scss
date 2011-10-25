@@ -166,6 +166,11 @@ input[type="submit"] { margin-right: 0; }
   overflow-y: auto;
   white-space: nowrap;
   
+  nav {
+    /* Why is this needed to make things line up? */
+    margin-top: -3px;
+  }
+  
   ul {
     padding-bottom: 3px;
     border-bottom: 1px solid $border_light;
@@ -279,12 +284,12 @@ input[type="submit"] { margin-right: 0; }
   }
   
   #group_header {
-    padding: 10px;
+    padding: 10px 0 0 10px;
   }
   
   .buttons {
     float: right;
-    margin-top: 15px;
+    margin-top: 14px;
     margin-right: 20px;
     
     .new_posts {
@@ -298,7 +303,7 @@ input[type="submit"] { margin-right: 0; }
   
   #posts_list {
     position: absolute;
-    top: 4em;
+    top: 52px;
     left: 0;
     right: 0;
     bottom: 0;
