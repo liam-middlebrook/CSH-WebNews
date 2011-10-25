@@ -29,8 +29,13 @@ class PagesController < ApplicationController
     render 'shared/dialog'
   end
   
+  def old_user
+    render 'shared/dialog'
+  end
+  
   def check_new
     sync_posts
+    clean_old_unread
     if params[:location] == '#!/home'
       @dashboard_active = true
       get_activity_feed
@@ -73,6 +78,16 @@ class PagesController < ApplicationController
           (!thread.followup_newsgroup and
             thread.in_all_newsgroups.length > 1 and
             thread != thread.in_all_newsgroups[0])
+      end
+    end
+    
+    def clean_old_unread
+      if not File.exists?('tmp/lastclean.txt') or
+          File.mtime('tmp/lastclean.txt') < 1.day.ago
+        FileUtils.touch('tmp/lastclean.txt')
+        User.inactive.each do |user|
+          UnreadPostEntry.where(:user_id => user.id).delete_all
+        end
       end
     end
     

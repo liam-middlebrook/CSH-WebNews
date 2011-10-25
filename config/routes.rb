@@ -3,6 +3,7 @@ Webnews::Application.routes.draw do
   get '/home', :to => 'pages#home'
   get '/about', :to => 'pages#about'
   get '/new_user', :to => 'pages#new_user'
+  get '/old_user', :to => 'pages#old_user'
   get '/check_new', :to => 'pages#check_new'
   get '/mark_read', :to => 'pages#mark_read'
   

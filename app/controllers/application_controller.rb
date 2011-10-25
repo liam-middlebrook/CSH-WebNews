@@ -38,6 +38,7 @@ class ApplicationController < ActionController::Base
         )
         @new_user = true
       else
+        @old_user = true if @current_user.is_inactive?
         @current_user.touch
       end
     end

@@ -5,6 +5,13 @@ class User < ActiveRecord::Base
   serialize :preferences, Hash
   attr_readonly :username, :real_name
   
+  scope :active, where('updated_at >= ?', 3.months.ago)
+  scope :inactive, where('updated_at < ?', 3.months.ago)
+  
+  def is_inactive?
+    updated_at < 3.months.ago
+  end
+  
   def email
     username + LOCAL_EMAIL_DOMAIN
   end

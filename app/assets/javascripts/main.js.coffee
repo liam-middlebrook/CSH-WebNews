@@ -92,9 +92,9 @@ $(document).ready ->
   target_external_links()
   $('a.resume_draft').hide() if not localStorage['draft_form']
   
-  if $('#new_user').length > 0
+  if $('#startup_msg').length > 0
     $('body').append(chunks.overlay.clone())
-    $.getScript '/new_user'
+    $.getScript $('#startup_msg').attr('data-action')
   
   if location.hash == '' or location.hash.substring(0, 3) != '#!/'
     location.hash = '#!/home'

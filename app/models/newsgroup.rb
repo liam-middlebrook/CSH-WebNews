@@ -53,7 +53,7 @@ class Newsgroup < ActiveRecord::Base
       body = nntp.body(number)[1].join("\n")
       post = Post.import!(newsgroup, number, head, body)
       if not full_reload
-        User.find_each do |user|
+        User.active.each do |user|
           if not post.authored_by?(user) and user.unread_in_group?(newsgroup)
             UnreadPostEntry.create!(:user => user, :newsgroup => newsgroup, :post => post,
               :personal_level => PERSONAL_CODES[post.personal_class_for_user(user)])
