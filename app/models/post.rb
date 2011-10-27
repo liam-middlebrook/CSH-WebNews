@@ -321,7 +321,7 @@ class Post < ActiveRecord::Base
       end
       line = ' ' + line if line[/^ /]
       if line.length > 78
-        line.gsub(/(.{1,#{72 - quotes.length}})(\s+|$)/, "#{quotes}\\1 \n").rstrip
+        line.gsub(/(.{1,#{72 - quotes.length}}|[^\s]+)(\s+|$)/, "#{quotes}\\1 \n").rstrip
       else
         quotes + line
       end
