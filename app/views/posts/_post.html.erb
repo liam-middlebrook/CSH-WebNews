@@ -76,7 +76,7 @@ end
       <div class="notice">
         <span class="icon">!</span>
         <% if not post.is_crossposted? %>
-          The author specified that replies to this post should go to <%= post.followup_newsgroup.name %>.
+          The author specified that replies to this message should go to <%= post.followup_newsgroup.name %>.
         <% else %>
           This message was cross-posted to <%= raw other_groups.to_sentence %>.
           <% if not post.followup_newsgroup %>
@@ -93,6 +93,12 @@ end
             %>"><%= post.followup_newsgroup.name %></a>.
           <% end %>
         <% end %>
+      </div>
+    <% end %>
+    <% if post.stripped %>
+      <div class="notice">
+        <span class="icon">!</span>
+        WebNews stripped one or more attachments from this message.
       </div>
     <% end %>
   </div>

@@ -23,6 +23,28 @@ class Newsgroup < ActiveRecord::Base
     return { :count => count, :hclass => hclass }
   end
   
+  def self.reimport!(post)
+    sleep 0.1 until not File.exists?('tmp/syncing.txt')
+    FileUtils.touch('tmp/syncing.txt')
+    
+    begin
+      head = body = nil
+      Net::NNTP.start(NEWS_SERVER) do |nntp|
+        nntp.group(post.newsgroup.name)
+        head = nntp.head(post.number)[1].join("\n")
+        body = nntp.body(post.number)[1].join("\n")
+      end
+      entries = post.unread_post_entries
+      post.delete # Shhh, don't run the destroy handlers
+      new_post = Post.import!(post.newsgroup, post.number, head, body)
+      entries.each do |entry|
+        entry.update_attributes(:post => new_post)
+      end
+    ensure
+      FileUtils.rm('tmp/syncing.txt')
+    end
+  end
+  
   def self.sync_group!(nntp, name, status, standalone = true, full_reload = false)
     if standalone
       sleep 0.1 until not File.exists?('tmp/syncing.txt')

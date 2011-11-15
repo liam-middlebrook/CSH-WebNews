@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20111004143929) do
+ActiveRecord::Schema.define(:version => 20111115010321) do
 
   create_table "newsgroups", :force => true do |t|
     t.string "name"
@@ -27,6 +27,7 @@ ActiveRecord::Schema.define(:version => 20111004143929) do
     t.string   "message_id"
     t.string   "parent_id"
     t.string   "thread_id"
+    t.boolean  "stripped"
     t.string   "first_line"
     t.text     "headers"
     t.text     "body"

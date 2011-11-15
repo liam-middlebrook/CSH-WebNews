@@ -180,25 +180,20 @@ class Post < ActiveRecord::Base
   end
   
   def self.import!(newsgroup, number, headers, body)
-    attachments_stripped = false
+    stripped = false
     headers.gsub!(/\n( |\t)/, ' ')
     headers.encode!('US-ASCII', :invalid => :replace, :undef => :replace)
   
-    if headers[/^Content-Type: multipart/i]
-      boundary = Regexp.escape(headers[/^Content-Type:.*boundary ?= ?"?([^"]+?)"?(;|$)/i, 1])
-      match = /.*?#{boundary}\n(.*?)\n\n(.*?)\n(--)?#{boundary}/m.match(body)
-      headers += "\n--- Message part headers follow ---\n" + match[1].gsub(/\n( |\t)/, ' ')
-      body = match[2]
-      attachments_stripped = true if headers[/^Content-Type:.*mixed/i]
-    end
+    part_headers, body = multipart_decode(headers, body)
+    stripped = true if headers[/^Content-Type:.*mixed/i]
     
-    body = body.unpack('M')[0] if headers[/^Content-Transfer-Encoding: quoted-printable/i]
+    body = body.unpack('M')[0] if part_headers[/^Content-Transfer-Encoding: quoted-printable/i]
     
-    if headers[/^Content-Type:.*(X-|unknown)/i]
+    if part_headers[/^Content-Type:.*(X-|unknown)/i]
       body.encode!('UTF-8', 'US-ASCII', :invalid => :replace, :undef => :replace)
-    elsif headers[/^Content-Type:.*charset/i]
+    elsif part_headers[/^Content-Type:.*charset/i]
       begin
-        body.encode!('UTF-8', headers[/^Content-Type:.*charset="?([^"]+?)"?(;|$)/i, 1],
+        body.encode!('UTF-8', part_headers[/^Content-Type:.*charset="?([^"]+?)"?(;|$)/i, 1],
           :invalid => :replace, :undef => :replace)
       rescue
         body.encode!('UTF-8', 'US-ASCII', :invalid => :replace, :undef => :replace)
@@ -218,13 +213,12 @@ class Post < ActiveRecord::Base
     if body[/^begin(-base64)? \d{3} /]
       body.gsub!(/^begin \d{3} .*?\nend\n/m, '')
       body.gsub!(/^begin-base64 \d{3} .*?\n====\n/m, '')
-      attachments_stripped = true
+      stripped = true
     end
     
-    body = flowed_decode(body) if headers[/^Content-Type:.*format="?flowed"?/i]
+    body = flowed_decode(body) if part_headers[/^Content-Type:.*format="?flowed"?/i]
     
     body.rstrip!
-    body += "\n\n--- Attachments stripped by WebNews ---" if attachments_stripped
     
     date = Time.parse(headers[/^Date: (.*)/i, 1])
     author = headers[/^From: (.*)/i, 1]
@@ -284,6 +278,7 @@ class Post < ActiveRecord::Base
             :message_id => message_id,
             :parent_id => parent_id,
             :thread_id => thread_id,
+            :stripped => stripped,
             :first_line => first_line,
             :headers => headers,
             :body => body)
@@ -326,5 +321,17 @@ class Post < ActiveRecord::Base
         quotes + line
       end
     end.join("\n")
+  end
+  
+  def self.multipart_decode(headers, body)
+    if headers[/^Content-Type: multipart/i]
+      boundary = Regexp.escape(headers[/^Content-Type:.*boundary ?= ?"?([^"]+?)"?(;|$)/i, 1])
+      match = /.*?#{boundary}\n(.*?)\n\n(.*?)\n(--)?#{boundary}/m.match(body)
+      part_headers = match[1].gsub(/\n( |\t)/, ' ')
+      part_body = match[2]
+      return multipart_decode(part_headers, part_body)
+    else
+      return headers, body
+    end
   end
 end
