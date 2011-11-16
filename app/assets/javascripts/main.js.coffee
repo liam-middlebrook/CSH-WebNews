@@ -50,7 +50,7 @@ jQuery.fn.outerHTML = ->
   clearInterval(window.draft_save_timer)
 
 # Returns number of rows shown or hidden by the expand/collapse
-@toggle_thread_expand = (tr) ->
+@toggle_thread_expand = (tr, check_selected = false) ->
   rows_changed = 0
   if tr.find('.expandable').length > 0
     tr.find('.expandable').removeClass('expandable').addClass('expanded')
@@ -59,7 +59,7 @@ jQuery.fn.outerHTML = ->
       $(child).show()
       $(child).find('.expandable').removeClass('expandable').addClass('expanded')
       rows_changed += 1
-  else if tr.find('.expanded').length > 0 and tr.hasClass('selected')
+  else if tr.find('.expanded').length > 0 and (tr.hasClass('selected') or not check_selected)
     tr.find('.expanded').removeClass('expanded').addClass('expandable')
     for child in tr.nextUntil('[data-level=' + tr.attr('data-level') + ']')
       break if parseInt($(child).attr('data-level')) < parseInt(tr.attr('data-level'))
@@ -174,6 +174,10 @@ $('a.new_posts').live 'click', ->
   $('#groups_list [data-loaded]').removeAttr('data-loaded')
   window.onhashchange()
 
+$('#posts_list .expander').live 'click', (e) ->
+  toggle_thread_expand($(this).closest('tr'))
+  e.stopImmediatePropagation()
+
 $('#posts_list tbody tr').live 'click', ->
   tr = $(this)
   
@@ -184,7 +188,7 @@ $('#posts_list tbody tr').live 'click', ->
     else
       location.hash = href
   
-  toggle_thread_expand(tr)
+  toggle_thread_expand(tr, true)
   
   $('#posts_list .selected').removeClass('selected')
   tr.addClass('selected')

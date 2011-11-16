@@ -350,11 +350,16 @@ input[type="submit"] { margin-right: 0; }
       .indent {
         @include ellipsis;
         padding-left: 20px;
+      }
+      
+      .expander {
+        width: 16px;
+        display: inline-block;
         background-repeat: no-repeat;
         background-position: left center;
-        
         &.expandable { background-image: url('expander-closed.png'); }
         &.expanded { background-image: url('expander-open.png'); }
+        &.expandable:hover, &.expanded:hover { background-color: $bg_toolbar; }
       }
       
       tr[data-level]:not([data-level="1"]) {
