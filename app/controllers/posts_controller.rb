@@ -123,7 +123,7 @@ class PostsController < ApplicationController
   end
   
   def create
-    @sync_error_text = nil
+    @sync_error = nil
   
     if params[:post][:subject].blank?
       form_error "You must enter a subject line for your post." and return
