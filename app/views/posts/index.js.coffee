@@ -30,7 +30,7 @@ if <%= @showing ? 'true' : 'false' %> or <%= @search_mode ? 'true' : 'false' %> 
   $('#posts_list tbody .expanded').removeClass('expanded').addClass('expandable')
   $('#posts_list tbody tr[data-level!="1"]').hide()
   for unread in $('#posts_list tbody .unread[data-level!="1"]')
-    toggle_thread_expand $($(unread).prevAll('[data-level="1"]')[0])
+    expand_thread $($(unread).prevAll('[data-level="1"]')[0])
   
   $('#posts_list').scroll ->
     if not window.active_scroll_load
@@ -74,7 +74,7 @@ from_tr = $('#posts_list tr[data-date="<%= @from_older %>"]').nextAll('[data-lev
 from_tr.nextAll().andSelf().find('.expanded').removeClass('expanded').addClass('expandable')
 from_tr.nextAll('[data-level!="1"]').hide()
 for unread in from_tr.nextAll('.unread[data-level!="1"]')
-  toggle_thread_expand $($(unread).prevAll('[data-level="1"]')[0])
+  expand_thread $($(unread).prevAll('[data-level="1"]')[0])
 <% end %>
 
 <% if @posts_newer %>
@@ -87,7 +87,7 @@ from_tr.prevAll('[data-level!="1"]').hide()
 from_tr.nextUntil('[data-level="1"]').hide()
 extra_rows = 0
 for unread in from_tr.nextAll('[data-level="1"]').first().prevAll('.unread[data-level!="1"]')
-  extra_rows += toggle_thread_expand $($(unread).prevAll('[data-level="1"]')[0])
+  extra_rows += expand_thread $($(unread).prevAll('[data-level="1"]')[0])
 $('#posts_list').scrollTop(
   $('#posts_list').scrollTop() + (tr_height * (<%= @posts_newer.length %> + extra_rows))
 )

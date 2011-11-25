@@ -49,24 +49,37 @@ jQuery.fn.outerHTML = ->
 @clear_draft_interval = ->
   clearInterval(window.draft_save_timer)
 
-# Returns number of rows shown or hidden by the expand/collapse
+# Calls expand_thread or collapse_thread depending on the current state
 @toggle_thread_expand = (tr, check_selected = false) ->
-  rows_changed = 0
   if tr.find('.expandable').length > 0
-    tr.find('.expandable').removeClass('expandable').addClass('expanded')
-    for child in tr.nextUntil('[data-level=' + tr.attr('data-level') + ']')
-      break if parseInt($(child).attr('data-level')) < parseInt(tr.attr('data-level'))
-      $(child).show()
-      $(child).find('.expandable').removeClass('expandable').addClass('expanded')
-      rows_changed += 1
+    return expand_thread(tr)
   else if tr.find('.expanded').length > 0 and (tr.hasClass('selected') or not check_selected)
-    tr.find('.expanded').removeClass('expanded').addClass('expandable')
-    for child in tr.nextUntil('[data-level=' + tr.attr('data-level') + ']')
-      break if parseInt($(child).attr('data-level')) < parseInt(tr.attr('data-level'))
-      $(child).hide()
-      $(child).find('.expanded').removeClass('expanded').addClass('expandable')
+    return collapse_thread(tr)
+
+# Returns number of rows shown
+@expand_thread = (tr) ->
+  rows_changed = 0
+  tr.find('.expandable').removeClass('expandable').addClass('expanded')
+  for child in tr.nextUntil('[data-level=' + tr.attr('data-level') + ']')
+    break if parseInt($(child).attr('data-level')) < parseInt(tr.attr('data-level'))
+    if $(child).is(':hidden')
+      $(child).show()
       rows_changed += 1
+    $(child).find('.expandable').removeClass('expandable').addClass('expanded')
   return rows_changed
+
+# Returns number of rows hidden
+@collapse_thread = (tr) ->
+  rows_changed = 0
+  tr.find('.expanded').removeClass('expanded').addClass('expandable')
+  for child in tr.nextUntil('[data-level=' + tr.attr('data-level') + ']')
+    break if parseInt($(child).attr('data-level')) < parseInt(tr.attr('data-level'))
+    if $(child).is(':visible')
+      $(child).hide()
+      rows_changed += 1
+    $(child).find('.expanded').removeClass('expanded').addClass('expandable')
+  return rows_changed
+
 
 window.onhashchange = ->
   if location.hash.substring(0, 3) == '#!/'
