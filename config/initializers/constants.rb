@@ -1,5 +1,5 @@
 NEWS_SERVER = 'news.csh.rit.edu'
-PROFILES_URL = 'https://members.csh.rit.edu/profiles/member/'
+PROFILES_URL = 'https://members.csh.rit.edu/profiles/members/'
 WIKI_URL = 'https://wiki.csh.rit.edu/wiki/User:'
 LOCAL_EMAIL_DOMAIN = '@csh.rit.edu'
 
