@@ -105,6 +105,14 @@ window.onhashchange = ->
       $('#post_view').empty()
       $('#groups_list .selected').removeClass('selected')
       $('#groups_list [data-name="' + new_location + '"]').addClass('selected')
+      if new_location == 'home'
+        $('#group_view').css('bottom', '0')
+        $('#group_view').css('border-bottom', '0')
+        $('#post_view').css('top', '100%')
+      else
+        $('#group_view').css('bottom', '')
+        $('#group_view').css('border-bottom', '')
+        $('#post_view').css('top', '')
 
 $(document).ready ->
   chunks.spinner = $('#loader .spinner').clone()
