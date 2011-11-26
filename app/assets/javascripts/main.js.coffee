@@ -146,15 +146,15 @@ $('a.mark_read').live 'click', ->
   after_func = null
   if location.hash.match '#!/home'
     document.title = 'CSH WebNews'
-    $('#unread_line').text('You have no unread posts.')
-    $('table.activity a').removeClass('unread')
+    $('#unread_line').text('All posts marked read. Reloading activity feeds...')
+    $('#activity_feeds').remove()
+    window.onhashchange()
   else
     abort_active_scroll()
     after_func = -> $('#posts_list').scroll()
     $('#posts_list tbody tr').removeClass('unread')
   
   $.getScript @href.replace('#~', ''), after_func
-  set_check_timeout()
   return false
 
 $('a.minimize_draft').live 'click', ->

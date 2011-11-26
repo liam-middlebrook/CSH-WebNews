@@ -1,14 +1,42 @@
+<% parent = thread[:parent] %>
 <tr>
-  <td class="subject">
-    <a class="<%= post.personal_class_for_user(@current_user) %><%= unread ? ' unread' : '' %>"
-      href="#!<%= post_path(post.newsgroup.name, post.number) %>"><%= post.subject %></a>
+  <td class="date">
+    <%= thread[:date].in_time_zone(@current_user.time_zone).strftime(SHORT_DATE_FORMAT) %>
   </td>
-  <td><%= post.author_name %></td>
-  <td>
-    <% if post.is_crossposted?(true) %>
-      (multiple)
-    <% else %>
-      <a href="#!<%= posts_path(post.newsgroup.name) %>"><%= post.newsgroup.name %></a></td>
-    <% end %>
-  <td><%= date.in_time_zone(@current_user.time_zone).strftime(DATE_FORMAT) %></td>
+  <td class="thread">
+    <div class="subject">
+      <a class="<%= parent.personal_class_for_user(@current_user) %><%= unread ? ' unread' : '' %>"
+        href="#!<%= post_path(parent.newsgroup.name, parent.number) %>"><%= parent.subject %></a>
+    </div>
+    <div class="details">
+      <% if thread[:posts] == 1 and thread[:parent] == thread[:oldest] %>
+        Thread started
+      <% else %>
+        <% if unread %>
+          <a href="#!<%= post_path(thread[:oldest].newsgroup.name, thread[:oldest].number) %>">
+            <%= pluralize(thread[:posts], 'new post') %>
+          </a>
+        <% else %>
+          <%= pluralize(thread[:posts], 'post') %>
+        <% end %>
+      <% end %>
+      
+      by <%= thread[:authors].first %>
+      <% if thread[:authors].size > 1 %>
+        and
+        <% if thread[:authors].size == 2 %>
+          <%= thread[:authors].last %>
+        <% else %>
+          <%= pluralize(thread[:authors].size - 1, 'other') %>
+        <% end %>
+      <% end %>
+      
+      in
+      <% if parent.is_crossposted?(true) %>
+        multiple newsgroups
+      <% else %>
+        <a href="#!<%= posts_path(parent.newsgroup.name) %>"><%= parent.newsgroup.name %></a>
+      <% end %>
+    </div>
+  </td>
 </tr>
