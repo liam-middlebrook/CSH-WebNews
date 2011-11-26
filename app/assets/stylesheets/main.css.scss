@@ -463,6 +463,18 @@ input[type="submit"] { margin-right: 0; }
     blockquote                       { color: #077; }
     blockquote blockquote            { color: #770; }
     blockquote blockquote blockquote { color: #707; }
+    
+    .showquote {
+      font-size: 80%;
+      font-family: sans-serif;
+      font-weight: bold;
+      color: #fff;
+      background-color: $border_button;
+      text-decoration: none;
+      padding: 2px 16px;
+      border-radius: 2px;
+      &:hover { color: #fff; opacity: 0.7; }
+    }
   }
 }
 

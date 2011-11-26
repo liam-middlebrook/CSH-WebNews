@@ -21,8 +21,11 @@ class Post < ActiveRecord::Base
   
   def quoted_body
     author_name + " wrote:\n\n" +
-      body.chomp.sub(/(.*)\n-- \n.*/m, '\\1').
-        split("\n").map{ |line| '>' + line }.join("\n") + "\n\n"
+      sigless_body.split("\n").map{ |line| '>' + line }.join("\n") + "\n\n"
+  end
+  
+  def sigless_body
+    body.chomp.sub(/(.*)\n-- \n.*/m, '\\1')
   end
   
   def is_crossposted?(quick = false)

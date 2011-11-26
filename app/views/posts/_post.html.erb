@@ -1,19 +1,5 @@
 <%
-html_body = ''
-quote_depth = 0
-post.body.each_line do |line|
-  depth_change = (line[/^>[> ]*/] || '').gsub(/\s/, '').length - quote_depth
-  line = html_escape(line.chomp)
-  if depth_change > 0
-    line = ('<blockquote>' * depth_change) + line
-  elsif depth_change < 0
-    line = ('</blockquote>' * depth_change.abs) + line
-  end
-  quote_depth += depth_change
-  html_body += line + "\n"
-end
-
-html_body = auto_link(html_body, :link => :urls, :sanitize => false)
+html_body = post_html_body(post)
 
 other_groups = []
 if post.is_crossposted?

@@ -63,5 +63,6 @@ group_li.addClass('selected') if selected
 
 $('#next_unread').attr('href', '<%= next_unread_href %>')
 $(window).resize()
+$('#post_view .fullquote').hide()
 
 <% end %>
