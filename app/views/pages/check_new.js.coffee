@@ -1,14 +1,11 @@
 $('#ajax_error').remove()
 
 selected = $('#groups_list .selected').attr('data-name')
-loaded = $('#groups_list [data-loaded]').attr('data-name')
-
 $('#groups_list nav').html('<%= j render('newsgroups/index') %>')
-
 $('#groups_list [data-name="' + selected + '"]').addClass('selected')
-$('#groups_list [data-name="' + loaded + '"]').attr('data-loaded', 'true')
 
-unread_in_loaded = parseInt($('#groups_list [data-name="' + loaded + '"]').attr('data-unread'))
+unread_in_loaded = parseInt(
+  $('#groups_list [data-name="' + window.loaded_location + '"]').attr('data-unread'))
 new_in_loaded = unread_in_loaded - $('#posts_list .unread').length
 if new_in_loaded > 0 and not window.active_scroll_load and $('#posts_load_newer').length == 0
   posts = if new_in_loaded == 1 then 'post' else 'posts'

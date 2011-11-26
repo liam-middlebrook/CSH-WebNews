@@ -7,12 +7,9 @@ $('#next_unread').attr('href', '<%= next_unread_href %>')
 <% end %>
 
 if <%= @showing ? 'true' : 'false' %> or <%= @search_mode ? 'true' : 'false' %> or
-    $('#groups_list li[data-loaded]').attr('data-name') != '<%=
-      @search_mode ? 'this_is_irrelevant' : @newsgroup.name %>'
+    window.loaded_location != '<%= @search_mode ? "dummy_location" : @newsgroup.name %>'
 
-  <% if not @search_mode %>
-  $('#groups_list li[data-name="<%= @newsgroup.name %>"]').attr('data-loaded', 'true')
-  <% end %>
+  set_loaded_location()
   
   $('#group_view').html '<%= j render(
     :partial => "posts_list", :layout => "list_layout", :locals => {

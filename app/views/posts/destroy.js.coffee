@@ -2,6 +2,6 @@
 alert('<%= j @sync_error %>')
 <% end %>
 
-$('#groups_list [data-loaded]').removeAttr('data-loaded')
+clear_loaded_location()
 location.hash = '#!<%= posts_path(@post.newsgroup.name) %>'
 $('#overlay').remove()

@@ -1,8 +1,8 @@
 <% if @not_found %>
 
-$('#post_view').html '<%= j render('not_found') %>'
+$('#post_view').html '<%= j render("not_found") %>'
 document.title = '<%= @newsgroup.name %> \u00bb Post not found!'
-if '<%= @newsgroup.name %>' != $('#groups_list [data-loaded]').attr('data-name')
+if window.loaded_location != '<%= @newsgroup.name %>'
   $.getScript '<%= posts_path(@newsgroup.name) %>?not_found=true'
 else
   $('#posts_list .selected').removeClass('selected')

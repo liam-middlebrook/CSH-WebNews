@@ -2,6 +2,7 @@
 @check_new_interval = 15000
 @check_new_retry_interval = 5000
 @draft_save_interval = 2000
+window.loaded_location = false
 window.active_navigation = false
 window.active_scroll_load = false
 window.active_check_new = false
@@ -13,6 +14,16 @@ jQuery.fn.outerHTML = ->
 
 @target_external_links = ->
   $('a[href^="http"]:not([href*="' + window.location.host + '"])').attr('target', '_blank')
+
+@set_loaded_location = ->
+  window.loaded_location = location.hash.split('/')[1]
+
+@clear_loaded_location = ->
+  window.loaded_location = false
+
+@refresh_loaded_location = ->
+  clear_loaded_location()
+  window.onhashchange()
 
 @set_check_timeout = (delay = check_new_interval) ->
   window.check_new_timeout = setTimeout (->
@@ -86,15 +97,14 @@ window.onhashchange = ->
     window.active_navigation.abort() if window.active_navigation
     window.active_navigation = $.getScript location.hash.replace('#!', '')
     
-    new_group = location.hash.split('/')[1]
-    loaded_group = $('#groups_list [data-loaded]').attr('data-name')
-    if new_group != loaded_group
+    new_location = location.hash.split('/')[1]
+    if new_location != window.loaded_location
       abort_active_scroll()
+      clear_loaded_location()
       $('#group_view').empty().append(chunks.spinner.clone())
       $('#post_view').empty()
-      $('#groups_list [data-loaded]').removeAttr('data-loaded')
       $('#groups_list .selected').removeClass('selected')
-      $('#groups_list [data-name="' + new_group + '"]').addClass('selected')
+      $('#groups_list [data-name="' + new_location + '"]').addClass('selected')
 
 $(document).ready ->
   chunks.spinner = $('#loader .spinner').clone()
@@ -146,7 +156,7 @@ $('a.mark_read').live 'click', ->
   after_func = null
   if location.hash.match '#!/home'
     document.title = 'CSH WebNews'
-    $('#unread_line').text('All posts marked read. Reloading activity feeds...')
+    $('#unread_line').text('Marked all posts read. Reloading activity feed...')
     $('#activity_feeds').remove()
     window.onhashchange()
   else
@@ -184,8 +194,7 @@ $('input[type="submit"]').live 'click', ->
   $('#dialog .errors').text('')
 
 $('a.new_posts').live 'click', ->
-  $('#groups_list [data-loaded]').removeAttr('data-loaded')
-  window.onhashchange()
+  refresh_loaded_location()
 
 $('#posts_list .expander').live 'click', (e) ->
   toggle_thread_expand($(this).closest('tr'))
