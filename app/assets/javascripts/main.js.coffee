@@ -166,7 +166,7 @@ $('a.mark_read').live 'click', ->
     document.title = 'CSH WebNews'
     $('#unread_line').text('Marked all posts read. Reloading activity feed...')
     $('#activity_feeds').remove()
-    window.onhashchange()
+    after_func = -> window.onhashchange()
   else
     abort_active_scroll()
     after_func = -> $('#posts_list').scroll()
