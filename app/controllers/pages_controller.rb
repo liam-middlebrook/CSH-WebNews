@@ -80,12 +80,12 @@ class PagesController < ApplicationController
             :parent => parent,
             :date => post.date,
             :posts => 1,
-            :authors => [parent.author_name],
+            :authors => [maybe_you(parent.author_name)],
             :oldest => post
           }
         else
           threads[i][:posts] += 1
-          threads[i][:authors] |= [post.author_name]
+          threads[i][:authors] |= [maybe_you(post.author_name)]
           if threads[i][:date] < post.date
             threads[i][:date] = post.date
           end
@@ -135,5 +135,9 @@ class PagesController < ApplicationController
     def get_last_sync_time
       @last_sync_time = File.mtime('tmp/lastsync.txt')
       @show_sync_warning = true if @last_sync_time < 2.minutes.ago
+    end
+    
+    def maybe_you(name)
+      name == @current_user.real_name ? 'you' : name
     end
 end
