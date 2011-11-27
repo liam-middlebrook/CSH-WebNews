@@ -17,20 +17,41 @@ module ApplicationHelper
   end
   
   def post_html_body(post)
+    pre_body = post.body.dup
+    parent = post.parent
     html_body = ''
     
-    quote_depth = 0
-    post.body.each_line do |line|
-      depth_change = (line[/^>[> ]*/] || '').gsub(/\s/, '').length - quote_depth
-      line = html_escape(line.chomp)
-      if depth_change > 0
-        line = ('<blockquote>' * depth_change) + line
-      elsif depth_change < 0
-        line = ('</blockquote>' * depth_change.abs) + line
+    # Warning: Even I barely understand this, and I wrote it. --grantovich
+    
+    if parent and @current_user.thread_mode == :normal
+      [parent.body, parent.sigless_body].each do |parent_body|
+        regex = '[> ]*' +
+          Regexp.escape(parent_body.gsub(/[>\s]+/, MARK_STRING)).gsub(MARK_STRING, '[>\s]+')
+        match = pre_body[Regexp.new(regex)]
+        next if match.nil?
+        pre_body.gsub!(
+          Regexp.new('(' + Regexp.escape(match.rstrip) + ')'),
+          "#{MARK_STRING}1\n" + '\\1' + "\n#{MARK_STRING}2"
+        )
+        break if pre_body != post.body
       end
-      quote_depth += depth_change
-      html_body += line + "\n"
     end
+    
+    (1..3).each do |depth|
+      more_quotes = ' ?>' * (depth - 1)
+      pre_body.gsub!(/((\a|\n)(>#{more_quotes}.*(\n|\z))+)/,
+        '\\2' + "#{MARK_STRING}3" + '\\1' + "#{MARK_STRING}4\n")
+    end
+    
+    html_body = html_escape(pre_body)
+    html_body.gsub!("#{MARK_STRING}1\n",
+      '<a href="#" class="showquote"
+        onclick="$(\'#post_view .fullquote\').toggle()">Show quoted text</a>' +
+        "\n" + '<div class="fullquote">'
+    )
+    html_body.gsub!("#{MARK_STRING}2\n", '</div>')
+    html_body.gsub!("#{MARK_STRING}3\n", "<blockquote>")
+    html_body.gsub!("#{MARK_STRING}4\n", "</blockquote>")
     
     html_body = auto_link(html_body, :link => :urls, :sanitize => false)
     
