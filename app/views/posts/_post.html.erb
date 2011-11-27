@@ -33,7 +33,7 @@ end
           <%= ' (' + post.author_username + ')' %>
           <a href="<%= PROFILES_URL + post.author_username %>"
             title="Go to this user's profile page">Profile</a>
-          <a href="<%= WIKI_URL + post.author_username.capitalize %>"
+          <a href="<%= WIKI_USER_URL + post.author_username.capitalize %>"
             title="Go to this user's wiki page">Wiki</a>
         <% else %>
           <%= ' <' + post.author_email + '>' if post.author_email %>
