@@ -24,8 +24,10 @@ class Post < ActiveRecord::Base
       sigless_body.split("\n").map{ |line| '>' + line }.join("\n") + "\n\n"
   end
   
-  def sigless_body
-    body.chomp.sub(/(.*)\n-- \n.*/m, '\\1')
+  def sigless_body(aggressive = false)
+    sb = body.sub(/(.*)\n-- \n.*/m, '\\1')
+    sb = sb.sub(/^[-~<]+.+\n*\z/, '') if aggressive
+    return sb.rstrip
   end
   
   def is_crossposted?(quick = false)
