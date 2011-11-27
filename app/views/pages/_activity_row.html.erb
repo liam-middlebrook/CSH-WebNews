@@ -14,10 +14,10 @@
       <% else %>
         <% if unread %>
           <a href="#!<%= post_path(thread[:oldest].newsgroup.name, thread[:oldest].number) %>">
-            <%= pluralize(thread[:posts], 'new post') %>
+            <%= pluralize(thread[:posts], 'unread post') %>
           </a>
         <% else %>
-          <%= pluralize(thread[:posts], 'post') %>
+          <%= pluralize(thread[:posts], 'recent post') %>
         <% end %>
       <% end %>
       
