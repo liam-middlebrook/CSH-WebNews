@@ -137,6 +137,14 @@ $(document).ready ->
 $('a[href="#"]').live 'click', ->
   return false
 
+$('.toggle').live 'click', ->
+  # Fixing the width is handled in ajaxComplete
+  a = $(this)
+  new_text = a.attr('data-text')
+  a.attr('data-text', a.text())
+  a.text(new_text)
+  $(a.attr('data-selector')).toggle()
+
 $('a.new_draft').live 'click', (e) ->
   if localStorage['draft_form'] and not confirm('Really abandon your saved draft and start a new post?')
     e.stopImmediatePropagation()
@@ -233,6 +241,8 @@ $('a, input').live 'blur', -> this.style.outlineStyle = ''
 
 $(document).ajaxComplete ->
   target_external_links()
+  for a in $('.toggle')
+    $(a).width($(a).width())
 
 $(document).ajaxError (event, jqxhr, settings, exception) ->
   if jqxhr.readyState != 0

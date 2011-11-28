@@ -102,6 +102,7 @@ i { font-style: italic; }
 
 .button, input[type="submit"] {
   display: inline-block;
+  text-align: center;
   line-height: 24px;
   vertical-align: middle;
   padding: 0 6px;
@@ -465,13 +466,15 @@ input[type="submit"] { margin-right: 0; }
     blockquote blockquote blockquote { color: #707; }
     
     .showquote {
+      display: inline-block;
+      text-align: center;
       font-size: 80%;
       font-family: sans-serif;
       font-weight: bold;
       color: #fff;
       background-color: $border_button;
       text-decoration: none;
-      padding: 2px 16px;
+      padding: 2px 24px;
       border-radius: 2px;
       &:hover { color: #fff; opacity: 0.7; }
     }

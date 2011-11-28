@@ -45,9 +45,8 @@ module ApplicationHelper
     
     html_body = html_escape(pre_body)
     html_body.gsub!("#{MARK_STRING}1\n",
-      '<a href="#" class="showquote"
-        onclick="$(\'#post_view .fullquote\').toggle()">Show quoted text</a>' +
-        "\n" + '<div class="fullquote">'
+      '<a href="#" class="showquote toggle" data-selector="#post_view .fullquote"
+        data-text="Hide quoted text">Show quoted text</a>' + "\n" + '<div class="fullquote">'
     )
     html_body.gsub!("#{MARK_STRING}2\n", '</div>')
     html_body.gsub!("#{MARK_STRING}3\n", "<blockquote>")
