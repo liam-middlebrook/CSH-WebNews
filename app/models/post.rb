@@ -134,6 +134,10 @@ class Post < ActiveRecord::Base
     end
   end
   
+  def thread_unread_class_for_user(user)
+    PERSONAL_CLASSES[user.unread_posts.where(:thread_id => thread_id).maximum(:personal_level)]
+  end
+  
   def kill_parent_id
     # Sub-optimal, should re-parent to next reference up the chain
     # (but posts getting canceled when they already have replies is rare)
