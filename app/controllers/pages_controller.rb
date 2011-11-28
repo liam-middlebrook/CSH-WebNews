@@ -80,7 +80,7 @@ class PagesController < ApplicationController
             :parent => parent,
             :date => post.date,
             :posts => 1,
-            :authors => [maybe_you(parent.author_name)],
+            :authors => [maybe_you(post.author_name)],
             :oldest => post
           }
         else
