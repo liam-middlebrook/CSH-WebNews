@@ -48,7 +48,7 @@ module ApplicationHelper
       '<a href="#" class="showquote toggle" data-selector="#post_view .fullquote"
         data-text="Hide quoted text">Show quoted text</a>' + "\n" + '<div class="fullquote">'
     )
-    html_body.gsub!("#{MARK_STRING}2\n", '</div>')
+    html_body.gsub!(/#{MARK_STRING}2(\n|\z)/, '</div>')
     html_body.gsub!("#{MARK_STRING}3\n", "<blockquote>")
     html_body.gsub!("#{MARK_STRING}4\n", "</blockquote>")
     
