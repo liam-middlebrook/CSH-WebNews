@@ -16,14 +16,14 @@ module ApplicationHelper
     end
   end
   
-  def post_html_body(post)
+  def post_html_body(post, quote_collapse = true)
     pre_body = post.body.dup
     parent = post.parent
     html_body = ''
     
     # Warning: Even I barely understand this, and I wrote it. --grantovich
     
-    if parent and @current_user.thread_mode == :normal
+    if quote_collapse and parent and @current_user.thread_mode == :normal
       [parent.body, parent.sigless_body].each do |parent_body|
         regex = '[> ]*' +
           Regexp.escape(parent_body.gsub(/[>\s]+/, MARK_STRING)).gsub(MARK_STRING, '[>\s]+')
@@ -43,6 +43,11 @@ module ApplicationHelper
         '\\2' + "#{MARK_STRING}3" + '\\1' + "#{MARK_STRING}4\n")
     end
     
+    # This structure tends to cause problems when the replacements are done
+    if pre_body[/#{MARK_STRING}3.*#{MARK_STRING}1.*#{MARK_STRING}4/m]
+      return post_html_body(post, false)
+    end
+    
     html_body = html_escape(pre_body)
     html_body.gsub!("#{MARK_STRING}1\n",
       '<a href="#" class="showquote toggle" data-selector="#post_view .fullquote"
@@ -51,6 +56,11 @@ module ApplicationHelper
     html_body.gsub!(/#{MARK_STRING}2(\n|\z)/, '</div>')
     html_body.gsub!("#{MARK_STRING}3\n", "<blockquote>")
     html_body.gsub!("#{MARK_STRING}4\n", "</blockquote>")
+    
+    # Definitely shouldn't have any leftover MARK_STRING at this point
+    if quote_collapse and html_body[MARK_STRING]
+      return post_html_body(post, false)
+    end
     
     html_body = auto_link(html_body, :link => :urls, :sanitize => false)
     
