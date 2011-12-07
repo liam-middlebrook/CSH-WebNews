@@ -184,7 +184,7 @@ class Post < ActiveRecord::Base
     m += "\nContent-Type: text/plain; charset=utf-8; format=flowed"
     m += "\nUser-Agent: CSH-WebNews"
     
-    m += "\n\n#{flowed_encode(p[:body])}"
+    m += "\n\n#{flowed_encode(p[:body].rstrip)}\n"
     return m
   end
   
