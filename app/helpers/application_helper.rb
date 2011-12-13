@@ -20,10 +20,11 @@ module ApplicationHelper
     pre_body = post.body.dup
     parent = post.parent
     html_body = ''
+    quote_collapse &&= parent
     
     # Warning: Even I barely understand this, and I wrote it. --grantovich
     
-    if quote_collapse and parent and @current_user.thread_mode == :normal
+    if quote_collapse and @current_user.thread_mode == :normal
       [parent.body, parent.sigless_body].each do |parent_body|
         regex = '[> ]*' +
           Regexp.escape(parent_body.gsub(/[>\s]+/, MARK_STRING)).gsub(MARK_STRING, '[>\s]+')
@@ -49,11 +50,20 @@ module ApplicationHelper
     end
     
     html_body = html_escape(pre_body)
-    html_body.gsub!("#{MARK_STRING}1\n",
-      '<a href="#" class="showquote toggle" data-selector="#post_view .fullquote"
-        data-text="Hide quoted text">Show quoted text</a>' + "\n" + '<div class="fullquote">'
-    )
-    html_body.gsub!(/#{MARK_STRING}2(\n|\z)/, '</div>')
+    
+    if quote_collapse
+      quoted = html_body[/#{MARK_STRING}1\n.*#{MARK_STRING}2/m]
+      # If the text that would be collapsed is trivially short, forget it
+      if quoted and quoted.gsub(/#{MARK_STRING}\d\n/, '').scan("\n").length <= 8
+        return post_html_body(post, false)
+      else
+        html_body.gsub!("#{MARK_STRING}1\n",
+          '<a href="#" class="showquote toggle" data-selector="#post_view .fullquote"
+            data-text="Hide quoted text">Show quoted text</a>' + "\n" + '<div class="fullquote">'
+        )
+        html_body.gsub!(/#{MARK_STRING}2(\n|\z)/, '</div>')
+      end
+    end
     html_body.gsub!("#{MARK_STRING}3\n", "<blockquote>")
     html_body.gsub!("#{MARK_STRING}4\n", "</blockquote>")
     

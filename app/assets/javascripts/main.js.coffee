@@ -242,7 +242,9 @@ $('a, input').live 'blur', -> this.style.outlineStyle = ''
 $(document).ajaxComplete ->
   target_external_links()
   for a in $('.toggle')
-    $(a).width($(a).width())
+    if not $(a).hasClass('width_fixed')
+      $(a).width($(a).width() + 1)
+      $(a).addClass('width_fixed')
 
 $(document).ajaxError (event, jqxhr, settings, exception) ->
   if jqxhr.readyState != 0
