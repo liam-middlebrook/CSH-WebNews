@@ -25,7 +25,7 @@ module ApplicationHelper
     # Warning: Even I barely understand this, and I wrote it. --grantovich
     
     if quote_collapse and @current_user.thread_mode == :normal
-      [parent.body, parent.sigless_body].each do |parent_body|
+      [parent.body, parent.sigless_body(true)].each do |parent_body|
         regex = '[> ]*' +
           Regexp.escape(parent_body.gsub(/[>\s]+/, MARK_STRING)).gsub(MARK_STRING, '[>\s]+')
         match = pre_body[Regexp.new(regex)]
