@@ -1,5 +1,5 @@
 <div id="dialog">
-  <h2><%= params[:number] ? 'Post Reply' : 'Post New' %></h2>
+  <h2><%= params[:number] ? 'Post Reply' : 'New Post' %></h2>
   
   <%= form_for @new_post,
       :url => create_post_path, :html => { :method => 'post'}, :remote => true do |f| %>
