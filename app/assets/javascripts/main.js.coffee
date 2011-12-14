@@ -114,7 +114,7 @@ window.onhashchange = ->
         $('#group_view').css('border-bottom', '')
         $('#post_view').css('top', '')
 
-$(document).ready ->
+$ ->
   chunks.spinner = $('#loader .spinner').clone()
   chunks.overlay = $('#loader #overlay').clone()
   chunks.ajax_error = $('#loader #ajax_error').clone()
@@ -216,7 +216,7 @@ $('#posts_list .expander').live 'click', (e) ->
   toggle_thread_expand($(this).closest('tr'))
   e.stopImmediatePropagation()
 
-$('#posts_list tbody tr').live 'click', ->
+$('#posts_list tbody tr').live 'click', (e, do_toggle = true) ->
   tr = $(this)
   
   if not tr.hasClass('selected')
@@ -226,7 +226,7 @@ $('#posts_list tbody tr').live 'click', ->
     else
       location.hash = href
   
-  toggle_thread_expand(tr, true)
+  toggle_thread_expand(tr, true) if do_toggle
   
   $('#posts_list .selected').removeClass('selected')
   tr.addClass('selected')
