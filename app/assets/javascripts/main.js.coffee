@@ -60,6 +60,17 @@ jQuery.fn.outerHTML = ->
 @clear_draft_interval = ->
   clearInterval(window.draft_save_timer)
 
+@init_dialog = ->
+  $('body').append(chunks.overlay.clone())
+
+@open_dialog = (content) ->
+  $('#overlay').append(content)
+  key.setScope('dialog')
+
+@close_dialog = ->
+  $('#overlay').remove()
+  key.setScope('main')
+
 # Calls expand_thread or collapse_thread depending on the current state
 @toggle_thread_expand = (tr, check_selected = false) ->
   if tr.find('.expandable').length > 0
@@ -124,7 +135,7 @@ $ ->
   $('a.resume_draft').hide() if not localStorage['draft_form']
   
   if $('#startup_msg').length > 0
-    $('body').append(chunks.overlay.clone())
+    init_dialog()
     $.getScript $('#startup_msg').attr('data-action')
   
   if location.hash == '' or location.hash.substring(0, 3) != '#!/'
@@ -151,7 +162,8 @@ $('a.new_draft').live 'click', (e) ->
     return false
 
 $('a[href^="#?/"]').live 'click', ->
-  $('body').append(chunks.overlay.clone())
+  key.setScope('intermediate')
+  init_dialog()
   $.getScript @href.replace('#?', '')
   return false
 
@@ -189,7 +201,7 @@ $('a.minimize_draft').live 'click', ->
 
 $('a.dialog_cancel').live 'click', ->
   clear_draft_interval()
-  $('#overlay').remove()
+  close_dialog()
 
 $('a.clear_draft').live 'click', ->
   localStorage.removeItem('draft_html')
@@ -197,8 +209,8 @@ $('a.clear_draft').live 'click', ->
   $('a.resume_draft').hide()
 
 $('a.resume_draft').live 'click', ->
-  $('body').append(chunks.overlay.clone())
-  $('#overlay').append(localStorage['draft_html'])
+  init_dialog()
+  open_dialog(localStorage['draft_html'])
   for elem in JSON.parse(localStorage['draft_form'])
     $('#dialog form [name="' + elem.name + '"]').val(elem.value)
   $('#post_body').putCursorAtEnd() if $('#post_body').val() != ''

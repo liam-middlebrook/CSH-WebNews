@@ -1,7 +1,7 @@
 <div class="buttons">
   <% if @search_mode %>
     <span class="explain">Searching <%= @newsgroup ? @newsgroup.name : 'all newsgroups' %></span>
-    <a class="button" href="#?<%= search_entry_path %>?<%=
+    <a id="revise_search_button" class="button" href="#?<%= search_entry_path %>?<%=
       request.fullpath.split('?')[1] %>">Revise Search</a>
   <% else %>
     <a class="new_posts" href="#!<%= posts_path(@newsgroup.name) %>"></a>
@@ -10,7 +10,8 @@
     <% else %>
       <span class="explain">This newsgroup is read-only.</span>
     <% end %>
-    <a class="button" href="#?<%= search_entry_path(:newsgroup => @newsgroup.name) %>">Search</a>
+    <a id="newsgroup_search_button" class="button"
+      href="#?<%= search_entry_path(:newsgroup => @newsgroup.name) %>">Search</a>
     <a class="button mark_read" data-newsgroup="<%= @newsgroup.name %>"
       href="#~/mark_read?newsgroup=<%= URI.encode_www_form_component(@newsgroup.name) %>">Mark All Read</a>
   <% end %>

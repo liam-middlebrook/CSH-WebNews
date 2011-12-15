@@ -11,4 +11,4 @@ $('a.resume_draft').hide()
 location.hash = '#!<%= post_path(@new_post.newsgroup.name, @new_post.number) %>'
 <% end %>
 
-$('#overlay').remove()
+close_dialog()

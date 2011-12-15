@@ -4,4 +4,4 @@ alert('<%= j @sync_error %>')
 
 clear_loaded_location()
 location.hash = '#!<%= posts_path(@post.newsgroup.name) %>'
-$('#overlay').remove()
+close_dialog()
