@@ -255,6 +255,12 @@ $(window).resize ->
 $('a, input').live 'mousedown', -> this.style.outlineStyle = 'none'
 $('a, input').live 'blur', -> this.style.outlineStyle = ''
 
+$('a, input, select, textarea, button').live 'focus', ->
+  if $('#dialog').length > 0 and $(this).parents('#dialog').length == 0
+    $('#dialog').find('a[href], input, select, textarea, button').
+      filter(':not([disabled])').filter(':visible').first().focus()
+    return false
+
 $(document).ajaxComplete ->
   target_external_links()
   for a in $('.toggle')
