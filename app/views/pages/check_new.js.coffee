@@ -21,6 +21,7 @@ if location.hash.match '#!/home'
   scroll = $('#dashboard').scrollTop()
   $('#group_view').html '<%= j render('dashboard') %>'
   $('#dashboard').scrollTop(scroll)
+  $('#dashboard').focus()
 <% end %>
 
 $('#sync_warning').remove()

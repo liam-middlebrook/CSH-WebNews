@@ -62,6 +62,7 @@ jQuery.fn.outerHTML = ->
 
 @init_dialog = ->
   $('body').append(chunks.overlay.clone())
+  $('#overlay').focus()
 
 @open_dialog = (content) ->
   $('#overlay').append(content)

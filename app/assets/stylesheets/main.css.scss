@@ -30,6 +30,10 @@ body, select, input, textarea { color: $text_normal; }
   text-overflow: ellipsis;
 }
 
+div:focus {
+  outline: none;
+}
+
 h2 {
   font-size: 200%;
   margin-bottom: 0.5em;

@@ -6,7 +6,7 @@ switch '<%= j raw(controller.controller_name + '/' + controller.action_name) %>'
     if $('#post_body').val() != ''
       $('#post_body').putCursorAtEnd()
     else
-      $('#dialog').focus()
+      $('#overlay').focus()
     set_draft_interval()
   else
-    $('#dialog').focus()
+    $('#overlay').focus()
