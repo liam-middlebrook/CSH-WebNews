@@ -2,16 +2,54 @@ $ ->
   key.setScope('main')
   
   # Select the next/previous post
-  key 'j', 'main', -> click $('#posts_list .selected').prevAll('tr:visible')[0], false
-  key 'k', 'main', -> click $('#posts_list .selected').nextAll('tr:visible')[0], false
+  key 'j', 'main', ->
+    prev_post = $('#posts_list .selected').prevAll('tr:visible')[0]
+    if prev_post
+      click prev_post, false
+    else
+      click $('#posts_list tbody tr:visible').last()
+  key 'k', 'main', ->
+    next_post = $('#posts_list .selected').nextAll('tr:visible')[0]
+    if next_post
+      click next_post, false
+    else
+      click $('#posts_list tbody tr:visible').first()
   
   # Select the next/previous thread
-  key 'h', 'main', -> click $('#posts_list .selected').prevAll('tr[data-level="1"]')[0], false
-  key 'l', 'main', -> click $('#posts_list .selected').nextAll('tr[data-level="1"]')[0], false
+  key 'shift+j', 'main', ->
+    prev_thread = $('#posts_list .selected').prevAll('tr[data-level="1"]')[0]
+    if prev_thread
+      click prev_thread, false
+    else
+      click $('#posts_list tr[data-level="1"]').last()
+  key 'shift+k', 'main', ->
+    next_thread = $('#posts_list .selected').nextAll('tr[data-level="1"]')[0]
+    if next_thread
+      click next_thread, false
+    else
+      click $('#posts_list tr[data-level="1"]').first()
   
   # Select the next/previous newsgroup
-  key 'shift+h', 'main', -> click $('#groups_list .selected').prev('li').find('a')
-  key 'shift+l', 'main', -> click $('#groups_list .selected').next('li').find('a')
+  key 'alt+j', 'main', ->
+    prev_group = $('#groups_list .selected').prev('li')[0]
+    if prev_group
+      click $(prev_group).find('a')
+    else
+      prev_group = $('#groups_list .selected').parent('ul').prev('ul').children('li').last()[0]
+      if prev_group
+        click $(prev_group).find('a')
+      else
+        click $('#groups_list li a').last()
+  key 'alt+k', 'main', ->
+    next_group = $('#groups_list .selected').next('li')[0]
+    if next_group
+      click $(next_group).find('a')
+    else
+      next_group = $('#groups_list .selected').parent('ul').next('ul').children('li').first()[0]
+      if next_group
+        click $(next_group).find('a')
+      else
+        click $('#groups_list li a').first()
   
   # Expand or collapse the current post/thread
   key 'e', 'main', -> toggle_thread_expand($('#posts_list .selected'))
@@ -27,7 +65,7 @@ $ ->
   key 'shift+r', 'main', -> click $('#group_view .mark_read')
   
   # Toolbar functions
-  key 'o', 'main', -> click $('#home_button')
+  key 'h', 'main', -> click $('#home_button')
   key 'n', 'main', -> click $('#next_unread')
   key 'shift+s', 'main', -> click $('#search_button')
   key 's', 'main', ->
@@ -35,6 +73,8 @@ $ ->
       if $(button).length > 0
         click $(button)
         return
+  key 'p', 'main', -> click $('#group_view .new_draft')
+  key 'r', 'main', -> click $('#post_view .new_draft')
   
   # Dialog functions
   key 'esc', 'dialog', ->
@@ -47,6 +87,8 @@ $ ->
   key 'alt+m', 'main', ->
     if $('.resume_draft').is(':visible')
       click $('.resume_draft')
+  key 'alt+s', 'dialog', ->
+    click $('#dialog form input[type="submit"]')
 
 
 @click = (elem, extra_data = null) ->

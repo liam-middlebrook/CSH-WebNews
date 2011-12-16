@@ -3,7 +3,10 @@ switch '<%= j raw(controller.controller_name + '/' + controller.action_name) %>'
   when 'posts/search_entry'
     $('input[name="keywords"]').focus()
   when 'posts/new'
-    $('#post_body').putCursorAtEnd() if $('#post_body').val() != ''
+    if $('#post_body').val() != ''
+      $('#post_body').putCursorAtEnd()
+    else
+      $('#dialog').focus()
     set_draft_interval()
   else
     $('#dialog').focus()
