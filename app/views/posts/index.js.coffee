@@ -57,6 +57,7 @@ if <%= @showing ? 'true' : 'false' %> or <%= @search_mode ? 'true' : 'false' %> 
           window.active_scroll_load = $.getScript request_path
   
   $('#posts_list').scroll()
+  $('#posts_list').focus() if not <%= @showing ? 'true' : 'false' %>
   
 else
   $('#posts_list').scrollTop(0)

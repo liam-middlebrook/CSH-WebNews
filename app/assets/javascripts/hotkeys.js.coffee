@@ -89,6 +89,16 @@ $ ->
       click $('.resume_draft')
   key 'alt+s', 'dialog', ->
     click $('#dialog form input[type="submit"]')
+  
+  # Change keyboard focus for scrolling
+  key 'alt+up', 'main', ->
+    $('#posts_list').focus()
+    $('#group_view').css('background-color', '#ffc')
+    setTimeout (-> $('#group_view').css('background-color', '')), 150
+  key 'alt+down', 'main', ->
+    $('#post_view .content').focus()
+    $('#post_view').css('background-color', '#ffc')
+    setTimeout (-> $('#post_view').css('background-color', '')), 150
 
 
 @click = (elem, extra_data = null) ->
