@@ -7,13 +7,13 @@ $ ->
     if prev_post
       click prev_post, false
     else
-      click $('#posts_list tbody tr:visible').last()
+      click $('#posts_list tbody tr:visible').last(), false
   key 'j', 'main', ->
     next_post = $('#posts_list .selected').nextAll('tr:visible')[0]
     if next_post
       click next_post, false
     else
-      click $('#posts_list tbody tr:visible').first()
+      click $('#posts_list tbody tr:visible').first(), false
   
   # Select the next/previous thread
   key 'shift+k', 'main', ->
@@ -21,13 +21,13 @@ $ ->
     if prev_thread
       click prev_thread, false
     else
-      click $('#posts_list tr[data-level="1"]').last()
+      click $('#posts_list tr[data-level="1"]').last(), false
   key 'shift+j', 'main', ->
     next_thread = $('#posts_list .selected').nextAll('tr[data-level="1"]')[0]
     if next_thread
       click next_thread, false
     else
-      click $('#posts_list tr[data-level="1"]').first()
+      click $('#posts_list tr[data-level="1"]').first(), false
   
   # Select the next/previous newsgroup
   key 'alt+k', 'main', ->
