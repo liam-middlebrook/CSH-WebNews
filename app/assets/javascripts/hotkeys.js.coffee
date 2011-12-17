@@ -68,6 +68,8 @@ $ ->
   key 'h', 'main', -> click $('#home_button')
   key 'n', 'main', -> click $('#next_unread')
   key 'shift+s', 'main', -> click $('#search_button')
+  key 't', 'main', -> click $('#settings_button')
+  key '/, shift+/', 'main', -> click $('#about_button')
   key 's', 'main', ->
     for button in ['#revise_search_button', '#newsgroup_search_button', '#search_button']
       if $(button).length > 0
@@ -75,9 +77,12 @@ $ ->
         return
   key 'p', 'main', -> click $('#group_view .new_draft')
   key 'r', 'main', -> click $('#post_view .new_draft')
+  key 'd', 'main', -> click $('#show_headers_button')
+  key 'c', 'main', -> click $('#cancel_post_button')
+  key 'q', 'main', -> click $('#show_quote_button')
   
   # Dialog functions
-  key 'esc', 'dialog', ->
+  key 'esc, alt+q', 'dialog', ->
     if $('.dialog_cancel.clear_draft').length > 0
       click $('.dialog_cancel.clear_draft')
     else
@@ -104,5 +109,5 @@ $ ->
 
 @click = (elem, extra_data = null) ->
   $(elem).trigger('click', extra_data)
-  if (hash = $(elem).attr('href')) && hash[0..1] == '#!'
-    location.hash = hash[1..-1]
+  if (href = $(elem).attr('href')) and href[0..1] == '#!'
+    location.hash = href[1..-1]

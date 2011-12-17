@@ -58,7 +58,7 @@ module ApplicationHelper
         return post_html_body(post, false)
       else
         html_body.gsub!("#{MARK_STRING}1\n",
-          '<a href="#" class="showquote toggle" data-selector="#post_view .fullquote"
+          '<a id="show_quote_button" href="#" class="showquote toggle" data-selector="#post_view .fullquote"
             data-text="Hide quoted text">Show quoted text</a>' + "\n" + '<div class="fullquote">'
         )
         html_body.gsub!(/#{MARK_STRING}2(\n|\z)/, '</div>')
