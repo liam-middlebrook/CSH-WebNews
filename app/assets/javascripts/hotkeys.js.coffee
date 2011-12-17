@@ -2,13 +2,13 @@ $ ->
   key.setScope('main')
   
   # Select the next/previous post
-  key 'j', 'main', ->
+  key 'k', 'main', ->
     prev_post = $('#posts_list .selected').prevAll('tr:visible')[0]
     if prev_post
       click prev_post, false
     else
       click $('#posts_list tbody tr:visible').last()
-  key 'k', 'main', ->
+  key 'j', 'main', ->
     next_post = $('#posts_list .selected').nextAll('tr:visible')[0]
     if next_post
       click next_post, false
@@ -16,13 +16,13 @@ $ ->
       click $('#posts_list tbody tr:visible').first()
   
   # Select the next/previous thread
-  key 'shift+j', 'main', ->
+  key 'shift+k', 'main', ->
     prev_thread = $('#posts_list .selected').prevAll('tr[data-level="1"]')[0]
     if prev_thread
       click prev_thread, false
     else
       click $('#posts_list tr[data-level="1"]').last()
-  key 'shift+k', 'main', ->
+  key 'shift+j', 'main', ->
     next_thread = $('#posts_list .selected').nextAll('tr[data-level="1"]')[0]
     if next_thread
       click next_thread, false
@@ -30,7 +30,7 @@ $ ->
       click $('#posts_list tr[data-level="1"]').first()
   
   # Select the next/previous newsgroup
-  key 'alt+j', 'main', ->
+  key 'alt+k', 'main', ->
     prev_group = $('#groups_list .selected').prev('li')[0]
     if prev_group
       click $(prev_group).find('a')
@@ -40,7 +40,7 @@ $ ->
         click $(prev_group).find('a')
       else
         click $('#groups_list li a').last()
-  key 'alt+k', 'main', ->
+  key 'alt+j', 'main', ->
     next_group = $('#groups_list .selected').next('li')[0]
     if next_group
       click $(next_group).find('a')
