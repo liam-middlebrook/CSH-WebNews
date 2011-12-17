@@ -570,6 +570,36 @@ input[type="submit"] { margin-right: 0; }
   }
 }
 
+table.hotkeys_container {
+  td:first-child { padding-right: 2em; }
+}
+
+table.hotkeys {
+  td { padding: 0.2em 0; }
+  td:first-child {
+    padding-right: 1em;
+    font-family: monospace;
+    text-align: right;
+    white-space: nowrap;
+  }
+  
+  .explain {
+    font-size: 80%;
+    color: $text_light;
+    padding-top: 1.2em;
+    padding-bottom: 0;
+  }
+  
+  .key {
+    font-family: monospace;
+    font-weight: bold;
+    background-color: #fff;
+    border: 1px solid $border_button;
+    padding: 0 0.4em;
+    margin: 0 0.1em;
+  }
+}
+
 #ajax_error {
   position: absolute;
   z-index: 15;

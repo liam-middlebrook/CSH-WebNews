@@ -1,13 +1,48 @@
 <div id="dialog">
   <h2>About WebNews</h2>
   
-  <p>WebNews is a Ruby on Rails app brought to you by Alex Grant, a.k.a. <a href="https://wiki.csh.rit.edu/wiki/User:Grantovich">Grantovich</a>. Detailed documentation is available through the <a href="https://wiki.csh.rit.edu/wiki/WebNews">WebNews page</a> on the CSH wiki.</p>
+  <p>WebNews is a Ruby on Rails frontend for <a href="https://wiki.csh.rit.edu/wiki/News">CSH News</a> brought to you by Alex Grant, a.k.a. <a href="https://wiki.csh.rit.edu/wiki/User:Grantovich">Grantovich</a>. Documentation on various features and implementation details is available on the <a href="https://wiki.csh.rit.edu/wiki/WebNews">WebNews wiki page</a>.</p>
   
   <p>The WebNews code lives on <a href="https://github.com/grantovich/CSH-WebNews">GitHub</a>. Bug reports and feature requests should be submitted to the <a href="https://github.com/grantovich/CSH-WebNews/issues">issue tracker</a>.</p>
   
-  <h3>About News</h3>
-  
-  <p><a href="https://wiki.csh.rit.edu/wiki/News">CSH News</a> is an early-90s-era anachronism that has somehow survived multiple complete hard drive failures and pretty much refuses to die. You can read more about <a href="http://en.wikipedia.org/wiki/InterNetNews">InterNetNews</a> (INN), the server software that runs the CSH newsgroups, and <a href="http://en.wikipedia.org/wiki/Network_News_Transfer_Protocol">NNTP</a>, the Network News Transfer Protocol that WebNews uses to interact with it.</p>
+  <h3>Hotkey Reference</h3>
+  <table class="hotkeys_container">
+    <tr>
+      <td>
+        <table class="hotkeys">
+          <tr><td><span class="key">h</span></td><td>Home</td></tr>
+          <tr><td><span class="key">n</span></td><td>Next Unread</td></tr>
+          <tr><td><span class="key">s</span></td><td>Search (<span class="key">Shift</span> forces new search)</td></tr>
+          <tr><td><span class="key">t</span></td><td>Settings</td></tr>
+          <tr><td><span class="key">/</span></td><td>About</td></tr>
+          <tr><td><span class="key">Alt</span>+<span class="key">r</span></td><td>Mark All Read</td></tr>
+          <tr><td><span class="key">Shift</span>+<span class="key">r</span></td><td>Mark All Read in current newsgroup</td></tr>
+          <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
+          <tr><td><span class="key">p</span></td><td>New Post</td></tr>
+          <tr><td><span class="key">r</span></td><td>Post Reply</td></tr>
+          <tr><td><span class="key">c</span></td><td>Cancel Post</td></tr>
+          <tr><td><span class="key">d</span></td><td>Show/Hide headers</td></tr>
+          <tr><td><span class="key">q</span></td><td>Show/Hide quoted text</td></tr>
+        </table>
+      </td>
+      <td>
+        <table class="hotkeys">
+          <tr><td><span class="key">j</span>/<span class="key">k</span></td><td>Select previous/next post</td></tr>
+          <tr><td><span class="key">Shift</span>+<span class="key">j</span>/<span class="key">k</span></td><td>Select previous/next thread</td></tr>
+          <tr><td><span class="key">Alt</span>+<span class="key">j</span>/<span class="key">k</span></td><td>Select previous/next newsgroup</td></tr>
+          <tr><td><span class="key">e</span></td><td>Expand/collapse selected post</td></tr>
+          <tr><td><span class="key">Shift</span>+<span class="key">e</span></td><td>Expand/collapse current thread</td></tr>
+          <tr><td><span class="key">Alt</span>+<span class="key">&#8679;</span></td><td>Focus on newsgroup view &lowast;</td></tr>
+          <tr><td><span class="key">Alt</span>+<span class="key">&#8681;</span></td><td>Focus on message view &lowast;</td></tr>
+          <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
+          <tr><td><span class="key">Alt</span>+<span class="key">s</span></td><td>Submit current dialog</td></tr>
+          <tr><td><span class="key">Alt</span>+<span class="key">m</span></td><td>Minimize or restore draft</td></tr>
+          <tr><td><span class="key">Alt</span>+<span class="key">q</span></td><td>Cancel/close dialog (also <span class="key">Esc</span>)</td></tr>
+          <tr><td></td><td class="explain">&lowast; Shifts the keyboard focus to enable<br>arrow keys and PgUp/PgDn scrolling</td></tr>
+        </table>
+      </td>
+    </tr>
+  </table>
   
   <div class="buttons">
     <a href="#" class="button dialog_cancel">Close</a>
