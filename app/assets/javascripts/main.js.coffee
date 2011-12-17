@@ -261,6 +261,9 @@ $('a, input, select, textarea, button').live 'focus', ->
     $('#dialog').find('a[href], input, select, textarea, button').
       filter(':not([disabled])').filter(':visible').first().focus()
     return false
+  else if $('#overlay').length > 0 and $('#dialog').length == 0
+    $('#overlay').focus()
+    return false
 
 $(document).ajaxComplete ->
   target_external_links()
