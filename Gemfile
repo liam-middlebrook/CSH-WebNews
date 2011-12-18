@@ -1,6 +1,6 @@
 source 'http://rubygems.org'
 
-gem 'rails', '3.1.1'
+gem 'rails', '3.1.3'
 
 group :development, :test do
   gem 'sqlite3'
@@ -23,9 +23,6 @@ gem 'coffee-rails'
 gem 'uglifier'
 
 gem 'jquery-rails'
-
-# To use debugger
-# gem 'ruby-debug19', :require => 'ruby-debug'
 
 group :test do
   # Pretty printed test output
