@@ -44,7 +44,7 @@ class PagesController < ApplicationController
   
   def mark_read
     if params[:mark_unread]
-      if @post and @post.unread_for_user?(@current_user)
+      if @post and not @post.unread_for_user?(@current_user)
         UnreadPostEntry.create!(
           :user => @current_user, :newsgroup => @post.newsgroup, :post => @post,
           :personal_level => PERSONAL_CODES[@post.personal_class_for_user(@current_user)]
