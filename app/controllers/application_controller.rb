@@ -71,14 +71,20 @@ class ApplicationController < ActionController::Base
     end
     
     def get_next_unread_post
+      unread_order = "CASE unread_post_entries.user_created WHEN #{Post.sanitize(true)} THEN 2 ELSE 1 END"
+      standard_order = 'newsgroup, date'
+      
       if @post and @current_user.thread_mode != :flat
-        order = "CASE newsgroup WHEN #{Post.sanitize(@post.newsgroup.name)} THEN 1 ELSE 2 END,
-        CASE thread_id WHEN #{Post.sanitize(@post.thread_id)} THEN 1 ELSE 2 END, newsgroup, date"
+        order = "#{unread_order},
+        CASE newsgroup WHEN #{Post.sanitize(@post.newsgroup.name)} THEN 1 ELSE 2 END,
+        CASE thread_id WHEN #{Post.sanitize(@post.thread_id)} THEN 1 ELSE 2 END, #{standard_order}"
       elsif @newsgroup
-        order = "CASE newsgroup WHEN #{Post.sanitize(@newsgroup.name)} THEN 1 ELSE 2 END, newsgroup, date"
+        order = "#{unread_order},
+          CASE newsgroup WHEN #{Post.sanitize(@newsgroup.name)} THEN 1 ELSE 2 END, #{standard_order}"
       else
-        order = 'newsgroup, date'
+        order = "#{unread_order}, #{standard_order}"
       end
+      
       @next_unread_post = @current_user.unread_posts.order(order).first
     end
     

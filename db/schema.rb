@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20111115010321) do
+ActiveRecord::Schema.define(:version => 20111226194104) do
 
   create_table "newsgroups", :force => true do |t|
     t.string "name"
@@ -43,6 +43,7 @@ ActiveRecord::Schema.define(:version => 20111115010321) do
     t.integer "newsgroup_id"
     t.integer "post_id"
     t.integer "personal_level"
+    t.boolean "user_created"
   end
 
   add_index "unread_post_entries", ["user_id", "post_id"], :name => "index_unread_post_entries_on_user_id_and_post_id", :unique => true

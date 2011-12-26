@@ -47,7 +47,8 @@ class PagesController < ApplicationController
       if @post and not @post.unread_for_user?(@current_user)
         UnreadPostEntry.create!(
           :user => @current_user, :newsgroup => @post.newsgroup, :post => @post,
-          :personal_level => PERSONAL_CODES[@post.personal_class_for_user(@current_user)]
+          :personal_level => PERSONAL_CODES[@post.personal_class_for_user(@current_user)],
+          :user_created => true
         )
       end
     else
