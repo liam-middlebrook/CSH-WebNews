@@ -78,6 +78,7 @@ $ ->
   key 'p', 'main', -> click $('#group_view .new_draft')
   key 'r', 'main', -> click $('#post_view .new_draft')
   key 'd', 'main', -> click $('#show_headers_button')
+  key 'u', 'main', -> click $('#mark_unread_button')
   key 'c', 'main', -> click $('#cancel_post_button')
   key 'q', 'main', -> click $('#show_quote_button')
   
