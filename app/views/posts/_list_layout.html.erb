@@ -13,7 +13,7 @@
     <a id="newsgroup_search_button" class="button"
       href="#?<%= search_entry_path(:newsgroup => @newsgroup.name) %>">Search</a>
     <a class="button mark_read" data-newsgroup="<%= @newsgroup.name %>"
-      href="#~/mark_read?newsgroup=<%= URI.encode_www_form_component(@newsgroup.name) %>">Mark All Read</a>
+      href="#~<%= mark_read_path(:newsgroup => @newsgroup.name) %>">Mark All Read</a>
   <% end %>
 </div>
 <div id="group_header">

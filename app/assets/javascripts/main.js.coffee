@@ -200,6 +200,13 @@ $('a.mark_read').live 'click', ->
   $.getScript @href.replace('#~', ''), after_func
   return false
 
+$('a.mark_unread').live 'click', ->
+  clear_check_timeout()
+  abort_active_check()
+  $('#posts_list .selected').addClass('unread')
+  $.getScript @href.replace('#~', ''), -> set_check_timeout(0)
+  return false
+
 $('a.minimize_draft').live 'click', ->
   localStorage['draft_html'] = $('#dialog').outerHTML()
   localStorage['draft_form'] = JSON.stringify($('#dialog form').serializeArray())

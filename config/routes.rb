@@ -5,7 +5,7 @@ Webnews::Application.routes.draw do
   get '/new_user', :to => 'pages#new_user'
   get '/old_user', :to => 'pages#old_user'
   get '/check_new', :to => 'pages#check_new'
-  get '/mark_read', :to => 'pages#mark_read'
+  get '/mark_read', :to => 'pages#mark_read', :as => :mark_read
   
   get '/settings', :to => 'users#edit',   :as => :edit_user
   put '/settings', :to => 'users#update', :as => :update_user
