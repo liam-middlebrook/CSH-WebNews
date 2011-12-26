@@ -10,7 +10,7 @@
         :selected => @post && @post.followup_newsgroup ? @post.followup_newsgroup.name : @newsgroup.name %>
     </div>
     <% if @post and @post.followup_newsgroup %>
-      <p class="explain">
+      <p class="explain close">
         (the author specified that replies should go to <%= @post.followup_newsgroup.name %>)
       </p>
     <% end %>
@@ -22,7 +22,7 @@
     <div class="form_element">
       <%= f.text_area :body %>
     </div>
-    <p class="explain">Drafts are saved automatically in your browser's local storage. Saved drafts will not be available if you switch browsers or devices.</p>
+    <p class="explain close">Drafts are saved automatically in your browser's local storage. Saved drafts will not be available if you switch browsers or devices.</p>
     
     <% if @post %>
       <%= f.hidden_field :reply_newsgroup, :value => @post.newsgroup.name %>

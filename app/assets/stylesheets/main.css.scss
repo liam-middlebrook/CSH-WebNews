@@ -44,9 +44,7 @@ h3 {
   margin-bottom: 0.5em;
 }
 
-p.explain {
-  margin-top: -1em;
-  margin-bottom: 1em;
+.explain {
   font-size: 80%;
   color: $text_light;
 }
@@ -100,7 +98,7 @@ i { font-style: italic; }
   .explain {
     display: inline-block;
     padding: 0 6px;
-    color: $text_light;
+    font-size: 100%;
   }
 }
 
@@ -236,6 +234,11 @@ input[type="submit"] { margin-right: 0; }
   #unread_line {
     @include links;
     margin-bottom: 2em;
+  }
+  
+  p.explain {
+    margin-top: -1em;
+    margin-bottom: 1em;
   }
   
   table.activity {
@@ -538,6 +541,10 @@ input[type="submit"] { margin-right: 0; }
     margin-top: 0.5em;
     margin-bottom: 1em;
   }
+  
+  p.explain.close {
+    margin-top: -1em;
+  }
 
   fieldset {
     border: 1px solid $border_light;
@@ -583,9 +590,7 @@ table.hotkeys {
     white-space: nowrap;
   }
   
-  .explain {
-    font-size: 80%;
-    color: $text_light;
+  td.explain {
     padding-bottom: 1.2em;
   }
   
