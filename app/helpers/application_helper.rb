@@ -52,9 +52,9 @@ module ApplicationHelper
     html_body = html_escape(pre_body)
     
     if quote_collapse
-      quoted = html_body[/#{MARK_STRING}1\n.*#{MARK_STRING}2/m]
+      quoted = html_body[/#{MARK_STRING}1\n.*#{MARK_STRING}2/m].andand.gsub(/#{MARK_STRING}\d\n/, '')
       # If the text that would be collapsed is trivially short, forget it
-      if quoted and quoted.gsub(/#{MARK_STRING}\d\n/, '').scan("\n").length <= 8
+      if quoted and quoted.length <= 800 and quoted.scan("\n").length <= 8
         return post_html_body(post, false)
       else
         html_body.gsub!("#{MARK_STRING}1\n",
