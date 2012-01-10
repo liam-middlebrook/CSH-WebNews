@@ -24,10 +24,11 @@ class Post < ActiveRecord::Base
       sigless_body.split("\n").map{ |line| '>' + line }.join("\n") + "\n\n"
   end
   
-  def sigless_body(aggressive = false)
-    sb = body.sub(/(.*)\n-- \n.*/m, '\\1')
-    sb = sb.sub(/^[-~<]+.+\n*\z/, '') if aggressive
-    return sb.rstrip
+  def sigless_body
+    return body.                               # Things to strip:
+      sub(/(.*)\n-- \n.*/m, '\\1').            # '-- ' on its own line and all following text ("standard" sig)
+      sub(/\n\n[-~].*[[:alpha:]].*\n*\z/, ''). # Non-blank final lines starting with [-~] and containing a letter
+      rstrip
   end
   
   def is_crossposted?(quick = false)
