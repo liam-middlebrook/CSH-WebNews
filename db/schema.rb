@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20111226194104) do
+ActiveRecord::Schema.define(:version => 20120112010906) do
 
   create_table "newsgroups", :force => true do |t|
     t.string "name"
@@ -33,6 +33,7 @@ ActiveRecord::Schema.define(:version => 20111226194104) do
     t.text     "body"
   end
 
+  add_index "posts", ["date"], :name => "index_posts_on_date"
   add_index "posts", ["message_id"], :name => "index_posts_on_message_id"
   add_index "posts", ["newsgroup", "number"], :name => "index_posts_on_newsgroup_and_number", :unique => true
   add_index "posts", ["parent_id"], :name => "index_posts_on_parent_id"
