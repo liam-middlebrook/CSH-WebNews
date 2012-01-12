@@ -22,7 +22,7 @@ class PostsController < ApplicationController
     limit = (@from_older and @from_newer) ? 6 : 11
     
     if not (@from_older or @from_newer)
-      @from_older = Time.now + 1.second
+      @from_older = Post.order('date').last.date + 1.second
     end
     
     if @from_older
