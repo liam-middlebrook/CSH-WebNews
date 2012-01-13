@@ -1,4 +1,5 @@
 require 'net/nntp'
+$in_rake = true
 
 namespace :nntp do
   desc "Delete and re-import all groups and posts"

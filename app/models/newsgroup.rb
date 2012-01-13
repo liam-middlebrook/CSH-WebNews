@@ -58,18 +58,18 @@ class Newsgroup < ActiveRecord::Base
       newsgroup = Newsgroup.create!(:name => name, :status => status)
     end
     
-    puts nntp.group(newsgroup.name)[1]
+    puts nntp.group(newsgroup.name)[1] if $in_rake
     my_posts = Post.where(:newsgroup => newsgroup.name).select(:number).map(&:number)
     news_posts = nntp.listgroup(newsgroup.name)[1].map(&:to_i)
     to_delete = my_posts - news_posts
     to_import = news_posts - my_posts
     
-    puts "Deleting #{to_delete.size} posts."
+    puts "Deleting #{to_delete.size} posts." if $in_rake
     to_delete.each do |number|
       Post.where(:newsgroup => newsgroup.name, :number => number).first.destroy
     end
     
-    puts "Importing #{to_import.size} posts."
+    puts "Importing #{to_import.size} posts." if $in_rake
     to_import.each do |number|
       head = nntp.head(number)[1].join("\n")
       body = nntp.body(number)[1].join("\n")
@@ -82,15 +82,15 @@ class Newsgroup < ActiveRecord::Base
           end
         end
       end
-      print '.'
+      print '.' if $in_rake
     end
-    puts
+    puts if $in_rake
   ensure
     FileUtils.rm('tmp/syncing.txt') if standalone
   end
   
   def self.sync_all!(full_reload = false)
-    puts "Waiting for any active sync to complete...\n\n"
+    puts "Waiting for any active sync to complete...\n\n" if $in_rake
     sleep 0.1 until not File.exists?('tmp/syncing.txt')
     FileUtils.touch('tmp/syncing.txt')
     

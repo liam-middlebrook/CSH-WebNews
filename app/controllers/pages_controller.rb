@@ -133,9 +133,9 @@ class PagesController < ApplicationController
         begin
           Newsgroup.sync_all!
         rescue
-          puts "\n\n### SYNC ERROR ###"
-          puts $!.message
-          puts "##################\n\n"
+          logger.error "\n\n### SYNC ERROR ###"
+          logger.error $!.message
+          logger.error "##################\n\n"
         end
       end
       get_last_sync_time
