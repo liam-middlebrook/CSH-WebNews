@@ -111,7 +111,7 @@ jQuery.fn.outerHTML = ->
 window.onhashchange = ->
   if location.hash.substring(0, 3) == '#!/'
     window.active_navigation.abort() if window.active_navigation
-    window.active_navigation = $.getScript location.hash.replace('#!', '')
+    window.active_navigation = $.getScript location.hash.replace('#!/', '')
     
     new_location = location.hash.split('/')[1]
     if new_location != window.loaded_location
@@ -169,7 +169,7 @@ $('a.new_draft').live 'click', (e) ->
 $('a[href^="#?/"]').live 'click', ->
   key.setScope('intermediate')
   init_dialog()
-  $.getScript @href.replace('#?', '')
+  $.getScript @href.replace('#?/', '')
   return false
 
 $('a.mark_read').live 'click', ->
@@ -197,14 +197,14 @@ $('a.mark_read').live 'click', ->
     after_func = -> $('#posts_list').scroll()
     $('#posts_list tbody tr').removeClass('unread')
   
-  $.getScript @href.replace('#~', ''), after_func
+  $.getScript @href.replace('#~/', ''), after_func
   return false
 
 $('a.mark_unread').live 'click', ->
   clear_check_timeout()
   abort_active_check()
   $('#posts_list .selected').addClass('unread')
-  $.getScript @href.replace('#~', ''), -> set_check_timeout(0)
+  $.getScript @href.replace('#~/', ''), -> set_check_timeout(0)
   return false
 
 $('a.minimize_draft').live 'click', ->
@@ -246,7 +246,7 @@ $('#posts_list tbody tr').live 'click', (e, do_toggle = true) ->
   if not tr.hasClass('selected')
     href = tr.find('a').attr('href')
     if href.substring(0, 3) == '#~/'
-      $.getScript href.replace('#~', '')
+      $.getScript href.replace('#~/', '')
     else
       location.hash = href
   
