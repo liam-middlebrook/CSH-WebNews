@@ -79,9 +79,7 @@ class PostsController < ApplicationController
       if error_text
         form_error error_text
       else
-        remove_params = %w[action controller source commit validate utf8 _]
-        search_params = params.select{ |k,v| not remove_params.include?(k) }
-        search_params.reject!{ |k,v| v.blank? }
+        search_params = params.except(:action, :controller, :source, :commit, :validate, :utf8, :_)
         render :partial => 'search_redirect', :locals => { :search_params => search_params }
       end
       return
