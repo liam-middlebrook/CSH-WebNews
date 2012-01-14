@@ -4,6 +4,9 @@ WIKI_URL = 'https://wiki.csh.rit.edu/wiki/'
 WIKI_USER_URL = WIKI_URL + 'User:'
 LOCAL_EMAIL_DOMAIN = '@csh.rit.edu'
 
+ENV_USERNAME = 'WEBAUTH_USER'
+ENV_REALNAME = 'WEBAUTH_LDAP_CN'
+
 DATE_FORMAT = '%-m/%-d/%Y %-I:%M%P'
 SHORT_DATE_FORMAT = '%-m/%-d %-I:%M%P'
 

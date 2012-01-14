@@ -1,0 +1,10 @@
+<div id="overlay_dimmer"></div>
+<div id="dialog">
+  <h2>No users exist in the database</h2>
+  <p><b>If you don't have Webauth set up</b> and want to create a test user for local development, run <code>rake webnews:no_auth</code> (this also creates <code>tmp/authdisabled.txt</code>, which must remain in place for Webauth redirection to be disabled). Then click the Refresh button below.</p>
+  <p><b>If you <i>do</i> have Webauth set up</b> and want to proceed with authentication, click the Attempt Webauth button below. If you enter an infinite refresh loop, something isn't set up correctly.</p>
+  <div class="buttons">
+    <a class="button" href="#" onclick="location.reload(true); return false;">Refresh</a>
+    <a class="button" href="/?no_user_override=true">Attempt Webauth</a>
+  </div>
+</div>

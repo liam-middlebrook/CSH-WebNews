@@ -1,0 +1,10 @@
+<div id="overlay_dimmer"></div>
+<div id="dialog">
+  <h2>No newsgroups have been imported</h2>
+  <p>Run <code>rake webnews:reload</code> to perform the initial import. This could take a while, especially if you are running in development with a SQLite database.</p>
+  <p>Note that if WebNews is not installed on a machine with direct access to the news server (no SSL, no NNTP authentication), you'll need to set <code>NEWS_SERVER = 'localhost'</code> in <code>config/initializers/constants.rb</code> and create an SSH tunnel redirecting port 119 on your machine to the same port on the news server. This can be done with <code>ssh -N -p 22 username@news-server-name -L 119/localhost/119</code>, or <b>Connection > SSH > Tunnels</b> for PuTTY users. Remember to restart the Rails server after changing the <code>NEWS_SERVER</code> constant!</p>
+  <p>(Currently <code>NEWS_SERVER</code> is set to <b><code><%= NEWS_SERVER %></code></b>)</p>
+  <div class="buttons">
+    <a class="button" href="#" onclick="location.reload(true); return false;">Refresh</a>
+  </div>
+</div>

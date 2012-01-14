@@ -1,6 +1,6 @@
 <div id="overlay_dimmer"></div>
 <div id="dialog">
-  <h2>WebNews is down for maintenance</h2>
+  <h2><%= @dialog_title %></h2>
   <p><%= !@explanation.blank? ? @explanation : "No explanation was provided for this maintenance, but hopefully we'll be back online soon." %></p>
   <div class="buttons">
     <a class="button" href="#" onclick="location.reload(true); return false;">Refresh</a>

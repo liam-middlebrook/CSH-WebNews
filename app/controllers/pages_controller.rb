@@ -8,8 +8,10 @@ class PagesController < ApplicationController
       
       wants.html do
         set_no_cache
-        @current_user.real_name = request.env['WEBAUTH_LDAP_CN']
-        @current_user.save!
+        if request.env[ENV_REALNAME]
+          @current_user.real_name = request.env[ENV_REALNAME]
+          @current_user.save!
+        end
         sync_posts
       end
       

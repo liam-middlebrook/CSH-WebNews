@@ -93,6 +93,7 @@ class Newsgroup < ActiveRecord::Base
     puts "Waiting for any active sync to complete...\n\n" if $in_rake
     sleep 0.1 until not File.exists?('tmp/syncing.txt')
     FileUtils.touch('tmp/syncing.txt')
+    FileUtils.touch('tmp/reloading.txt') if full_reload
     
     begin
       Net::NNTP.start(NEWS_SERVER) do |nntp|
@@ -107,6 +108,7 @@ class Newsgroup < ActiveRecord::Base
       end
       FileUtils.touch('tmp/lastsync.txt')
     ensure
+      FileUtils.rm('tmp/reloading.txt') if full_reload
       FileUtils.rm('tmp/syncing.txt')
     end
   end

@@ -7,20 +7,44 @@ class ApplicationController < ActionController::Base
   private
   
     def authenticate
-      if not request.env['WEBAUTH_USER']
+      if not Newsgroup.select(true).first
         set_no_cache
-        respond_to do |wants|
-          wants.html { render :file => "#{Rails.root}/public/auth.html", :layout => false }
-          wants.js { render 'shared/needs_auth' }
+        @no_script = true
+        render 'shared/no_groups'
+      end
+      
+      if not request.env[ENV_USERNAME]
+        set_no_cache
+        if not User.select(true).first and not params[:no_user_override]
+          @no_script = true
+          render 'shared/no_users'
+        elsif not auth_disabled?
+          respond_to do |wants|
+            wants.html { render :file => "#{Rails.root}/public/auth.html", :layout => false }
+            wants.js { render 'shared/needs_auth' }
+          end
         end
       end
     end
     
     def check_maintenance
-      if File.exists?('tmp/maintenance.txt')
+      maintenance = File.exists?('tmp/maintenance.txt')
+      reloading = File.exists?('tmp/reloading.txt')
+      if maintenance or reloading
         set_no_cache
         @no_script = true
-        @explanation = File.read('tmp/maintenance.txt')
+        @dialog_title = if reloading
+          'WebNews is re-importing all newsgroups'
+        else
+          'WebNews is down for maintenance'
+        end
+        @explanation = if reloading
+          "This could take a while.
+          (#{Newsgroup.count - 1} newsgroups completed so far, 
+          started #{File.mtime('tmp/syncing.txt').strftime(SHORT_DATE_FORMAT)})"
+        else
+          File.read('tmp/maintenance.txt')
+        end
         respond_to do |wants|
           wants.html { render 'shared/maintenance' }
           wants.js { render 'shared/maintenance' }
@@ -29,12 +53,12 @@ class ApplicationController < ActionController::Base
     end
   
     def get_or_create_user
-      @current_user = User.find_by_username(request.env['WEBAUTH_USER'])
+      @current_user = auth_disabled? ? User.first :
+        User.find_by_username(request.env[ENV_USERNAME])
       if @current_user.nil?
         @current_user = User.create!(
-          :username => request.env['WEBAUTH_USER'],
-          :real_name => request.env['WEBAUTH_LDAP_CN'],
-          :preferences => {}
+          :username => request.env[ENV_USERNAME],
+          :real_name => request.env[ENV_REALNAME]
         )
         @new_user = true
       else
@@ -90,6 +114,10 @@ class ApplicationController < ActionController::Base
     
     def form_error(error_text)
       render :partial => 'shared/form_error', :object => error_text
+    end
+    
+    def auth_disabled?
+      not Rails.env.production? and File.exists?('tmp/authdisabled.txt')
     end
     
     def set_no_cache
