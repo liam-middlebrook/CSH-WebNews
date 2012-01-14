@@ -3,7 +3,6 @@ class User < ActiveRecord::Base
   has_many :unread_posts, :through => :unread_post_entries, :source => :post
   
   serialize :preferences, Hash
-  attr_protected :username, :real_name
   
   scope :active, where('updated_at >= ?', 3.months.ago)
   scope :inactive, where('updated_at < ?', 3.months.ago)

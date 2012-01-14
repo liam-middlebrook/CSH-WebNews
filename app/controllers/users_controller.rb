@@ -4,7 +4,7 @@ class UsersController < ApplicationController
   end
   
   def update
-    @current_user.update_attributes(params[:user])
+    @current_user.update_attributes(params[:user].except(:username, :real_name))
     Newsgroup.find_each do |newsgroup|
       if not @current_user.unread_in_group?(newsgroup)
         UnreadPostEntry.where(:user_id => @current_user.id, :newsgroup_id => newsgroup.id).delete_all
