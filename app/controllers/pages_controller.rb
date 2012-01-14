@@ -4,6 +4,10 @@ class PagesController < ApplicationController
   before_filter :get_post, :only => [:check_new, :mark_read]
 
   def home
+    if params[:no_user_override]
+      redirect_to root_path and return
+    end
+    
     respond_to do |wants|
       
       wants.html do
