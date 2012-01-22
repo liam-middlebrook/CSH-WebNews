@@ -102,6 +102,21 @@ i { font-style: italic; }
   }
 }
 
+.smallbutton {
+  display: inline-block;
+  text-align: center;
+  font-size: 80%;
+  font-weight: bold;
+  color: $bg_light !important;
+  background-color: $border_button;
+  text-decoration: none !important;
+  border-radius: 2px;
+  &:hover {
+    opacity: 0.7;
+    color: $bg_light !important;
+  }
+}
+
 .button, input[type="submit"] {
   display: inline-block;
   text-align: center;
@@ -422,14 +437,9 @@ input[type="submit"] { margin-right: 0; }
       .author {
         color: $text_normal;
         
-        a {
-          font-size: 80%;
-          display: inline-block;
+        .smallbutton {
           padding: 0 0.5em;
-          border-radius: 2px;
-          color: $bg_light;
           background-color: $link_hover;
-          &:hover { opacity: 0.7; }
         }
       }
     }
@@ -474,17 +484,8 @@ input[type="submit"] { margin-right: 0; }
     blockquote blockquote blockquote { color: #707; }
     
     .showquote {
-      display: inline-block;
-      text-align: center;
-      font-size: 80%;
       font-family: sans-serif;
-      font-weight: bold;
-      color: #fff;
-      background-color: $border_button;
-      text-decoration: none;
       padding: 2px 24px;
-      border-radius: 2px;
-      &:hover { color: #fff; opacity: 0.7; }
     }
   }
 }
@@ -518,6 +519,11 @@ input[type="submit"] { margin-right: 0; }
     margin-top: 10px;
   }
   
+  .smallbutton {
+    padding: 0 0.25em;
+    font-size: 90%;
+  }
+  
   .loading, .errors {
     font-weight: bold;
     text-align: right;
@@ -544,6 +550,24 @@ input[type="submit"] { margin-right: 0; }
   
   p.explain.close {
     margin-top: -1em;
+  }
+  
+  #link_markup_note {
+    float: left;
+    
+    #link_markup_tease {
+      margin-top: 0.25em;
+      margin-bottom: 0;
+    }
+    
+    #link_markup_explain {
+      font-family: monospace;
+      margin-top: 0.5em;
+      margin-bottom: 0;
+      background-color: #fff;
+      border: 1px solid $border_button;
+      padding-left: 2px;
+    }
   }
 
   fieldset {

@@ -30,8 +30,6 @@ select_post = (showing) ->
     $('#posts_list').scrollTop(post_top - (view_height / 2))
 
 $('#post_view').html '<%= j render(@post) %>'
-$('#post_view .headers').hide()
-$('#post_view .fullquote').hide()
 
 <% if not @search_mode %>
 document.title = '<%= @newsgroup.name %> \u00bb <%= raw j(@post.subject) %>'

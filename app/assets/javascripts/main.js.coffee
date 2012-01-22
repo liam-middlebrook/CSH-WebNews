@@ -156,10 +156,11 @@ $('a[href="#"]').live 'click', ->
 $('.toggle').live 'click', ->
   # Fixing the width is handled in ajaxComplete
   a = $(this)
-  new_text = a.attr('data-text')
-  a.attr('data-text', a.text())
-  a.text(new_text)
   $(a.attr('data-selector')).toggle()
+  new_text = a.attr('data-text')
+  if new_text
+    a.attr('data-text', a.text())
+    a.text(new_text)
 
 $('a.new_draft').live 'click', (e) ->
   if localStorage['draft_form'] and not confirm('Really abandon your saved draft and start a new post?')
@@ -278,6 +279,7 @@ $(document).ajaxComplete ->
     if not $(a).hasClass('width_fixed')
       $(a).width($(a).width() + 1)
       $(a).addClass('width_fixed')
+      $($(a).attr('data-selector')).toggle()
 
 $(document).ajaxError (event, jqxhr, settings, exception) ->
   if jqxhr.readyState != 0

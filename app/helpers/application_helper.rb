@@ -54,12 +54,15 @@ module ApplicationHelper
     if quote_collapse
       quoted = html_body[/#{MARK_STRING}1\n.*#{MARK_STRING}2/m].andand.gsub(/#{MARK_STRING}\d\n/, '')
       # If the text that would be collapsed is trivially short, forget it
-      if quoted and quoted.length <= 800 and quoted.scan("\n").length <= 8
+      if quoted and quoted.length <= 800 and quoted.scan("\n").length <= 10
         return post_html_body(post, false)
       else
         html_body.gsub!("#{MARK_STRING}1\n",
-          '<a id="show_quote_button" href="#" class="showquote toggle" data-selector="#post_view .fullquote"
-            data-text="Hide quoted text">Show quoted text</a>' + "\n" + '<div class="fullquote">'
+          '<a href="#"
+            id="show_quote_button" class="smallbutton showquote toggle"
+            data-selector="#post_view .fullquote"
+            data-text="Hide quoted text">Show quoted text</a>' +
+            "\n" + '<div class="fullquote">'
         )
         html_body.gsub!(/#{MARK_STRING}2(\n|\z)/, '</div>')
       end
@@ -72,6 +75,11 @@ module ApplicationHelper
       return post_html_body(post, false)
     end
     
+    # gsub doesn't work with this regex, unfortunately
+    {} while html_body.sub!(
+      /(\[\d+\])(?!<\/a>)(.*\n {0,3}\1[^\n]*?(https?:[^\s]+).*?(\n|\z))/m,
+      '<a href="\\3">\\1</a>\\2'
+    )
     html_body = auto_link(html_body, :link => :urls, :sanitize => false)
     
     return html_body
