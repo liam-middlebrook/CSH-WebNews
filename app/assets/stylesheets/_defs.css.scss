@@ -1,0 +1,32 @@
+$white: #fff;
+$black: #000;
+
+$bg_light: #f5f5f5;
+$bg_toolbar: #ddd;
+$border_light: #ddd;
+$border_button: #bbb;
+$border_pane: #444;
+
+$text_dark: #111;
+$text_normal: #444;
+$text_light: #999;
+$link_hover: #77c;
+
+@mixin links {
+  a {
+    color: $text_dark;
+    text-decoration: underline;
+    &:hover { color: $link_hover; }
+  }
+}
+
+@mixin highlights {
+  &.selected { background-color: #dddfff !important; }
+  &:hover { background-color: #eeefff; cursor: pointer; }
+}
+
+@mixin ellipsis {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
