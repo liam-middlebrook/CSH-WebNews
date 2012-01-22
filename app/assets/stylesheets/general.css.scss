@@ -39,6 +39,7 @@ i { font-style: italic; }
 .mine_reply { color: #d1d !important; }
 .mine_in_thread { color: #11f !important; }
 
+.button { margin-right: 8px; }
 input[type="submit"] { margin-right: 0; }
 
 .button, input[type="submit"] {
@@ -47,7 +48,6 @@ input[type="submit"] { margin-right: 0; }
   line-height: 24px;
   vertical-align: middle;
   padding: 0 6px;
-  margin-right: 8px;
   margin-top: -2px;
   border: 2px solid $border_button;
   border-radius: 2px;
