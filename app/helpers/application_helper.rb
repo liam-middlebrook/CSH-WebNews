@@ -40,8 +40,8 @@ module ApplicationHelper
     
     (1..3).each do |depth|
       more_quotes = ' ?>' * (depth - 1)
-      pre_body.gsub!(/((\a|\n)(>#{more_quotes}.*(\n|\z))+)/,
-        '\\2' + "#{MARK_STRING}3" + '\\1' + "#{MARK_STRING}4\n")
+      pre_body.gsub!(/(\A|\n)((>#{more_quotes}.*(\n|\z))+)/,
+        '\\1' + "#{MARK_STRING}3\n" + '\\2' + "#{MARK_STRING}4\n")
     end
     
     # This structure tends to cause problems when the replacements are done
