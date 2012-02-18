@@ -70,7 +70,7 @@ class Post < ActiveRecord::Base
   end
   
   def parent
-    Post.where(:message_id => parent_id, :newsgroup => newsgroup.name).first
+    parent_id == '' ? nil : Post.where(:message_id => parent_id, :newsgroup => newsgroup.name).first
   end
   
   def children
@@ -78,7 +78,7 @@ class Post < ActiveRecord::Base
   end
   
   def thread_parent
-    Post.where(:message_id => thread_id, :newsgroup => newsgroup.name).first
+    message_id == thread_id ? self : Post.where(:message_id => thread_id, :newsgroup => newsgroup.name).first
   end
   
   def thread_children

@@ -12,7 +12,7 @@ else
 select_post = (showing) ->
   post_tr = $('#posts_list tr[data-id="<%= @post.id %>"]')
   
-  if post_tr.is(':hidden') or (showing and post_tr.attr('data-parent') == '')
+  if post_tr.is(':hidden') or (showing and post_tr.attr('data-parent') == 'false')
     parent = if post_tr.is(':hidden') then post_tr.prevAll('[data-level="1"]:first') else post_tr
     parent.find('.expandable').removeClass('expandable').addClass('expanded')
     for child in parent.nextUntil('[data-level="1"]')
