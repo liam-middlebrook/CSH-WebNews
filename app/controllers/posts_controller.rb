@@ -20,7 +20,8 @@ class PostsController < ApplicationController
       @from_newer = @showing_thread.date
     end
     
-    limit = (@from_older and @from_newer) ? 6 : 11
+    limit = (@from_older and @from_newer) ? 5 : 9
+    limit *= 2 if @flat_mode
     
     if not (@from_older or @from_newer)
       @from_older = Post.order('date').last.date + 1.second
@@ -28,9 +29,7 @@ class PostsController < ApplicationController
     
     if @from_older
       if @flat_mode
-        @posts_older = @newsgroup.posts.
-          where('date < ?', @from_older).
-          order('date DESC').limit(limit * 2)
+        @posts_older = @newsgroup.posts.where('date < ?', @from_older).order('date DESC').limit(limit)
       else
         @posts_older = @newsgroup.posts.
           where('parent_id = ? and date < ?', '', @from_older).
@@ -40,9 +39,7 @@ class PostsController < ApplicationController
     
     if @from_newer
       if @flat_mode
-        @posts_newer = @newsgroup.posts.
-          where('date > ?', @from_newer).
-          order('date').limit(limit * 2)
+        @posts_newer = @newsgroup.posts.where('date > ?', @from_newer).order('date').limit(limit)
       else
         @from_newer = @newsgroup.posts.where(:date => @from_newer).first.thread_parent.date
         @posts_newer = @newsgroup.posts.
@@ -72,7 +69,7 @@ class PostsController < ApplicationController
   end
   
   def search
-    limit = 21
+    limit = 18
     conditions, values, error_text = build_search_conditions
     
     if @from_older
