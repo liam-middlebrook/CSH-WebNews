@@ -7,10 +7,11 @@ class PostsController < ApplicationController
 
   def index
     @not_found = true if params[:not_found]
+    @flat_mode = true if @current_user.thread_mode == :flat
     
     if params[:showing]
       @showing = @newsgroup.posts.find_by_number(params[:showing])
-      if @current_user.thread_mode == :flat
+      if @flat_mode
         @showing_thread = @showing
       else
         @showing_thread = @showing.thread_parent
@@ -26,7 +27,7 @@ class PostsController < ApplicationController
     end
     
     if @from_older
-      if @current_user.thread_mode == :flat
+      if @flat_mode
         @posts_older = @newsgroup.posts.
           where('date < ?', @from_older).
           order('date DESC').limit(limit * 2)
@@ -38,7 +39,7 @@ class PostsController < ApplicationController
     end
     
     if @from_newer
-      if @current_user.thread_mode == :flat
+      if @flat_mode
         @posts_newer = @newsgroup.posts.
           where('date > ?', @from_newer).
           order('date').limit(limit * 2)
@@ -57,6 +58,14 @@ class PostsController < ApplicationController
     if @posts_newer
       @more_newer = @posts_newer.length > 0 && !@posts_newer[limit - 1].nil?
       @posts_newer.delete_at(-1) if @posts_newer.length == limit
+    end
+    
+    if not @flat_mode
+      flatten = (@current_user.thread_mode == :hybrid)
+      @showing_thread = @showing_thread.thread_tree_for_user(@current_user, flatten) if @showing_thread
+      [@posts_older, @posts_newer].each do |posts|
+        posts.map!{ |post| post.thread_tree_for_user(@current_user, flatten) } if posts
+      end
     end
     
     get_next_unread_post
@@ -88,7 +97,7 @@ class PostsController < ApplicationController
       render :nothing => true and return
     end
     
-    @search_mode = true
+    @search_mode = @flat_mode = true
     @posts_older = Post.where(conditions.join(' and '), *values).order('date DESC').limit(limit)
     @more_older = @posts_older.length > 0 && !@posts_older[limit - 1].nil?
     @posts_older.delete_at(-1) if @posts_older.length == limit

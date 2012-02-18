@@ -1,29 +1,6 @@
-<%
-if @current_user.thread_mode == :hybrid
-  if level == 1
-    children = post.thread_children
-  else
-    children = []
-  end
-else
-  children = post.children
-end
+<%= render :partial => 'post_row', :locals => { :post => tree[:post], :level => level,
+  :unread => tree[:unread], :tr_class => tree[:personal_class], :expanded => (tree[:children].count > 0) } %>
 
-# If level != 1, mine_in_thread is provided by the next recursion level up
-mine_in_thread = post.user_in_thread?(@current_user) if level == 1
-
-# Can't use personal_class_for_user due to mine_in_thread caching stuff
-tr_class = case
-  when post.authored_by?(@current_user) then 'mine'
-  when post.parent && post.parent.authored_by?(@current_user) then 'mine_reply'
-  when mine_in_thread then 'mine_in_thread'
-end
-%>
-
-<%= render :partial => 'post_row', :locals => {
-  :post => post, :level => level, :tr_class => tr_class, :expanded => (children.count > 0) } %>
-
-<% children.each do |child| %>
-  <%= render :partial => 'post_tree',
-    :locals => { :post => child, :level => level + 1, :mine_in_thread => mine_in_thread } %>
-<% end if children.count > 0 %>
+<% tree[:children].each do |child_tree| %>
+  <%= render :partial => 'post_tree', :locals => { :tree => child_tree, :level => level + 1 } %>
+<% end %>

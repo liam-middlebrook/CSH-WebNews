@@ -86,7 +86,27 @@ class Post < ActiveRecord::Base
   end
   
   def all_in_thread
-    Post.where(:thread_id => thread_id, :newsgroup => newsgroup.name)
+    Post.where(:thread_id => thread_id, :newsgroup => newsgroup.name).order('date')
+  end
+  
+  def thread_tree_for_user(user, flatten = false, all_posts = nil)
+    all_posts ||= all_in_thread.to_a
+    {
+      :post => self,
+      :children => if flatten
+        all_posts.reject{ |p| p == self }.map{ |p| {
+          :post => p, :children => [],
+          :unread => p.unread_for_user?(user),
+          :personal_class => p.personal_class_for_user(user)
+        }}
+      else
+        all_posts.
+          select{ |p| p.parent_id == self.message_id }.
+          map{ |p| p.thread_tree_for_user(user, flatten, all_posts) }
+      end,
+      :unread => self.unread_for_user?(user),
+      :personal_class => self.personal_class_for_user(user)
+    }
   end
   
   def original_parent_id
@@ -127,11 +147,11 @@ class Post < ActiveRecord::Base
     return all_in_thread.reduce(false){ |m, post| m || post.unread_for_user?(user) }
   end
   
-  def personal_class_for_user(user)
+  def personal_class_for_user(user, check_thread = true)
     case
       when authored_by?(user) then :mine
       when parent && parent.authored_by?(user) then :mine_reply
-      when thread_parent.user_in_thread?(user) then :mine_in_thread
+      when check_thread && thread_parent.user_in_thread?(user) then :mine_in_thread
     end
   end
   
