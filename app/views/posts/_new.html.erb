@@ -22,18 +22,14 @@
     <div class="form_element">
       <%= f.text_area :body %>
     </div>
-    <p class="explain close">Drafts are saved automatically in your browser's local storage. Saved drafts will not be available if you switch browsers or devices.</p>
+    <p class="explain close">Drafts are saved automatically in your browser's local storage. Saved drafts will not be available if you switch browsers or devices.<br>Need to reference a bunch of long URLs? WebNews auto-links &quot;footnote&quot; style URL references. <a href="#" class="smallbutton toggle" title="Show me how!" data-selector="#link_markup_explain">?</a></p>
     
     <% if @post %>
       <%= f.hidden_field :reply_newsgroup, :value => @post.newsgroup.name %>
       <%= f.hidden_field :reply_number, :value => @post.number %>
     <% end %>
     
-    <div id="link_markup_note" class="form_element">
-      <p id="link_markup_tease">Protip: Use numbered footnotes to reference long URLs.
-      <a href="#" class="smallbutton toggle" title="Show me how!" data-selector="#link_markup_explain">?</a></p>
-      <p id="link_markup_explain">This is an example of using footnotes to reference web sites[1] or other news posts[2]. WebNews translates the inline numbers into clickable links when displaying the post.<br><br>[1] https://wiki.csh.rit.edu/wiki/News<br>[2] https://webnews.csh.rit.edu/#!/csh.noise/8487</p>
-    </div>
+    <p id="link_markup_explain">This is an example of using footnotes to reference web sites[1] or other news posts[2]. WebNews translates the inline numbers into clickable links when displaying the post.<br><br>[1] https://wiki.csh.rit.edu/wiki/News<br>[2] https://webnews.csh.rit.edu/#!/csh.noise/8487</p>
     
     <div class="buttons">
       <%= f.submit 'Post', :class => 'button green' %>

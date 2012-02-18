@@ -62,22 +62,13 @@
     margin-top: -1em;
   }
   
-  #link_markup_note {
-    float: left;
-    
-    #link_markup_tease {
-      margin-top: 0.25em;
-      margin-bottom: 0;
-    }
-    
-    #link_markup_explain {
-      font-family: monospace;
-      margin-top: 0.5em;
-      margin-bottom: 0;
-      background-color: $white;
-      border: 1px solid $border_button;
-      padding-left: 2px;
-    }
+  #link_markup_explain {
+    font-family: monospace;
+    margin-top: 0.5em;
+    margin-bottom: 0;
+    background-color: $white;
+    border: 1px solid $border_button;
+    padding-left: 2px;
   }
 
   fieldset {
