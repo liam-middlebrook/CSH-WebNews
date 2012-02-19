@@ -229,7 +229,7 @@ $('a.resume_draft').live 'click', ->
   $('#post_body').putCursorAtEnd() if $('#post_body').val() != ''
   set_draft_interval()
 
-$('input[type="submit"]').live 'click', ->
+$('[type="submit"]').live 'click', ->
   $('#dialog .buttons').hide()
   $('#dialog .loading').text('Working...')
   $('#dialog .errors').text('')

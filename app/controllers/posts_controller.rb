@@ -199,13 +199,15 @@ class PostsController < ApplicationController
     begin
       Net::NNTP.start(NEWS_SERVER) do |nntp|
         Newsgroup.sync_group!(nntp, @post.newsgroup.name, @post.newsgroup.status)
+        Newsgroup.sync_group!(nntp, 'control.cancel', 'n')
       end
     rescue
-      @sync_error = "Your cancel was accepted by the news server, but an error occurred while attempting to sync the newsgroup containing the canceled post. This may be a transient issue: Wait a couple minutes and manually refresh the newsgroup, and the post should be gone.\n\nThe exact error was: #{$!.message}"
+      @sync_error = "Your cancel was accepted by the news server, but an error occurred while attempting to sync the local post database. This may be a transient issue: Wait a couple minutes and manually refresh the newsgroup, and the post should be gone.\n\nThe exact error was: #{$!.message}"
     end
   end
   
   def destroy_confirm
+    @admin_cancel = !@post.authored_by?(@current_user)
     render 'shared/dialog'
   end
   

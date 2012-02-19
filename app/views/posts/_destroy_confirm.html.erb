@@ -20,7 +20,7 @@
     </div>
     
     <div class="buttons">
-      <%= f.submit 'I understand, cancel this post', :class => 'button red' %>
+      <button name="commit" type="submit" class="button red"><% if @admin_cancel %><span class="role_badge admin">A</span> <% end %>I understand, cancel this post</button>
       <a href="#" class="button dialog_cancel">Never mind</a>
     </div>
   <% end %>

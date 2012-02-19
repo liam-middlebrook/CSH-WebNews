@@ -12,19 +12,21 @@ end
 <div class="buttons">
   <% if not @search_mode and @newsgroup.posting_allowed? %>
     <a class="button new_draft"
-      href="#?<%= new_post_path(:newsgroup => @newsgroup.name, :number => post.number) %>">Reply</a>
+      href="#?<%= new_post_path(:newsgroup => @newsgroup.name, :number => post.number) %>">Post Reply</a>
   <% end %>
   <% if @search_mode %>
     <a class="button" href="#!<%= post_path(@newsgroup.name, post.number) %>">View in Group</a>
   <% end %>
-  <a id="show_headers_button" class="button toggle" href="#"
-    data-selector="#post_view .headers" data-text="Hide Headers">Show Headers</a>
   <% if not post.authored_by?(@current_user) %>
     <a id="mark_unread_button" class="button mark_unread"
       href="#~<%= mark_read_path(:mark_unread => true, :newsgroup => @newsgroup.name, :number => @post.number) %>">Mark Unread</a>
   <% end %>
-  <% if not @search_mode and post.authored_by?(@current_user) and post.children.count == 0 and @newsgroup.posting_allowed? %>
-    <a id="cancel_post_button" class="button red" href="#?<%= confirm_destroy_post_path(:newsgroup => @newsgroup.name, :number => post.number) %>">Cancel</a>
+  <% if not @search_mode and @newsgroup.posting_allowed? and post.children.count == 0 %>
+    <% if post.authored_by?(@current_user) %>
+      <a id="cancel_post_button" class="button" href="#?<%= confirm_destroy_post_path(:newsgroup => @newsgroup.name, :number => post.number) %>">Cancel</a>
+    <% elsif @current_user.is_admin? && false #disabled for now %>
+      <a id="cancel_post_button" class="button" href="#?<%= confirm_destroy_post_path(:newsgroup => @newsgroup.name, :number => post.number) %>"><span class="role_badge admin">A</span> Cancel</a>
+    <% end %>
   <% end %>
 </div>
 <div class="content" tabindex="-1">
@@ -44,6 +46,8 @@ end
         <% end %>
       </span> &mdash;
       <span class="date"><%= post.date.in_time_zone(@current_user.time_zone).strftime(DATE_FORMAT) %></span>
+      <a id="show_headers_button" class="smallbutton toggle" href="#"
+        data-selector="#post_view .headers" data-text="Hide Headers">Show Headers</a>
     </div>
     <% if post.date > Time.now + 60.seconds %>
       <div class="notice">

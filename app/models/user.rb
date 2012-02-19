@@ -11,6 +11,18 @@ class User < ActiveRecord::Base
     updated_at < 3.months.ago
   end
   
+  def unix_groups
+    @unix_groups ||= `groups #{username}`.split.reject{ |g| g == username } rescue []
+  end
+  
+  def is_admin?
+    unix_groups.include?('rtp')
+  end
+  
+  def is_moderator?
+    unix_groups.include?('rtp') or unix_groups.include?('eboard')
+  end
+  
   def email
     username + LOCAL_EMAIL_DOMAIN
   end

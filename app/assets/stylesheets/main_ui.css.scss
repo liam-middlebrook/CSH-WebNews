@@ -317,9 +317,12 @@
         color: $text_normal;
         
         .smallbutton {
-          padding: 0 0.5em;
           background-color: $link_hover;
         }
+      }
+      
+      .smallbutton {
+        padding: 0 0.5em;
       }
     }
     
