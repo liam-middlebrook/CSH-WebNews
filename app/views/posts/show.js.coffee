@@ -62,6 +62,5 @@ group_li.addClass('selected') if selected
 <% end %>
 
 $('#next_unread').attr('href', '<%= next_unread_href %>')
-$(window).resize()
 
 <% end %>

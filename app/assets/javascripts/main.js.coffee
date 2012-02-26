@@ -12,6 +12,10 @@ window.draft_save_timer = false
 jQuery.fn.outerHTML = ->
   $('<div>').append(this.eq(0).clone()).html()
 
+@fix_post_header = ->
+  if $('#post_header').length > 0
+    $('#post_view .content').css('top', $('#post_header').outerHeight() + 'px');
+
 @target_external_links = ->
   $('a[href^="http"]:not([href*="' + window.location.host + '"])').attr('target', '_blank')
 
@@ -257,10 +261,6 @@ $('#posts_list tbody tr').live 'click', (e, do_toggle = true) ->
   tr.addClass('selected')
   return false
 
-$(window).resize ->
-  if $('#post_view .buttons').length > 0
-    $('#post_view .info h3').css('margin-right', $('#post_view .buttons').outerWidth() + 'px')
-
 $('a, input').live 'mousedown', -> this.style.outlineStyle = 'none'
 $('a, input').live 'blur', -> this.style.outlineStyle = ''
 
@@ -273,7 +273,11 @@ $('a, input, select, textarea, button').live 'focus', ->
     $('#overlay').focus()
     return false
 
+$(window).resize ->
+  fix_post_header()
+
 $(document).ajaxComplete ->
+  fix_post_header()
   target_external_links()
   for a in $('.toggle')
     if not $(a).hasClass('width_fixed')

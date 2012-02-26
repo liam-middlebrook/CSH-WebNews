@@ -1,6 +1,4 @@
 <%
-html_body = post_html_body(post)
-
 other_groups = []
 if post.is_crossposted?
   other_groups = (post.in_all_newsgroups - [post]).map{ |other_post|
@@ -9,100 +7,103 @@ if post.is_crossposted?
   }
 end
 %>
-<div class="buttons">
-  <% if not @search_mode and @newsgroup.posting_allowed? %>
-    <a class="button new_draft"
-      href="#?<%= new_post_path(:newsgroup => @newsgroup.name, :number => post.number) %>">Post Reply</a>
-  <% end %>
-  <% if @search_mode %>
-    <a class="button" href="#!<%= post_path(@newsgroup.name, post.number) %>">View in Group</a>
-  <% end %>
-  <% if not post.authored_by?(@current_user) %>
-    <a id="mark_unread_button" class="button mark_unread"
-      href="#~<%= mark_read_path(:mark_unread => true, :newsgroup => @newsgroup.name, :number => @post.number) %>">Mark Unread</a>
-  <% end %>
-  <% if not @search_mode and @newsgroup.posting_allowed? and post.children.count == 0 %>
-    <% if post.authored_by?(@current_user) %>
-      <a id="cancel_post_button" class="button" href="#?<%= confirm_destroy_post_path(:newsgroup => @newsgroup.name, :number => post.number) %>">Cancel</a>
-    <% elsif @current_user.is_admin? && false #disabled for now %>
-      <a id="cancel_post_button" class="button" href="#?<%= confirm_destroy_post_path(:newsgroup => @newsgroup.name, :number => post.number) %>"><span class="role_badge admin">A</span> Cancel</a>
+
+<div id="post_header">
+  <div class="buttons">
+    <% if not @search_mode and @newsgroup.posting_allowed? %>
+      <a class="button new_draft"
+        href="#?<%= new_post_path(:newsgroup => @newsgroup.name, :number => post.number) %>">Post Reply</a>
     <% end %>
-  <% end %>
-</div>
-<div class="content" tabindex="-1">
-  <div class="info">
-    <h3><%= post.subject %></h3>
-    <div class="byline">
-      <span class="author">
-        <%= post.author_name %>
-        <% if post.author_is_local? %>
-          <%= ' (' + post.author_username + ')' %>
-          <a class="smallbutton" href="<%= PROFILES_URL + post.author_username %>"
-            title="Go to this user's profile page">Profile</a>
-          <a class="smallbutton" href="<%= WIKI_USER_URL + post.author_username.capitalize %>"
-            title="Go to this user's wiki page">Wiki</a>
-        <% else %>
-          <%= ' <' + post.author_email + '>' if post.author_email %>
-        <% end %>
-      </span> &mdash;
-      <span class="date"><%= post.date.in_time_zone(@current_user.time_zone).strftime(DATE_FORMAT) %></span>
-      <a id="show_headers_button" class="smallbutton toggle" href="#"
-        data-selector="#post_view .headers" data-text="Hide Headers">Show Headers</a>
-    </div>
-    <% if post.date > Time.now + 60.seconds %>
-      <div class="notice">
-        <span class="icon">!</span>
-        Great Scott! This message is from the future! (may indicate a clock sync issue)
-      </div>
+    <% if @search_mode %>
+      <a class="button" href="#!<%= post_path(@newsgroup.name, post.number) %>">View in Group</a>
     <% end %>
-    <% if post.is_reparented? and
-        not (@current_user.thread_mode == :flat and not post.is_orphaned?) %>
-      <div class="notice">
-        <span class="icon">!</span>
-        <% if post.is_orphaned? %>
-          <% if post.original_parent %>
-            This message is a reply to <a href="#!<%=
-              post_path(post.original_parent.newsgroup.name, post.original_parent.number)
-            %>"><%= post.original_parent.subject %></a> in <%= post.original_parent.newsgroup.name %>.
-          <% else %>
-            This message is orphaned. It may be a reply to a canceled message or an off-group email.
-          <% end %>
-        <% else # Not displayed in flat view %>
-          This message was de-threaded. WebNews tried to guess where it belongs, but this may not be correct.
-        <% end %>
-      </div>
+    <% if not post.authored_by?(@current_user) %>
+      <a id="mark_unread_button" class="button mark_unread"
+        href="#~<%= mark_read_path(:mark_unread => true, :newsgroup => @newsgroup.name, :number => @post.number) %>">Mark Unread</a>
     <% end %>
-    <% if post.is_crossposted? or
-        (post.followup_newsgroup and not post.newsgroup == post.followup_newsgroup) %>
-      <div class="notice">
-        <span class="icon">!</span>
-        <% if not post.is_crossposted? %>
-          The author specified that replies to this message should go to <%= post.followup_newsgroup.name %>.
-        <% else %>
-          This message was cross-posted to <%= raw other_groups.to_sentence %>.
-          <% if not post.followup_newsgroup %>
-            The author did not specify where replies should go.
-          <% elsif post.followup_newsgroup == @newsgroup %>
-            The author specified that replies should go here.
-          <% elsif other_groups.length == 1 %>
-            The author specified that replies should go <a href="#!<%=
-              post_path(post.followup_newsgroup.name, post.in_newsgroup(post.followup_newsgroup).number)
-            %>">there</a>.
-          <% else %>
-            The author specified that replies should go to <a href="#!<%=
-              post_path(post.followup_newsgroup.name, post.in_newsgroup(post.followup_newsgroup).number)
-            %>"><%= post.followup_newsgroup.name %></a>.
-          <% end %>
-        <% end %>
-      </div>
-    <% end %>
-    <% if post.stripped %>
-      <div class="notice">
-        <span class="icon">!</span>
-        WebNews stripped one or more attachments from this message.
-      </div>
+    <% if not @search_mode and @newsgroup.posting_allowed? and post.children.count == 0 %>
+      <% if post.authored_by?(@current_user) %>
+        <a id="cancel_post_button" class="button" href="#?<%= confirm_destroy_post_path(:newsgroup => @newsgroup.name, :number => post.number) %>">Cancel</a>
+      <% elsif @current_user.is_admin? && false #disabled for now %>
+        <a id="cancel_post_button" class="button" href="#?<%= confirm_destroy_post_path(:newsgroup => @newsgroup.name, :number => post.number) %>"><span class="role_badge admin">A</span> Cancel</a>
+      <% end %>
     <% end %>
   </div>
+
+  <h3><%= post.subject %></h3>
+  <div class="byline">
+    <span class="author">
+      <%= post.author_name %>
+      <% if post.author_is_local? %>
+        <%= ' (' + post.author_username + ')' %>
+        <a class="smallbutton" href="<%= PROFILES_URL + post.author_username %>"
+          title="Go to this user's profile page">Profile</a>
+        <a class="smallbutton" href="<%= WIKI_USER_URL + post.author_username.capitalize %>"
+          title="Go to this user's wiki page">Wiki</a>
+      <% else %>
+        <%= ' <' + post.author_email + '>' if post.author_email %>
+      <% end %>
+    </span> &mdash;
+    <span class="date"><%= post.date.in_time_zone(@current_user.time_zone).strftime(DATE_FORMAT) %></span>
+    <a id="show_headers_button" class="smallbutton toggle" href="#"
+      data-selector="#post_view .headers" data-text="Hide Headers">Show Headers</a>
+  </div>
+  <% if post.date > Time.now + 60.seconds %>
+    <div class="notice">
+      <span class="icon">!</span>
+      Great Scott! This message is from the future! (may indicate a clock sync issue)
+    </div>
+  <% end %>
+  <% if post.is_reparented? and
+      not (@current_user.thread_mode == :flat and not post.is_orphaned?) %>
+    <div class="notice">
+      <span class="icon">!</span>
+      <% if post.is_orphaned? %>
+        <% if post.original_parent %>
+          This message is a reply to <a href="#!<%=
+            post_path(post.original_parent.newsgroup.name, post.original_parent.number)
+          %>"><%= post.original_parent.subject %></a> in <%= post.original_parent.newsgroup.name %>.
+        <% else %>
+          This message is orphaned. It may be a reply to a canceled message or an off-group email.
+        <% end %>
+      <% else # Not displayed in flat view %>
+        This message was de-threaded. WebNews tried to guess where it belongs, but this may not be correct.
+      <% end %>
+    </div>
+  <% end %>
+  <% if post.is_crossposted? or
+      (post.followup_newsgroup and not post.newsgroup == post.followup_newsgroup) %>
+    <div class="notice">
+      <span class="icon">!</span>
+      <% if not post.is_crossposted? %>
+        The author specified that replies to this message should go to <%= post.followup_newsgroup.name %>.
+      <% else %>
+        This message was cross-posted to <%= raw other_groups.to_sentence %>.
+        <% if not post.followup_newsgroup %>
+          The author did not specify where replies should go.
+        <% elsif post.followup_newsgroup == @newsgroup %>
+          The author specified that replies should go here.
+        <% elsif other_groups.length == 1 %>
+          The author specified that replies should go <a href="#!<%=
+            post_path(post.followup_newsgroup.name, post.in_newsgroup(post.followup_newsgroup).number)
+          %>">there</a>.
+        <% else %>
+          The author specified that replies should go to <a href="#!<%=
+            post_path(post.followup_newsgroup.name, post.in_newsgroup(post.followup_newsgroup).number)
+          %>"><%= post.followup_newsgroup.name %></a>.
+        <% end %>
+      <% end %>
+    </div>
+  <% end %>
+  <% if post.stripped %>
+    <div class="notice">
+      <span class="icon">!</span>
+      WebNews stripped one or more attachments from this message.
+    </div>
+  <% end %>
+</div>
+
+<div class="content" tabindex="-1">
   <div class="headers"><%= post.headers %></div>
-  <div class="body"><%= raw html_body %></div>
+  <div class="body"><%= raw post_html_body(post) %></div>
 </div>
