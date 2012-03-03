@@ -44,6 +44,10 @@
   .loading { color: #0b0; }
   .errors { color: #d00; }
   
+  .with_links {
+    @include links;
+  }
+  
   p, ul {
     @include links;
     margin-bottom: 1.25em;

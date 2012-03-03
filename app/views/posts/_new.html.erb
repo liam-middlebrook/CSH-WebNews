@@ -4,6 +4,13 @@
   <%= form_for @new_post,
       :url => create_post_path, :html => { :method => 'post'}, :remote => true do |f| %>
     
+    <% if @post %>
+      <div class="form_element with_links">
+        Replying to <a class="dialog_cancel minimize_draft"
+          href="#!<%= post_path(@post.newsgroup.name, @post.number) %>"><%= @post.subject %></a>
+      </div>
+    <% end %>
+    
     <div class="form_element">
       <%= f.label :newsgroup, 'Newsgroup:' %>
       <%= f.select :newsgroup, @newsgroups.map{ |n| [n.name, n.name] },
