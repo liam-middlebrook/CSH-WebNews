@@ -19,8 +19,12 @@
       <%= text_field_tag :reason, nil, :placeholder => 'Reason for canceling (optional)' %>
     </div>
     
+    <% if @admin_cancel %>
+    <p class="bigexplain"><span class="role_badge">Admin</span> Your admin privileges allow you to cancel this post even though you are not the author.</p>
+    <% end %>
+    
     <div class="buttons">
-      <button name="commit" type="submit" class="button red"><% if @admin_cancel %><span class="role_badge admin">A</span> <% end %>I understand, cancel this post</button>
+      <button name="commit" type="submit" class="button red">I understand, cancel this post</button>
       <a href="#" class="button dialog_cancel">Never mind</a>
     </div>
   <% end %>

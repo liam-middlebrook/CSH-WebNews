@@ -112,6 +112,7 @@ class PostsController < ApplicationController
     if @post
       @post_was_unread = @post.mark_read_for_user(@current_user)
       get_next_unread_post
+      @admin_cancel = true if @current_user.is_admin? and not @post.authored_by?(@current_user)
     else
       @not_found = true
     end

@@ -1,6 +1,6 @@
 <div id="toolbar">
   <div id="user_info">
-    <% if @current_user.is_admin? %><span class="role_badge admin">Admin</span><% end %>
+    <% if @current_user.is_admin? %><span class="role_badge">Admin</span><% end %>
     <span class="real_name"><%= @current_user.real_name %></span>
     <span class="username">(<%= @current_user.username %>)</span>
     <a id="settings_button" class="button" href="#?<%= edit_user_path %>">Settings</a>

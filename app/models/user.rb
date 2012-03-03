@@ -16,10 +16,6 @@ class User < ActiveRecord::Base
   end
   
   def is_admin?
-    unix_groups.include?('rtp')
-  end
-  
-  def is_moderator?
     unix_groups.include?('rtp') or unix_groups.include?('eboard')
   end
   
