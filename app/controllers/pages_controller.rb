@@ -100,6 +100,7 @@ class PagesController < ApplicationController
           threads << {
             :parent => parent,
             :date => post.date,
+            :oldest => post,
             :posts => 1,
             :authors => [maybe_you(post.author_name)],
             :unread => unread,
