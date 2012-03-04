@@ -1,6 +1,6 @@
 class PostsController < ApplicationController
   before_filter :get_newsgroup, :only => [:index, :search, :search_entry, :show, :new]
-  before_filter :get_post, :only => [:show, :new, :destroy, :destroy_confirm]
+  before_filter :get_post, :only => [:show, :new, :destroy, :destroy_confirm, :edit_sticky, :update_sticky]
   before_filter :get_newsgroups_for_search, :only => :search_entry
   before_filter :get_newsgroups_for_posting, :only => [:new, :create]
   before_filter :set_list_layout_and_offset, :only => [:index, :search]
@@ -210,12 +210,12 @@ class PostsController < ApplicationController
   end
   
   def destroy
-    if not @post.newsgroup.posting_allowed?
-      form_error "The newsgroup containing the post you are trying to cancel is read-only. Posts in read-only newsgroups cannot be canceled." and return
-    end
-    
     if @post.nil?
       form_error "The post you are trying to cancel doesn't exist; it may have already been canceled. Try manually refreshing the newsgroup." and return
+    end
+    
+    if not @post.newsgroup.posting_allowed?
+      form_error "The newsgroup containing the post you are trying to cancel is read-only. Posts in read-only newsgroups cannot be canceled." and return
     end
     
     if not @post.authored_by?(@current_user) and not @current_user.is_admin?
@@ -243,6 +243,34 @@ class PostsController < ApplicationController
   def destroy_confirm
     @admin_cancel = !@post.authored_by?(@current_user)
     render 'shared/dialog'
+  end
+  
+  def edit_sticky
+    render 'shared/dialog'
+  end
+  
+  def update_sticky
+    if not @current_user.is_admin?
+      form_error "You cannot sticky or unsticky posts without admin privileges." and return
+    end
+    
+    if @post.nil?
+      form_error "The post you are trying to sticky doesn't exist; it may have been canceled. Try manually refreshing the newsgroup." and return
+    end
+    
+    if params[:do_sticky]
+      t = Chronic.parse(params[:sticky_until])
+      if t.nil?
+        form_error "Unable to parse \"#{params[:sticky_until]}\"." and return
+      end
+      sticky_until = t - t.sec - ((((t.min + 15) % 30) - 15) * 1.minute)
+      if sticky_until < Time.now
+        form_error "You must enter a time that is in the future, when rounded to the nearest half-hour." and return
+      end
+      @post.update_attributes(:sticky_user => @current_user, :sticky_until => sticky_until)
+    else
+      @post.update_attributes(:sticky_until => nil)
+    end
   end
   
   private

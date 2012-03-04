@@ -8,5 +8,8 @@ switch '<%= j raw(controller.controller_name + '/' + controller.action_name) %>'
     else
       $('#overlay').focus()
     set_draft_interval()
+  when 'posts/edit_sticky'
+    if $('#sticky_until').val() == ''
+      $('#sticky_until').focus()
   else
     $('#overlay').focus()

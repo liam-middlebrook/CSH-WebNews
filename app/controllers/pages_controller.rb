@@ -73,9 +73,13 @@ class PagesController < ApplicationController
     def get_activity_feed
       unread_posts = @current_user.unread_posts
       recent_posts = Post.where('date > ?', 1.week.ago)
+      sticky_posts = Post.where('sticky_until > ?', Time.now).map{ |p| p.all_in_thread }.flatten
+      @sticky_threads = build_thread_activity_data(sticky_posts)
       @unread_threads = build_thread_activity_data(unread_posts)
       @recent_threads = build_thread_activity_data(recent_posts, RECENT_EXCLUDE)
       @recent_threads.reject!{ |rt| @unread_threads.index{ |ut| ut[:parent] == rt[:parent] } }
+      @recent_threads.reject!{ |rt| @sticky_threads.index{ |st| st[:parent] == rt[:parent] } }
+      @unread_threads.reject!{ |ut| @sticky_threads.index{ |st| st[:parent] == ut[:parent] } }
     end
     
     def build_thread_activity_data(posts, exclude = nil)
@@ -92,18 +96,28 @@ class PagesController < ApplicationController
         parent = post.thread_parent
         i = threads.index{ |t| t[:parent] == parent }
         if i.nil?
+          unread = post.unread_for_user?(@current_user)
           threads << {
             :parent => parent,
             :date => post.date,
             :posts => 1,
             :authors => [maybe_you(post.author_name)],
-            :oldest => post
+            :unread => unread,
+            :oldest_unread => unread ? post : nil,
+            :unread_posts => unread ? 1 : 0,
+            :unread_authors => unread ? [maybe_you(post.author_name)] : []
           }
         else
           threads[i][:posts] += 1
           threads[i][:authors] |= [maybe_you(post.author_name)]
           if threads[i][:date] < post.date
             threads[i][:date] = post.date
+          end
+          if post.unread_for_user?(@current_user)
+            threads[i][:unread] = true
+            threads[i][:oldest_unread] ||= post
+            threads[i][:unread_posts] += 1
+            threads[i][:unread_authors] |= [maybe_you(post.author_name)]
           end
         end
       end

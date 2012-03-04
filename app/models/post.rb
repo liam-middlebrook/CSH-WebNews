@@ -1,5 +1,6 @@
 class Post < ActiveRecord::Base
   belongs_to :newsgroup, :foreign_key => :newsgroup, :primary_key => :name
+  belongs_to :sticky_user, :class_name => 'User'
   has_many :unread_post_entries, :dependent => :destroy
   before_destroy :kill_parent_id
   
@@ -29,6 +30,10 @@ class Post < ActiveRecord::Base
       sub(/(.*)\n-- \n.*/m, '\\1').            # '-- ' on its own line and all following text ("standard" sig)
       sub(/\n\n[-~].*[[:alpha:]].*\n*\z/, ''). # Non-blank final lines starting with [-~] and containing a letter
       rstrip
+  end
+  
+  def is_sticky?
+    !sticky_until.nil? and sticky_until > Time.now
   end
   
   def is_crossposted?(quick = false)
@@ -79,10 +84,6 @@ class Post < ActiveRecord::Base
   
   def thread_parent
     message_id == thread_id ? self : Post.where(:message_id => thread_id, :newsgroup => newsgroup.name).first
-  end
-  
-  def thread_children
-    Post.where('thread_id = ? and parent_id != ?', thread_id, '').order('date')
   end
   
   def all_in_thread

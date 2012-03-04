@@ -1,5 +1,9 @@
-<% parent = thread[:parent] %>
-<tr>
+<%
+parent = thread[:parent]
+unread = thread[:unread]
+authors = unread ? thread[:unread_authors] : thread[:authors]
+%>
+<tr<% if mode == :sticky %> class="sticky"<% end %>>
   <td class="date">
     <%= thread[:date].in_time_zone(@current_user.time_zone).strftime(SHORT_DATE_FORMAT) %>
   </td>
@@ -13,24 +17,26 @@
     </div>
     <div class="details">
       <% if thread[:posts] == 1 and thread[:parent] == thread[:oldest] %>
-        Thread started
+        Posted
       <% else %>
         <% if unread %>
-          <a href="#!<%= post_path(thread[:oldest].newsgroup.name, thread[:oldest].number) %>">
-            <%= pluralize(thread[:posts], 'unread post') %>
+          <a href="#!<%= post_path(thread[:oldest_unread].newsgroup.name, thread[:oldest_unread].number) %>">
+            <%= pluralize(thread[:unread_posts], 'unread post') %>
           </a>
-        <% else %>
+        <% elsif mode == :recent %>
           <%= pluralize(thread[:posts], 'recent post') %>
+        <% else %>
+          <%= pluralize(thread[:posts], 'post') %>
         <% end %>
       <% end %>
       
-      by <%= thread[:authors].first %>
-      <% if thread[:authors].size > 1 %>
+      by <%= authors.first %>
+      <% if authors.size > 1 %>
         and
-        <% if thread[:authors].size == 2 %>
-          <%= thread[:authors].last %>
+        <% if authors.size == 2 %>
+          <%= authors.last %>
         <% else %>
-          <%= pluralize(thread[:authors].size - 1, 'other') %>
+          <%= pluralize(authors.size - 1, 'other') %>
         <% end %>
       <% end %>
       

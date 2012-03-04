@@ -96,11 +96,16 @@
     overflow-y: auto;
   }
   
-  .aligned_field {
+  .inline_inputs {
     label { vertical-align: middle; }
+    input[type=checkbox] { vertical-align: middle; }
+    input[type=text] { width: auto; }
+  }
+  
+  .aligned_field {
     label:first-child { width: 90px; display: inline-block; }
     input[type=text] { width: 350px; }
-    input[type=checkbox] { vertical-align: middle; margin-left: 20px; }
+    input[type=checkbox] { margin-left: 20px; }
     input.date { width: auto; }
     p { clear: both; margin-left: 90px; margin-top: 0.25em; }
   }

@@ -43,6 +43,7 @@ i { font-style: italic; }
 .mine { color: #1b1 !important; }
 .mine_reply { color: #d1d !important; }
 .mine_in_thread { color: #11f !important; }
+.sticky { background-color: #ffc; }
 
 .button { margin-right: 8px; }
 [type="submit"] { margin-right: 0; }
@@ -108,6 +109,15 @@ i { font-style: italic; }
     display: inline-block;
     padding: 0 6px;
     font-size: 100%;
+  }
+  
+  .sticky_explain {
+    display: inline-block;
+    font-size: 80%;
+    color: $text_light;
+    text-align: center;
+    vertical-align: middle;
+    line-height: 1;
   }
 }
 

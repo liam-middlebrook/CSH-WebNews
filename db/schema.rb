@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120112010906) do
+ActiveRecord::Schema.define(:version => 20120304014715) do
 
   create_table "newsgroups", :force => true do |t|
     t.string "name"
@@ -28,6 +28,8 @@ ActiveRecord::Schema.define(:version => 20120112010906) do
     t.string   "parent_id"
     t.string   "thread_id"
     t.boolean  "stripped"
+    t.integer  "sticky_user_id"
+    t.datetime "sticky_until"
     t.string   "first_line"
     t.text     "headers"
     t.text     "body"
@@ -37,6 +39,7 @@ ActiveRecord::Schema.define(:version => 20120112010906) do
   add_index "posts", ["message_id"], :name => "index_posts_on_message_id"
   add_index "posts", ["newsgroup", "number"], :name => "index_posts_on_newsgroup_and_number", :unique => true
   add_index "posts", ["parent_id"], :name => "index_posts_on_parent_id"
+  add_index "posts", ["sticky_until"], :name => "index_posts_on_sticky_until"
   add_index "posts", ["thread_id"], :name => "index_posts_on_thread_id"
 
   create_table "unread_post_entries", :force => true do |t|
