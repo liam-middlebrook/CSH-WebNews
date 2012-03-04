@@ -14,7 +14,7 @@ end
       <div class="sticky_explain">
         Stickied by
         <%= post.sticky_user.real_name %><br>until
-        <%= post.sticky_until.strftime(DATE_FORMAT) %>
+        <%= post.sticky_until.in_time_zone(@current_user.time_zone).strftime(DATE_FORMAT) %>
       </div>
     <% end %>
     <% if not @search_mode and @newsgroup.posting_allowed? %>

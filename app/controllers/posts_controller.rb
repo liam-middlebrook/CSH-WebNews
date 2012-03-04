@@ -267,9 +267,13 @@ class PostsController < ApplicationController
       if sticky_until < Time.now
         form_error "You must enter a time that is in the future, when rounded to the nearest half-hour." and return
       end
-      @post.update_attributes(:sticky_user => @current_user, :sticky_until => sticky_until)
+      @post.in_all_newsgroups.each do |post|
+        post.update_attributes(:sticky_user => @current_user, :sticky_until => sticky_until)
+      end
     else
-      @post.update_attributes(:sticky_until => nil)
+      @post.in_all_newsgroups.each do |post|
+        post.update_attributes(:sticky_until => nil)
+      end
     end
   end
   
