@@ -218,6 +218,10 @@ class PostsController < ApplicationController
       form_error "The post you are trying to cancel doesn't exist; it may have already been canceled. Try manually refreshing the newsgroup." and return
     end
     
+    if not @post.authored_by?(@current_user) and not @current_user.is_admin?
+      form_error "You are not the author of this post; you cannot cancel it without admin privileges." and return
+    end
+    
     begin
       Net::NNTP.start(NEWS_SERVER) do |nntp|
         nntp.post(@post.build_cancel_message(@current_user, params[:reason]))
