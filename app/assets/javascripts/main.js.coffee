@@ -212,6 +212,10 @@ $('a.mark_unread').live 'click', ->
   $.getScript @href.replace('#~/', ''), -> set_check_timeout(0)
   return false
 
+$('#crosspost_toggle').live 'click', ->
+  $('#crosspost_to').val('')
+  $('.crosspost_options input').val([])
+
 $('a.minimize_draft').live 'click', ->
   localStorage['draft_html'] = $('#dialog').outerHTML()
   localStorage['draft_form'] = JSON.stringify($('#dialog form').serializeArray())

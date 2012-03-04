@@ -128,6 +128,7 @@ class PostsController < ApplicationController
   end
   
   def create
+    post_newsgroups = []
     @sync_error = nil
   
     if params[:post][:subject].blank?
@@ -136,7 +137,35 @@ class PostsController < ApplicationController
     
     newsgroup = @newsgroups.where_posting_allowed.find_by_name(params[:post][:newsgroup])
     if newsgroup.nil?
-      form_error "The newsgroup you are trying to post to either doesn't exist or doesn't allow posting." and return
+      form_error "The specified newsgroup is either nonexistent or read-only." and return
+    end
+    post_newsgroups << newsgroup
+    
+    if params[:crosspost_to] and params[:crosspost_to] != ''
+      crosspost_to = @newsgroups.where_posting_allowed.find_by_name(params[:crosspost_to])
+      if crosspost_to.nil?
+        form_error "The specified cross-post newsgroup is either nonexistent or read-only." and return
+      elsif crosspost_to == newsgroup
+        form_error "The specified cross-post newsgroup is the same as the primary newsgroup." and return
+      end
+      post_newsgroups << crosspost_to
+    end
+    
+    # TODO: Generalize the concept of "extra cross-post newsgroups" as a configuration option
+    if params[:crosspost_sysadmin]
+      n = @newsgroups.where_posting_allowed.find_by_name('csh.lists.sysadmin')
+      if post_newsgroups.include?(n)
+        form_error "You specified 'also to csh.lists.sysadmin', but that newsgroup is already selected." and return
+      end
+      post_newsgroups << n
+    end
+    
+    if params[:crosspost_alumni]
+      n = @newsgroups.where_posting_allowed.find_by_name('csh.lists.alumni')
+      if post_newsgroups.include?(n)
+        form_error "You specified 'also to csh.lists.alumni', but that newsgroup is already selected." and return
+      end
+      post_newsgroups << n
     end
     
     reply_newsgroup = reply_post = nil
@@ -151,7 +180,7 @@ class PostsController < ApplicationController
     
     post_string = Post.build_message(
       :user => @current_user,
-      :newsgroup => newsgroup,
+      :newsgroups => post_newsgroups.map(&:name),
       :subject => params[:post][:subject],
       :body => params[:post][:body],
       :reply_post => reply_post
@@ -168,7 +197,7 @@ class PostsController < ApplicationController
     
     begin
       Net::NNTP.start(NEWS_SERVER) do |nntp|
-        Newsgroup.sync_group!(nntp, newsgroup.name, newsgroup.status)
+        post_newsgroups.each{ |n| Newsgroup.sync_group!(nntp, n.name, n.status) }
       end
     rescue
       @sync_error = "Your post was accepted by the news server, but an error occurred while attempting to sync the newsgroup it was posted to. This may be a transient issue: Wait a couple minutes and manually refresh the newsgroup, and you should see your post.\n\nThe exact error was: #{$!.message}"
@@ -199,7 +228,7 @@ class PostsController < ApplicationController
     
     begin
       Net::NNTP.start(NEWS_SERVER) do |nntp|
-        Newsgroup.sync_group!(nntp, @post.newsgroup.name, @post.newsgroup.status)
+        @post.all_newsgroups.each{ |n| Newsgroup.sync_group!(nntp, n.name, n.status) }
         Newsgroup.sync_group!(nntp, 'control.cancel', 'n')
       end
     rescue

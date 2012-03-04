@@ -13,13 +13,36 @@
     
     <div class="form_element">
       <%= f.label :newsgroup, 'Newsgroup:' %>
-      <%= f.select :newsgroup, @newsgroups.map{ |n| [n.name, n.name] },
-        :selected => @post && @post.followup_newsgroup ? @post.followup_newsgroup.name : @newsgroup.name %>
+      <%= f.select :newsgroup, options_from_collection_for_select(@newsgroups, :name, :name,
+        @post && @post.followup_newsgroup ? @post.followup_newsgroup.name : @newsgroup.name) %>
+      <% if not @post and @current_user.is_admin? %>
+        <a id="crosspost_toggle" href="#"
+          class="smallbutton toggle" data-selector=".crosspost_options">Cross-post...</a>
+      <% end %>
     </div>
+    <% if not @post and @current_user.is_admin? %>
+      <p class="explain close crosspost_options">
+        (replies will go to this newsgroup)
+      </p>
+    <% end %>
     <% if @post and @post.followup_newsgroup %>
       <p class="explain close">
         (the author specified that replies should go to <%= @post.followup_newsgroup.name %>)
       </p>
+    <% end %>
+    
+    <% if not @post and @current_user.is_admin? %>
+      <div class="form_element crosspost_options">
+        <%= label_tag :crosspost_to, 'Cross-post to:' %>
+        <%= select_tag :crosspost_to,
+          options_from_collection_for_select(@newsgroups, :name, :name), :include_blank => true %>
+        &mdash;
+        <%= check_box_tag :crosspost_sysadmin %>
+        <%= label_tag :crosspost_sysadmin, 'also to csh.lists.sysadmin' %>
+        &mdash;
+        <%= check_box_tag :crosspost_alumni %>
+        <%= label_tag :crosspost_alumni, 'also to csh.lists.alumni' %>
+      </div>
     <% end %>
     
     <div class="form_element">

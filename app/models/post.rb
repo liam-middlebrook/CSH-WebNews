@@ -33,7 +33,7 @@ class Post < ActiveRecord::Base
   
   def is_crossposted?(quick = false)
     if quick
-      headers[/^Newsgroups: (.*)/i, 1].split(',').length > 1
+      all_newsgroup_names.length > 1
     else
       in_all_newsgroups.length > 1
     end
@@ -52,11 +52,11 @@ class Post < ActiveRecord::Base
   end
   
   def all_newsgroups
-    headers[/^Newsgroups: (.*)/i, 1].
-      split(',').
-      map(&:strip).
-      map{ |name| Newsgroup.find_by_name(name) }.
-      reject(&:nil?)
+    all_newsgroup_names.map{ |name| Newsgroup.find_by_name(name) }.reject(&:nil?)
+  end
+  
+  def all_newsgroup_names
+    headers[/^Newsgroups: (.*)/i, 1].split(',').map(&:strip)
   end
   
   def in_newsgroup(newsgroup)
@@ -170,7 +170,7 @@ class Post < ActiveRecord::Base
   def build_cancel_message(user, reason)
     m = "From: #{user.real_name} <#{user.email}>"
     m += "\nSubject: cmsg cancel #{message_id}"
-    m += "\nNewsgroups: " + headers[/^Newsgroups: (.*)/i, 1]
+    m += "\nNewsgroups: " + all_newsgroup_names.join(',')
     m += "\nControl: cancel #{message_id}"
     m += "\nContent-Type: text/plain; charset=utf-8; format=flowed"
     m += "\nUser-Agent: CSH-WebNews"
@@ -196,7 +196,8 @@ class Post < ActiveRecord::Base
   def self.build_message(p)
     m = "From: #{p[:user].real_name} <#{p[:user].email}>"
     m += "\nSubject: #{p[:subject].encode('US-ASCII', :invalid => :replace, :undef => :replace)}"
-    m += "\nNewsgroups: #{p[:newsgroup].name}"
+    m += "\nNewsgroups: #{p[:newsgroups].join(',')}"
+    m += "\nFollowup-To: #{p[:newsgroups].first}" if p[:newsgroups].size > 1
     if p[:reply_post]
       existing_refs = p[:reply_post].headers[/^References: (.*)/i, 1]
       existing_refs ? existing_refs += ' ' : existing_refs = ''

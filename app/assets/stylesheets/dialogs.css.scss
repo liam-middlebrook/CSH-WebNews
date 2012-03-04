@@ -29,11 +29,6 @@
     margin-top: 10px;
   }
   
-  .smallbutton {
-    padding: 0 0.25em;
-    font-size: 90%;
-  }
-  
   .loading, .errors {
     font-weight: bold;
     text-align: right;
@@ -60,6 +55,11 @@
   p.explain {
     margin-top: 0.5em;
     margin-bottom: 1em;
+    
+    .smallbutton {
+      padding: 0 0.25em;
+      font-size: 90%;
+    }
   }
   
   p.explain.close {
