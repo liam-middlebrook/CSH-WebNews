@@ -12,7 +12,7 @@
     <div class="inline_inputs">
       <%= check_box_tag :do_sticky, '1', true, :onclick => '$("#sticky_until").val("")' %>
       <%= label_tag :do_sticky, 'Sticky this post until' %>
-      <%= text_field_tag :sticky_until, @post.sticky_until.andand.strftime(DATE_FORMAT) %>
+      <%= text_field_tag :sticky_until, @post.sticky_until.andand.in_time_zone(Time.now.zone).strftime(DATE_FORMAT) %>
     </div>
     <p class="explain">Examples: "<b>12 hours from now</b>", "<b>1 week from today at 3am</b>", "<b><%= (Time.now + 1.week).strftime('%-m/%-d') %> 9:30pm</b>"<br>If you do not specify a time, the current time will be used. Times are rounded to the nearest half-hour.</p>
     
