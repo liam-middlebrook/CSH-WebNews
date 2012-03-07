@@ -1,3 +1,9 @@
+GIT
+  remote: git://github.com/mojombo/chronic.git
+  revision: f5a247025ab02ced1fd5fbb8d779b34a1fe43331
+  specs:
+    chronic (0.6.7)
+
 GEM
   remote: http://rubygems.org/
   specs:
@@ -31,7 +37,6 @@ GEM
     andand (1.3.1)
     arel (3.0.2)
     builder (3.0.0)
-    chronic (0.6.7)
     coffee-rails (3.2.2)
       coffee-script (>= 2.2.0)
       railties (~> 3.2.0)
@@ -112,7 +117,7 @@ PLATFORMS
 
 DEPENDENCIES
   andand
-  chronic
+  chronic!
   coffee-rails
   jquery-rails
   mysql2

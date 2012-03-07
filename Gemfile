@@ -6,7 +6,7 @@ gem 'sqlite3', :groups => [:development, :test]
 gem 'mysql2', :group => :production
 
 gem 'rails_autolink'
-gem 'chronic'
+gem 'chronic', :git => 'git://github.com/mojombo/chronic.git'
 gem 'andand'
 
 # ExecJS engine
