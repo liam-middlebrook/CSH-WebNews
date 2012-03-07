@@ -15,7 +15,7 @@
       <%= text_field_tag :sticky_until,
         @post.is_sticky? ? @post.sticky_until.andand.in_time_zone(Time.now.zone).strftime(DATE_FORMAT) : '' %>
     </div>
-    <p class="explain">Examples: "<b>12 hours from now</b>", "<b>1 week from today at 3am</b>", "<b><%= (Time.now + 1.week).strftime('%-m/%-d') %> 9:30pm</b>"<br>If you do not specify a time, the current time will be used. Times are rounded to the nearest half-hour.</p>
+    <p class="explain">Examples: "<b>12 hours from now</b>", "<b>1 week from today at 3am</b>", "<b><%= (Time.now + 1.week).strftime('%-m/%-d') %> 9:30pm</b>"<br>If you leave out the time part, the current time will be used. Times are rounded to the nearest half-hour.</p>
     
     <div class="buttons">
       <%= f.submit 'Save', :class => 'button green' %>
