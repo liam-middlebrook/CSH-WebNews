@@ -45,6 +45,8 @@ end
       <%= post.author_name %>
       <% if post.author_is_local? %>
         <%= ' (' + post.author_username + ')' %>
+        <a class="smallbutton" href="#!<%= search_path(:author => post.author_email) %>"
+          title="Search for posts by this user">Posts</a>
         <a class="smallbutton" href="<%= PROFILES_URL + post.author_username %>"
           title="Go to this user's profile page">Profile</a>
         <a class="smallbutton" href="<%= WIKI_USER_URL + post.author_username.capitalize %>"
