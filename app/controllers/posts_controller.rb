@@ -259,6 +259,7 @@ class PostsController < ApplicationController
     end
     
     if params[:do_sticky]
+      Chronic.time_class = Time.find_zone(@current_user.time_zone)
       t = Chronic.parse(params[:sticky_until])
       if t.nil?
         form_error "Unable to parse \"#{params[:sticky_until]}\"." and return
