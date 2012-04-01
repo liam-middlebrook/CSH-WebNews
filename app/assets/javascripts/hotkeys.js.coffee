@@ -1,4 +1,9 @@
 $ ->
+  key.filter = (event) ->
+    # https://github.com/grantovich/CSH-WebNews/issues/54
+    # https://github.com/madrobby/keymaster/issues/36
+    return !event.ctrlKey
+  
   key.setScope('main')
   
   # Select the next/previous post
