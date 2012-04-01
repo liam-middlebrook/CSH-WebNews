@@ -15,12 +15,12 @@
       <%= f.label :newsgroup, 'Newsgroup:' %>
       <%= f.select :newsgroup, options_from_collection_for_select(@newsgroups, :name, :name,
         @post && @post.followup_newsgroup ? @post.followup_newsgroup.name : @newsgroup.name) %>
-      <% if not @post and @current_user.is_admin? %>
+      <% if not @post %>
         <a id="crosspost_toggle" href="#"
           class="smallbutton toggle" data-selector=".crosspost_options">Cross-post...</a>
       <% end %>
     </div>
-    <% if not @post and @current_user.is_admin? %>
+    <% if not @post %>
       <p class="explain close crosspost_options">
         (replies will go to this newsgroup)
       </p>
@@ -31,7 +31,7 @@
       </p>
     <% end %>
     
-    <% if not @post and @current_user.is_admin? %>
+    <% if not @post %>
       <div class="form_element crosspost_options">
         <%= label_tag :crosspost_to, 'Cross-post to:' %>
         <%= select_tag :crosspost_to,
