@@ -220,6 +220,7 @@ class Post < ActiveRecord::Base
     part_headers, body = multipart_decode(headers, body)
     stripped = true if headers[/^Content-Type:.*mixed/i]
     
+    body = body.unpack('m')[0] if part_headers[/^Content-Transfer-Encoding: base64/i]
     body = body.unpack('M')[0] if part_headers[/^Content-Transfer-Encoding: quoted-printable/i]
     
     if part_headers[/^Content-Type:.*(X-|unknown)/i]
