@@ -92,8 +92,12 @@
   
   input[type=text], textarea {
     width: 99%;
+  }
+  
+  textarea {
     overflow-x: hidden;
     overflow-y: auto;
+    resize: vertical;
   }
   
   .inline_inputs {

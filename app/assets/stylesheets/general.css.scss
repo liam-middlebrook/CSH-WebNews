@@ -1,5 +1,7 @@
 @import "defs";
 
+body { overflow: hidden; }
+
 body, select, input, button, textarea { color: $text_normal; }
 
 div:focus {
