@@ -1,5 +1,10 @@
+# FIXME: Characters requiring a Shift modifier on US keyboards must actually
+# be assigned as Shift+<unshifted_character>. Assigning to e.g. '?' or '#' in
+# keymaster does not work. See https://github.com/madrobby/keymaster/issues/29
+
 $ ->
   key.filter = (event) ->
+    event.preventDefault() if event.keyCode == 27
     # https://github.com/grantovich/CSH-WebNews/issues/54
     # https://github.com/madrobby/keymaster/issues/36
     return !event.ctrlKey
@@ -66,26 +71,25 @@ $ ->
     toggle_thread_expand($(selected))
   
   # Mark all read, mark all in group read
-  key 'alt+r', 'main', -> click $('#toolbar .mark_read')
-  key 'shift+r', 'main', -> click $('#group_view .mark_read')
+  key 'alt+shift+i', 'main', -> click $('#toolbar .mark_read')
+  key 'alt+i', 'main', -> click $('#group_view .mark_read')
   
   # Toolbar functions
-  key 'h', 'main', -> click $('#home_button')
+  key 'esc, h', 'main', -> click $('#home_button')
   key 'n', 'main', -> click $('#next_unread')
-  key 'shift+s', 'main', -> click $('#search_button')
-  key 't', 'main', -> click $('#settings_button')
-  key '/, shift+/', 'main', -> click $('#about_button')
-  key 's', 'main', ->
+  key 'shift+`', 'main', -> click $('#settings_button')
+  key 'shift+/', 'main', -> click $('#about_button')
+  key '/', 'main', ->
     for button in ['#revise_search_button', '#newsgroup_search_button', '#search_button']
       if $(button).length > 0
         click $(button)
         return
-  key 'p', 'main', -> click $('#group_view .new_draft')
+  key 'c', 'main', -> click $('#group_view .new_draft')
   key 'r', 'main', -> click $('#post_view .new_draft')
   key 'd', 'main', -> click $('#show_headers_button')
   key 'u', 'main', -> click $('#mark_unread_button')
-  key 'i', 'main', -> click $('#sticky_post_button')
-  key 'c', 'main', -> click $('#cancel_post_button')
+  key 't', 'main', -> click $('#sticky_post_button')
+  key 'shift+3', 'main', -> click $('#cancel_post_button')
   key 'q', 'main', -> click $('#show_quote_button')
   
   # Dialog functions
