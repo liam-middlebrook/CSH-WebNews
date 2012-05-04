@@ -16,7 +16,7 @@ else
 $('#next_unread').attr('href', '<%= next_unread_href %>')
 
 <% if @dashboard_active %>
-if location.hash.match '#!/home'
+if window.loaded_location == 'home'
   document.title = '<%= j home_page_title %>'
   scroll = $('#dashboard').scrollTop()
   $('#group_view').html '<%= j render('dashboard') %>'

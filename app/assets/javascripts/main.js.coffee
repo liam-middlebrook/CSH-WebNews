@@ -200,7 +200,7 @@ $('a.mark_read').live 'click', ->
   $('#groups_list [data-name="' + selected + '"]').addClass('selected')
   
   after_func = null
-  if location.hash.match '#!/home'
+  if window.loaded_location == 'home'
     document.title = 'CSH WebNews'
     $('#unread_line').text('Marked all posts read. Reloading activity feed...')
     $('#activity_feeds').remove()
