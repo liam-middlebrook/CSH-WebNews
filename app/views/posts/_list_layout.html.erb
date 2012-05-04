@@ -12,8 +12,8 @@
     <% end %>
     <a id="newsgroup_search_button" class="button"
       href="#?<%= search_entry_path(:newsgroup => @newsgroup.name) %>">Search</a>
-    <a class="button mark_read" data-newsgroup="<%= @newsgroup.name %>"
-      href="#~<%= mark_read_path(:newsgroup => @newsgroup.name) %>">Mark All Read</a>
+    <a id="mark_thread_read_button" class="button mark_read" data-scope="thread" href="#">Mark Thread Read</a>
+    <a id="mark_group_read_button" class="button mark_read" data-scope="newsgroup" href="#">Mark All Read</a>
   <% end %>
 </div>
 <div id="group_header">

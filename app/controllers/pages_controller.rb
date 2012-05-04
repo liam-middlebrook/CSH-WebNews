@@ -1,6 +1,6 @@
 class PagesController < ApplicationController
   before_filter :get_newsgroups_for_nav, :only => [:home, :check_new]
-  before_filter :get_newsgroup, :only => :check_new
+  before_filter :get_newsgroup, :only => [:check_new, :mark_read]
   before_filter :get_post, :only => [:check_new, :mark_read]
 
   def home
@@ -58,7 +58,10 @@ class PagesController < ApplicationController
         )
       end
     else
-      if params[:newsgroup]
+      if params[:thread_id]
+        @current_user.unread_post_entries.
+          where(:post_id => Post.where(:thread_id => params[:thread_id])).destroy_all
+      elsif params[:newsgroup]
         @current_user.unread_post_entries.
           where(:newsgroup_id => Newsgroup.find_by_name(params[:newsgroup]).id).destroy_all
       elsif params[:all_posts]

@@ -70,9 +70,10 @@ $ ->
       click selected, false
     toggle_thread_expand($(selected))
   
-  # Mark all read, mark all in group read
-  key 'alt+shift+i', 'main', -> click $('#toolbar .mark_read')
-  key 'alt+i', 'main', -> click $('#group_view .mark_read')
+  # Mark read buttons
+  key 'alt+shift+i', 'main', -> click $('#mark_all_read_button')
+  key 'alt+i', 'main', -> click $('#mark_group_read_button')
+  key 'shift+i', 'main', -> click $('#mark_thread_read_button')
   
   # Toolbar functions
   key 'esc, h', 'main', -> click $('#home_button')

@@ -10,7 +10,8 @@ newsgroup_name = @newsgroup ? @newsgroup.name : post.newsgroup.name
   data-number="<%= post.number %>"
   data-level="<%= level %>"
   data-date="<%= post.date %>"
-  data-parent="<%= post.parent_id == '' ? 'false' : 'true' %>">
+  data-parent="<%= post.parent_id == '' ? 'false' : 'true' %>"
+  data-thread="<%= post.thread_id %>">
   <td>
     <% (level - 1).times do %><div class="indent"><% end %>
     <span class="expander<%= expanded ? ' expanded' : '' %>">&nbsp;</span>

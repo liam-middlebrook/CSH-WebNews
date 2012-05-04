@@ -187,30 +187,43 @@ $('a[href^="#?/"]').live 'click', ->
 
 $('a.mark_read').live 'click', ->
   reset_check_timeout()
+  $('#next_unread').attr('href', '#')
   
-  selected = $('#groups_list .selected').attr('data-name')
-  newsgroup = $(this).attr('data-newsgroup')
-  if newsgroup
+  path = 'mark_read'
+  after_func = null
+  scope = $(this).attr('data-scope')
+  newsgroup = $('#groups_list .selected').attr('data-name')
+  number = $('#posts_list .selected').attr('data-number')
+  thread_id = $('#posts_list .selected').attr('data-thread')
+  
+  if thread_id and scope == 'thread'
+    path += '?thread_id=' + encodeURIComponent(thread_id)
+    path += '&newsgroup=' + encodeURIComponent(newsgroup) + '&number=' + number
+    abort_active_scroll()
+    after_func = -> $('#posts_list').scroll()
+    $('#posts_list tr[data-thread="' + thread_id + '"]').removeClass('unread')
+  else if newsgroup and scope == 'newsgroup'
+    path += '?newsgroup=' + encodeURIComponent(newsgroup)
     group_item = $('#groups_list [data-name="' + newsgroup + '"]')
     group_item.removeClass('unread mine_reply mine_in_thread').find('.unread_count').remove()
     $('#next_unread').attr('href', '#') if $('#groups_list .unread_count').length == 0
-  else
-    $('#groups_list li').removeClass('unread mine_reply mine_in_thread').find('.unread_count').remove()
-    $('#next_unread').attr('href', '#')
-  $('#groups_list [data-name="' + selected + '"]').addClass('selected')
-  
-  after_func = null
-  if window.loaded_location == 'home'
-    document.title = 'CSH WebNews'
-    $('#unread_line').text('Marked all posts read. Reloading activity feed...')
-    $('#activity_feeds').remove()
-    after_func = -> window.onhashchange()
-  else
     abort_active_scroll()
     after_func = -> $('#posts_list').scroll()
     $('#posts_list tbody tr').removeClass('unread')
+  else if scope == 'all'
+    path += '?all_posts=true'
+    $('#groups_list li').removeClass('unread mine_reply mine_in_thread').find('.unread_count').remove()
+    $('#next_unread').attr('href', '#')
+    if window.loaded_location == 'home'
+      document.title = 'CSH WebNews'
+      $('#unread_line').text('Marked all posts read. Reloading activity feed...')
+      $('#activity_feeds').remove()
+      after_func = -> window.onhashchange()
+    else
+      abort_active_scroll()
+      after_func = -> $('#posts_list').scroll()
   
-  $.getScript @href.replace('#~/', ''), after_func
+  $.getScript path, after_func
   return false
 
 $('a.mark_unread').live 'click', ->
