@@ -78,6 +78,7 @@ $ ->
   # Toolbar functions
   key 'esc, h', 'main', -> click $('#home_button')
   key 'n', 'main', -> click $('#next_unread')
+  key 'shift+s', 'main', -> click $('#starred_button')
   key 'shift+`', 'main', -> click $('#settings_button')
   key 'shift+/', 'main', -> click $('#about_button')
   key '/', 'main', ->
