@@ -2,6 +2,9 @@ class Post < ActiveRecord::Base
   belongs_to :newsgroup, :foreign_key => :newsgroup, :primary_key => :name
   belongs_to :sticky_user, :class_name => 'User'
   has_many :unread_post_entries, :dependent => :destroy
+  has_many :starred_post_entries, :dependent => :destroy
+  has_many :unread_users, :through => :unread_post_entries, :source => :user
+  has_many :starred_users, :through => :starred_post_entries, :source => :user
   before_destroy :kill_parent_id
   
   def author_name
@@ -128,8 +131,12 @@ class Post < ActiveRecord::Base
     return all_in_thread.reduce(false){ |m, post| m || post.authored_by?(user) }
   end
   
+  def starred_by_user?(user)
+    starred_users.include?(user)
+  end
+  
   def unread_for_user?(user)
-    unread_post_entries.where(:user_id => user.id).any?
+    unread_users.include?(user)
   end
   
   def mark_read_for_user(user)

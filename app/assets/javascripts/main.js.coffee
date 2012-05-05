@@ -233,6 +233,10 @@ $('a.mark_unread').live 'click', ->
   $.getScript @href.replace('#~/', ''), -> set_check_timeout(0)
   return false
 
+$('#star_post_button').live 'click', ->
+  $.getScript @href.replace('#~/', '')
+  return false
+
 $('#crosspost_toggle').live 'click', ->
   $('#crosspost_to').val('')
   $('.crosspost_options input').val([])
@@ -263,7 +267,7 @@ $('[type="submit"]').live 'click', ->
   $('#dialog .loading').text('Working...')
   $('#dialog .errors').text('')
 
-$('a.new_posts').live 'click', ->
+$('a.refresh').live 'click', ->
   refresh_loaded_location()
 
 $('#posts_list .expander').live 'click', (e) ->

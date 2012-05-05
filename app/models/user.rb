@@ -1,6 +1,8 @@
 class User < ActiveRecord::Base
   has_many :unread_post_entries
+  has_many :starred_post_entries
   has_many :unread_posts, :through => :unread_post_entries, :source => :post
+  has_many :starred_posts, :through => :starred_post_entries, :source => :post
   
   serialize :preferences, Hash
   

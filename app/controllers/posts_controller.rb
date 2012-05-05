@@ -1,6 +1,6 @@
 class PostsController < ApplicationController
   before_filter :get_newsgroup, :only => [:index, :search, :search_entry, :show, :new]
-  before_filter :get_post, :only => [:show, :new, :destroy, :destroy_confirm, :edit_sticky, :update_sticky]
+  before_filter :get_post, :except => [:index, :search, :search_entry, :create]
   before_filter :get_newsgroups_for_search, :only => :search_entry
   before_filter :get_newsgroups_for_posting, :only => [:new, :create]
   before_filter :set_list_layout_and_offset, :only => [:index, :search]
@@ -81,11 +81,12 @@ class PostsController < ApplicationController
       values << 'control%'
     end
     
+    search_params = params.except(:action, :controller, :source, :commit, :validate, :utf8, :_)
+    
     if params[:validate]
       if error_text
         form_error error_text
       else
-        search_params = params.except(:action, :controller, :source, :commit, :validate, :utf8, :_)
         render :partial => 'search_redirect', :locals => { :search_params => search_params }
       end
       return
@@ -95,7 +96,12 @@ class PostsController < ApplicationController
     end
     
     @search_mode = @flat_mode = true
-    @posts_older = Post.where(conditions.join(' and '), *values).order('date DESC').limit(limit)
+    if search_params.include?(:starred) and search_params.reject{ |k,v| v.blank? }.length == 1
+      @starred_only = true
+    end
+    
+    scope = params[:starred] ? @current_user.starred_posts : Post
+    @posts_older = scope.where(conditions.join(' and '), *values).order('date DESC').limit(limit)
     @more_older = @posts_older.length > 0 && !@posts_older[limit - 1].nil?
     @posts_older.delete_at(-1) if @posts_older.length == limit
     
@@ -275,6 +281,20 @@ class PostsController < ApplicationController
       @post.in_all_newsgroups.each do |post|
         post.update_attributes(:sticky_until => nil)
       end
+    end
+  end
+  
+  def update_star
+    if @post.nil?
+      @star_error = "The post you are trying to star/unstar doesn't exist; it may have been canceled. Try manually refreshing the newsgroup." and return
+    end
+    
+    if @post.starred_by_user?(@current_user)
+      @post.starred_post_entries.find_by_user_id(@current_user.id).destroy
+      @starred = false
+    else
+      StarredPostEntry.create!(:user => @current_user, :post => @post)
+      @starred = true
     end
   end
   

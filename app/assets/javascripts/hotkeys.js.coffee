@@ -91,6 +91,7 @@ $ ->
   key 'u', 'main', -> click $('#mark_unread_button')
   key 't', 'main', -> click $('#sticky_post_button')
   key 'shift+3', 'main', -> click $('#cancel_post_button')
+  key 's', 'main', -> click $('#star_post_button')
   key 'q', 'main', -> click $('#show_quote_button')
   
   # Dialog functions

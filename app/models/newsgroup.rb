@@ -34,7 +34,7 @@ class Newsgroup < ActiveRecord::Base
         head = nntp.head(post.number)[1].join("\n")
         body = nntp.body(post.number)[1].join("\n")
       end
-      entries = post.unread_post_entries
+      entries = post.unread_post_entries + post.starred_post_entries
       post.delete # Shhh, don't run the destroy handlers
       new_post = Post.import!(post.newsgroup, post.number, head, body)
       entries.each do |entry|

@@ -1,10 +1,13 @@
 <div class="buttons">
   <% if @search_mode %>
-    <span class="explain">Searching <%= @newsgroup ? @newsgroup.name : 'all newsgroups' %></span>
+    <% if not @starred_only %>
+      <span class="explain">Searching <%= @newsgroup ? @newsgroup.name : 'all newsgroups' %></span>
+    <% end %>
     <a id="revise_search_button" class="button" href="#?<%= search_entry_path %>?<%=
-      request.fullpath.split('?')[1] %>">Revise Search</a>
+      request.fullpath.split('?')[1] %>"><%= @starred_only ? 'Search' : 'Revise Search' %></a>
+    <% if @starred_only %><a class="button refresh" href="#">Refresh</a><% end %>
   <% else %>
-    <a class="new_posts" href="#!<%= posts_path(@newsgroup.name) %>"></a>
+    <a class="refresh new_posts" href="#!<%= posts_path(@newsgroup.name) %>"></a>
     <% if @newsgroup.posting_allowed? %>
       <a class="button new_draft" href="#?<%= new_post_path(:newsgroup => @newsgroup.name) %>">Post New</a>
     <% else %>
@@ -17,7 +20,7 @@
   <% end %>
 </div>
 <div id="group_header">
-  <h2><%= @search_mode ? 'Search Results' : @newsgroup.name %></h2>
+  <h2><%= @search_mode ? (@starred_only ? 'Starred Posts' : 'Search Results') : @newsgroup.name %></h2>
 </div>
 <div id="posts_list" tabindex="-1">
   <table>

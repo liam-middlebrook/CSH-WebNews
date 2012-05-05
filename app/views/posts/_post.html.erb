@@ -37,6 +37,8 @@ end
         <a id="cancel_post_button" class="button<%= @admin_cancel ? ' orange' : '' %>" href="#?<%= confirm_destroy_post_path(:newsgroup => @newsgroup.name, :number => post.number) %>">Cancel</a>
       <% end %>
     <% end %>
+    <a id="star_post_button" class="button<%= post.starred_by_user?(@current_user) ? ' starred' : '' %>"
+      title="Star this post" href="#~<%= update_post_star_path %>">&nbsp;</a>
   </div>
 
   <h3><%= post.subject %></h3>

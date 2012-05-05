@@ -10,6 +10,7 @@
     <h1>CSH WebNews</h1>
     <a id="home_button" class="button" href="#!/home">Home</a>
     <a id="search_button" class="button" href="#?<%= search_entry_path %>">Search</a>
+    <a id="starred_button" class="button" href="#!<%= search_path(:starred => true) %>">Starred</a>
     <a id="next_unread" class="button" href="<%= next_unread_href %>">Next Unread</a>
     <a id="mark_all_read_button" class="button mark_read" data-scope="all" href="#"
       data-confirm="Really mark all posts read?">Mark All Read</a>
