@@ -22,19 +22,22 @@ end
         href="#?<%= new_post_path(:newsgroup => @newsgroup.name, :number => post.number) %>">Post Reply</a>
     <% end %>
     <% if @search_mode %>
-      <a class="button" href="#!<%= post_path(@newsgroup.name, post.number) %>">View in Newsgroup</a>
-    <% end %>
-    <% if not post.authored_by?(@current_user) %>
-      <a id="mark_unread_button" class="button mark_unread"
-        href="#~<%= mark_read_path(:mark_unread => true, :newsgroup => @newsgroup.name, :number => @post.number) %>">Mark Unread</a>
-    <% end %>
-    <% if not @search_mode and @current_user.is_admin? and post == post.thread_parent %>
-      <a id="sticky_post_button" class="button orange"
-        href="#?<%= edit_post_sticky_path(:newsgroup => @newsgroup.name, :number => post.number) %>">Sticky</a>
-    <% end %>
-    <% if not @search_mode and @newsgroup.posting_allowed? and post.children.count == 0 %>
-      <% if post.authored_by?(@current_user) or @current_user.is_admin? %>
-        <a id="cancel_post_button" class="button<%= @admin_cancel ? ' orange' : '' %>" href="#?<%= confirm_destroy_post_path(:newsgroup => @newsgroup.name, :number => post.number) %>">Cancel</a>
+      <span class="explain" style="margin-right: -10px">To see all post actions:</span>
+      <a id="view_in_newsgroup_button" class="button"
+        href="#!<%= post_path(@newsgroup.name, post.number) %>">View in Newsgroup</a>
+    <% else %>
+      <% if not post.authored_by?(@current_user) %>
+        <a id="mark_unread_button" class="button mark_unread"
+          href="#~<%= mark_read_path(:mark_unread => true, :newsgroup => @newsgroup.name, :number => @post.number) %>">Mark Unread</a>
+      <% end %>
+      <% if @current_user.is_admin? and post == post.thread_parent %>
+        <a id="sticky_post_button" class="button orange"
+          href="#?<%= edit_post_sticky_path(:newsgroup => @newsgroup.name, :number => post.number) %>">Sticky</a>
+      <% end %>
+      <% if @newsgroup.posting_allowed? and post.children.count == 0 %>
+        <% if post.authored_by?(@current_user) or @current_user.is_admin? %>
+          <a id="cancel_post_button" class="button<%= @admin_cancel ? ' orange' : '' %>" href="#?<%= confirm_destroy_post_path(:newsgroup => @newsgroup.name, :number => post.number) %>">Cancel</a>
+        <% end %>
       <% end %>
     <% end %>
     <a id="star_post_button" class="button<%= post.starred_by_user?(@current_user) ? ' starred' : '' %>"

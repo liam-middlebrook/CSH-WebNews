@@ -93,6 +93,7 @@ $ ->
   key 'shift+3', 'main', -> click $('#cancel_post_button')
   key 's', 'main', -> click $('#star_post_button')
   key 'q', 'main', -> click $('#show_quote_button')
+  key 'v', 'main', -> click $('#view_in_newsgroup_button')
   
   # Dialog functions
   key 'esc, alt+q', 'dialog', ->
