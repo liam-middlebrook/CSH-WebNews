@@ -83,10 +83,10 @@ jQuery.fn.outerHTML = ->
 @close_dialog = ->
   $('#overlay').remove()
   key.setScope('main')
-  if $('#posts_list').length > 0
-    $('#posts_list').focus()
+  if $('#dashboard').length > 0
+    $('#dashboard').focus()
   else
-    $('#group_view').focus()
+    $('#posts_list').focus()
 
 # Calls expand_thread or collapse_thread depending on the current state
 @toggle_thread_expand = (tr, check_selected = false) ->
