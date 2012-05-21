@@ -2,15 +2,34 @@
 @check_new_interval = 15000
 @check_new_retry_interval = 5000
 @draft_save_interval = 2000
+@delay_click_time = 300
 window.loaded_location = false
 window.active_navigation = false
 window.active_scroll_load = false
 window.active_check_new = false
 window.check_new_timeout = false
 window.draft_save_timer = false
+window.delay_click_timeout = false
 
 jQuery.fn.outerHTML = ->
   $('<div>').append(this.eq(0).clone()).html()
+
+@click = (elem, extra_data = null) ->
+  $(elem).trigger('click', extra_data)
+  if (href = $(elem).attr('href')) and href[0..1] == '#!'
+    location.hash = href[1..-1]
+
+@delay_click = (element, extra_data = null, remove_sel_from = null, add_sel_to_parent = null) ->
+  clearTimeout(window.delay_click_timeout)
+  if remove_sel_from
+    remove_sel_from.find('.selected').removeClass('selected')
+    if add_sel_to_parent
+      $(element).parent(add_sel_to_parent).addClass('selected')
+    else
+      $(element).addClass('selected')
+  window.delay_click_timeout = setTimeout (->
+    click element, extra_data
+  ), delay_click_time
 
 @align_activity_tables = ->
   tables = $('table.activity')
@@ -87,6 +106,14 @@ jQuery.fn.outerHTML = ->
     $('#dashboard').focus()
   else
     $('#posts_list').focus()
+
+@scroll_to_selected_post = ->
+  view_height = $('#posts_list').height()
+  scroll_top = $('#posts_list').scrollTop()
+  post_top = $('#posts_list .selected').first().position().top + scroll_top
+  
+  if post_top + 20 > scroll_top + view_height or post_top < scroll_top
+    $('#posts_list').scrollTop(post_top - (view_height / 2))
 
 # Calls expand_thread or collapse_thread depending on the current state
 @toggle_thread_expand = (tr, check_selected = false) ->
@@ -277,12 +304,11 @@ $('#posts_list .expander').live 'click', (e) ->
 $('#posts_list tbody tr').live 'click', (e, do_toggle = true) ->
   tr = $(this)
   
-  if not tr.hasClass('selected')
-    href = tr.find('a').attr('href')
-    if href.substring(0, 3) == '#~/'
-      $.getScript href.replace('#~/', '')
-    else
-      location.hash = href
+  href = tr.find('a').attr('href')
+  if href.substring(0, 3) == '#~/'
+    $.getScript href.replace('#~/', '')
+  else
+    location.hash = href
   
   toggle_thread_expand(tr, true) if do_toggle
   
