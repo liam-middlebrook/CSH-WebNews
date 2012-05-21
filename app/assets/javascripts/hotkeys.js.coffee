@@ -16,13 +16,13 @@ $ ->
     prev_post = $('#posts_list .selected').prevAll('tr:visible')[0]
     if prev_post
       click prev_post, false
-    else
+    else if $('#posts_list .selected').length == 0
       click $('#posts_list tbody tr:visible').last(), false
   key 'j', 'main', ->
     next_post = $('#posts_list .selected').nextAll('tr:visible')[0]
     if next_post
       click next_post, false
-    else
+    else if $('#posts_list .selected').length == 0
       click $('#posts_list tbody tr:visible').first(), false
   
   # Select the next/previous thread
@@ -30,13 +30,13 @@ $ ->
     prev_thread = $('#posts_list .selected').prevAll('tr[data-level="1"]')[0]
     if prev_thread
       click prev_thread, false
-    else
+    else if $('#posts_list .selected').length == 0
       click $('#posts_list tr[data-level="1"]').last(), false
   key 'shift+j', 'main', ->
     next_thread = $('#posts_list .selected').nextAll('tr[data-level="1"]')[0]
     if next_thread
       click next_thread, false
-    else
+    else if $('#posts_list .selected').length == 0
       click $('#posts_list tr[data-level="1"]').first(), false
   
   # Select the next/previous newsgroup
