@@ -330,24 +330,28 @@ class PostsController < ApplicationController
           
           phrases.each do |phrase|
             if phrase[0] == '-'
-              exclude_conditions << 'subject like ?'
+              exclude_conditions << '('
+              exclude_conditions[-1] += 'subject like ?'
               exclude_values << '%' + phrase[1..-1] + '%'
               if not params[:subject_only]
-                exclude_conditions << 'body like ?'
+                exclude_conditions[-1] += ' or body like ?'
                 exclude_values << '%' + phrase[1..-1] + '%'
               end
+              exclude_conditions[-1] += ')'
             else
-              keyword_conditions << 'subject like ?'
+              keyword_conditions << '('
+              keyword_conditions[-1] += 'subject like ?'
               keyword_values << '%' + phrase + '%'
               if not params[:subject_only]
-                keyword_conditions << 'body like ?'
+                keyword_conditions[-1] += ' or body like ?'
                 keyword_values << '%' + phrase + '%'
               end
+              keyword_conditions[-1] += ')'
             end
           end
           
           conditions << '(' + 
-            '(' + keyword_conditions.join(' or ') + ')' + (
+            '(' + keyword_conditions.join(' and ') + ')' + (
               exclude_conditions.empty? ?
                 '' : ' and not (' + exclude_conditions.join(' or ') + ')'
             ) + ')'
