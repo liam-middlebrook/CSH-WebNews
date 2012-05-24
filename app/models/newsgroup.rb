@@ -116,6 +116,7 @@ class Newsgroup < ActiveRecord::Base
   def self.reload_all!
     sleep 0.1 until not File.exists?('tmp/syncing.txt')
     FileUtils.touch('tmp/syncing.txt')
+    StarredPostEntry.delete_all
     UnreadPostEntry.delete_all
     Post.delete_all
     Newsgroup.delete_all
