@@ -12,6 +12,9 @@ SHORT_DATE_FORMAT = '%-m/%-d %-I:%M%P'
 
 RECENT_EXCLUDE = /^(control|csh\.lists|csh\.test)/
 
+# Set true if the 'whenever' cron jobs have been installed for this instance
+CRON_ENABLED = false
+
 # Randomly generate a short string unlikely to be found in post content
 MARK_STRING = (1..12).map{ ('A'..'Z').to_a[rand(26)] }.join.gsub(/[AEIOU]/, 'x')
 

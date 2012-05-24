@@ -16,7 +16,9 @@ class PagesController < ApplicationController
           @current_user.real_name = request.env[ENV_REALNAME]
           @current_user.save!
         end
-        sync_posts
+        cronless_sync_all if not CRON_ENABLED
+        get_last_sync_time
+        get_next_unread_post
       end
       
       wants.js do
@@ -40,8 +42,12 @@ class PagesController < ApplicationController
   end
   
   def check_new
-    sync_posts
-    clean_old_unread
+    if not CRON_ENABLED
+      cronless_sync_all
+      cronless_clean_unread
+    end
+    get_last_sync_time
+    get_next_unread_post
     if params[:location] == '#!/home'
       @dashboard_active = true
       get_activity_feed
@@ -140,17 +146,15 @@ class PagesController < ApplicationController
       return threads.sort{ |x,y| y[:date] <=> x[:date] }
     end
     
-    def clean_old_unread
+    def cronless_clean_unread
       if not File.exists?('tmp/lastclean.txt') or
           File.mtime('tmp/lastclean.txt') < 1.day.ago
         FileUtils.touch('tmp/lastclean.txt')
-        User.inactive.each do |user|
-          UnreadPostEntry.where(:user_id => user.id).delete_all
-        end
+        User.clean_unread!
       end
     end
     
-    def sync_posts
+    def cronless_sync_all
       if not File.exists?('tmp/syncing.txt') and
           (not File.exists?('tmp/lastsync.txt') or
             File.mtime('tmp/lastsync.txt') < 1.minute.ago)
@@ -162,8 +166,6 @@ class PagesController < ApplicationController
           logger.error "##################\n\n"
         end
       end
-      get_last_sync_time
-      get_next_unread_post
     end
     
     def get_last_sync_time

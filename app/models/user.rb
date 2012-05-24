@@ -64,4 +64,10 @@ class User < ActiveRecord::Base
   def unread_count_in_reply
     unread_post_entries.where(:personal_level => PERSONAL_CODES[:mine_reply]).count
   end
+  
+  def self.clean_unread!
+    inactive.each do |user|
+      UnreadPostEntry.where(:user_id => user.id).delete_all
+    end
+  end
 end

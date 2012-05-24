@@ -8,6 +8,7 @@ gem 'mysql2', :group => :production
 gem 'rails_autolink'
 gem 'chronic', :git => 'git://github.com/mojombo/chronic.git'
 gem 'andand'
+gem 'whenever'
 
 # ExecJS engine
 gem 'therubyracer', :platform => :ruby
