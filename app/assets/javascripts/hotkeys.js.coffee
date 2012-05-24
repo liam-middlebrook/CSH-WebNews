@@ -15,59 +15,51 @@ $ ->
   key 'k', 'main', ->
     prev_post = $('#posts_list .selected').prevAll('tr:visible')[0]
     if prev_post
-      delay_click prev_post, false, $('#posts_list')
-      scroll_to_selected_post()
+      delay_click_post prev_post
     else if $('#posts_list .selected').length == 0
-      delay_click $('#posts_list tbody tr:visible').last(), false, $('#posts_list')
-      scroll_to_selected_post()
+      delay_click_post $('#posts_list tbody tr:visible').last()
   key 'j', 'main', ->
     next_post = $('#posts_list .selected').nextAll('tr:visible')[0]
     if next_post
-      delay_click next_post, false, $('#posts_list')
-      scroll_to_selected_post()
+      delay_click_post next_post
     else if $('#posts_list .selected').length == 0
-      delay_click $('#posts_list tbody tr:visible').first(), false, $('#posts_list')
-      scroll_to_selected_post()
+      delay_click_post $('#posts_list tbody tr:visible').first()
   
   # Select the next/previous thread
   key 'shift+k', 'main', ->
     prev_thread = $('#posts_list .selected').prevAll('tr[data-level="1"]')[0]
     if prev_thread
-      delay_click prev_thread, false, $('#posts_list')
-      scroll_to_selected_post()
+      delay_click_post prev_thread
     else if $('#posts_list .selected').length == 0
-      delay_click $('#posts_list tr[data-level="1"]').last(), false, $('#posts_list')
-      scroll_to_selected_post()
+      delay_click_post $('#posts_list tr[data-level="1"]').last()
   key 'shift+j', 'main', ->
     next_thread = $('#posts_list .selected').nextAll('tr[data-level="1"]')[0]
     if next_thread
-      delay_click next_thread, false, $('#posts_list')
-      scroll_to_selected_post()
+      delay_click_post next_thread
     else if $('#posts_list .selected').length == 0
-      delay_click $('#posts_list tr[data-level="1"]').first(), false, $('#posts_list')
-      scroll_to_selected_post()
+      delay_click_post $('#posts_list tr[data-level="1"]').first()
   
   # Select the next/previous newsgroup
   key 'alt+k', 'main', ->
     prev_group = $('#groups_list .selected').prev('li')[0]
     if prev_group
-      delay_click $(prev_group).find('a'), null, $('#groups_list'), 'li'
+      delay_click_group $(prev_group)
     else
       prev_group = $('#groups_list .selected').parent('ul').prev('ul').children('li').last()[0]
       if prev_group
-        delay_click $(prev_group).find('a'), null, $('#groups_list'), 'li'
+        delay_click_group $(prev_group)
       else
-        delay_click $('#groups_list li a').last(), null, $('#groups_list'), 'li'
+        delay_click_group $('#groups_list li').last()
   key 'alt+j', 'main', ->
     next_group = $('#groups_list .selected').next('li')[0]
     if next_group
-      delay_click $(next_group).find('a'), null, $('#groups_list'), 'li'
+      delay_click_group $(next_group)
     else
       next_group = $('#groups_list .selected').parent('ul').next('ul').children('li').first()[0]
       if next_group
-        delay_click $(next_group).find('a'), null, $('#groups_list'), 'li'
+        delay_click_group $(next_group)
       else
-        delay_click $('#groups_list li a').first(), null, $('#groups_list'), 'li'
+        delay_click_group $('#groups_list li').first()
   
   # Expand or collapse the current post/thread
   key 'e', 'main', -> toggle_thread_expand($('#posts_list .selected'))

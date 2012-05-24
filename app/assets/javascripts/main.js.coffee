@@ -19,16 +19,21 @@ jQuery.fn.outerHTML = ->
   if (href = $(elem).attr('href')) and href[0..1] == '#!'
     location.hash = href[1..-1]
 
-@delay_click = (element, extra_data = null, remove_sel_from = null, add_sel_to_parent = null) ->
+@delay_click_group = (group_li) ->
   clearTimeout(window.delay_click_timeout)
-  if remove_sel_from
-    remove_sel_from.find('.selected').removeClass('selected')
-    if add_sel_to_parent
-      $(element).parent(add_sel_to_parent).addClass('selected')
-    else
-      $(element).addClass('selected')
+  $('#groups_list .selected').removeClass('selected')
+  $(group_li).addClass('selected')
   window.delay_click_timeout = setTimeout (->
-    click element, extra_data
+    click $(group_li).find('a'), false
+  ), delay_click_time
+
+@delay_click_post = (post_tr) ->
+  clearTimeout(window.delay_click_timeout)
+  $('#posts_list .selected').removeClass('selected')
+  $(post_tr).addClass('selected')
+  scroll_to_selected_post()
+  window.delay_click_timeout = setTimeout (->
+    click post_tr, false
   ), delay_click_time
 
 @align_activity_tables = ->
