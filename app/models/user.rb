@@ -18,7 +18,7 @@ class User < ActiveRecord::Base
   end
   
   def is_admin?
-    unix_groups.include?('rtp') or unix_groups.include?('eboard')
+    unix_groups.include?('rtp') or unix_groups.include?('eboard') or DEV_MODE_ENABLED
   end
   
   def email

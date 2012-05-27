@@ -90,7 +90,7 @@ class Newsgroup < ActiveRecord::Base
   end
   
   def self.sync_all!(full_reload = false)
-    puts "Waiting for any active sync to complete...\n\n" if $in_rake
+    puts "Waiting for any active sync to complete...\n\n" if $in_rake && !full_reload
     sleep 0.1 until not File.exists?('tmp/syncing.txt')
     FileUtils.touch('tmp/syncing.txt')
     FileUtils.touch('tmp/reloading.txt') if full_reload
@@ -114,8 +114,14 @@ class Newsgroup < ActiveRecord::Base
   end
   
   def self.reload_all!
+    # This should only be run interactively via rake anyway
+    Rails.logger = Logger.new(nil)
+    ActiveRecord::Base.logger = Logger.new(nil)
+    
+    puts "Waiting for any active sync to complete...\n\n" if $in_rake
     sleep 0.1 until not File.exists?('tmp/syncing.txt')
     FileUtils.touch('tmp/syncing.txt')
+    puts "Deleting all existing post data...\n\n" if $in_rake
     StarredPostEntry.delete_all
     UnreadPostEntry.delete_all
     Post.delete_all

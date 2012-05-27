@@ -1,3 +1,8 @@
 <div id="sync_warning">
-  <b>Warning:</b> Last sync with the news server was <%= time_ago_in_words(@last_sync_time) %> ago.
+  <b>Warning:</b>
+  <% if @no_complete_sync %>
+    The initial news server sync was interrupted and could not be resumed. Some newsgroups and/or posts may be missing.
+  <% else %>
+    Last sync with the news server was <%= time_ago_in_words(@last_sync_time) %> ago.
+  <% end %>
 </div>

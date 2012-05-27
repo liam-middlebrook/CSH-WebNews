@@ -2,7 +2,7 @@ class ApplicationController < ActionController::Base
   require 'net/nntp'
   require 'shellwords'
   protect_from_forgery
-  before_filter :authenticate, :check_maintenance, :get_or_create_user
+  before_filter :check_maintenance, :authenticate, :get_or_create_user
   
   private
   
@@ -11,14 +11,16 @@ class ApplicationController < ActionController::Base
         set_no_cache
         @no_script = true
         render 'shared/no_groups'
-      end
-      
-      if not request.env[ENV_USERNAME]
+      elsif not request.env[ENV_USERNAME]
         set_no_cache
         if not User.select(true).first and not params[:no_user_override]
-          @no_script = true
-          render 'shared/no_users'
-        elsif not auth_disabled?
+          if DEV_MODE_ENABLED
+            User.create!(:username => 'nobody', :real_name => 'Testing User')
+          else
+            @no_script = true
+            render 'shared/no_users'
+          end
+        elsif not DEV_MODE_ENABLED
           respond_to do |wants|
             wants.html { render :file => "#{Rails.root}/public/auth.html", :layout => false }
             wants.js { render 'shared/needs_auth' }
@@ -53,7 +55,7 @@ class ApplicationController < ActionController::Base
     end
   
     def get_or_create_user
-      @current_user = auth_disabled? ? User.first :
+      @current_user = DEV_MODE_ENABLED ? User.first :
         User.find_by_username(request.env[ENV_USERNAME])
       if @current_user.nil?
         @current_user = User.create!(
@@ -120,10 +122,6 @@ class ApplicationController < ActionController::Base
     
     def form_error(error_text)
       render :partial => 'shared/form_error', :object => error_text
-    end
-    
-    def auth_disabled?
-      not Rails.env.production? and File.exists?('tmp/authdisabled.txt')
     end
     
     def set_no_cache

@@ -16,10 +16,4 @@ namespace :webnews do
   task :clean_unread => :environment do
     User.clean_unread!
   end
-  
-  desc "Create a test user for local development, and disable Webauth"
-  task :no_auth => :environment do
-    User.create!(:username => 'nobody', :real_name => 'Testing User') if not User.any?
-    FileUtils.touch('tmp/authdisabled.txt')
-  end
 end

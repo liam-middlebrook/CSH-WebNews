@@ -169,8 +169,13 @@ class PagesController < ApplicationController
     end
     
     def get_last_sync_time
-      @last_sync_time = File.mtime('tmp/lastsync.txt')
-      @show_sync_warning = true if @last_sync_time < 2.minutes.ago
+      if File.exists?('tmp/lastsync.txt')
+        @last_sync_time = File.mtime('tmp/lastsync.txt')
+        @show_sync_warning = true if @last_sync_time < 2.minutes.ago
+      else
+        @show_sync_warning = true
+        @no_complete_sync = true
+      end
     end
     
     def maybe_you(name)

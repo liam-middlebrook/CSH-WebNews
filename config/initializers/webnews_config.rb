@@ -22,3 +22,6 @@ RECENT_EXCLUDE = /^(control|csh\.lists|csh\.test)/
 
 # Set true if the 'whenever' cron jobs have been installed for this instance
 CRON_ENABLED = false
+
+# Set true to disable authentication and auto-login as a testing admin user
+DEV_MODE_ENABLED = false
