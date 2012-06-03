@@ -24,7 +24,7 @@ class Newsgroup < ActiveRecord::Base
   end
   
   def self.reimport!(post)
-    sleep 0.1 until not File.exists?('tmp/syncing.txt')
+    wait_for_sync_or_timeout
     FileUtils.touch('tmp/syncing.txt')
     
     begin
@@ -47,7 +47,7 @@ class Newsgroup < ActiveRecord::Base
   
   def self.sync_group!(nntp, name, status, standalone = true, full_reload = false)
     if standalone
-      sleep 0.1 until not File.exists?('tmp/syncing.txt')
+      wait_for_sync_or_timeout
       FileUtils.touch('tmp/syncing.txt')
     end
     
@@ -90,8 +90,7 @@ class Newsgroup < ActiveRecord::Base
   end
   
   def self.sync_all!(full_reload = false)
-    puts "Waiting for any active sync to complete...\n\n" if $in_rake && !full_reload
-    sleep 0.1 until not File.exists?('tmp/syncing.txt')
+    wait_for_sync_or_timeout
     FileUtils.touch('tmp/syncing.txt')
     FileUtils.touch('tmp/reloading.txt') if full_reload
     
@@ -118,8 +117,7 @@ class Newsgroup < ActiveRecord::Base
     Rails.logger = Logger.new(nil)
     ActiveRecord::Base.logger = Logger.new(nil)
     
-    puts "Waiting for any active sync to complete...\n\n" if $in_rake
-    sleep 0.1 until not File.exists?('tmp/syncing.txt')
+    wait_for_sync_or_timeout
     FileUtils.touch('tmp/syncing.txt')
     puts "Deleting all existing post data...\n\n" if $in_rake
     StarredPostEntry.delete_all
@@ -128,5 +126,22 @@ class Newsgroup < ActiveRecord::Base
     Newsgroup.delete_all
     FileUtils.rm('tmp/syncing.txt')
     sync_all!(true)
+  end
+  
+  def self.wait_for_sync_or_timeout
+    return if not File.exists?('tmp/syncing.txt')
+    print "Waiting for another active sync to complete... " if $in_rake
+    seconds = 0
+    loop do
+      sleep 1
+      seconds += 1
+      if not File.exists?('tmp/syncing.txt')
+        puts "OK\n\n"
+        return
+      elsif seconds >= 15
+        puts "timed out!\n\n"
+        raise 'Timed out waiting for another active sync to complete'
+      end
+    end
   end
 end
