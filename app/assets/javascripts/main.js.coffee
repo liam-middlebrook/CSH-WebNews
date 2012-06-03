@@ -14,6 +14,14 @@ window.delay_click_timeout = false
 jQuery.fn.outerHTML = ->
   $('<div>').append(this.eq(0).clone()).html()
 
+jQuery.ajaxScript = (method, url, success = null) ->
+  $.ajax {
+    url: url,
+    type: method,
+    dataType: 'script',
+    success: success
+  }
+
 @click = (elem, extra_data = null) ->
   $(elem).trigger('click', extra_data)
   if (href = $(elem).attr('href')) and href[0..1] == '#!'
@@ -255,18 +263,18 @@ $('a.mark_read').live 'click', ->
       abort_active_scroll()
       after_func = -> $('#posts_list').scroll()
   
-  $.getScript path, after_func
+  $.ajaxScript 'PUT', path, after_func
   return false
 
 $('a.mark_unread').live 'click', ->
   clear_check_timeout()
   abort_active_check()
   $('#posts_list .selected').addClass('unread')
-  $.getScript @href.replace('#~/', ''), -> set_check_timeout(0)
+  $.ajaxScript 'PUT', @href.replace('#~/', ''), -> set_check_timeout(0)
   return false
 
 $('#star_post_button').live 'click', ->
-  $.getScript @href.replace('#~/', '')
+  $.ajaxScript 'PUT', @href.replace('#~/', '')
   return false
 
 $('#crosspost_toggle').live 'click', ->
