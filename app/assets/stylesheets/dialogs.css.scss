@@ -48,6 +48,10 @@
     margin-bottom: 1.25em;
   }
   
+  fieldset p {
+    margin-bottom: inherit;
+  }
+  
   .form_element {
     margin-bottom: 1em;
   }
@@ -133,11 +137,10 @@ table.hotkeys {
   }
   
   .key {
-    font-family: monospace;
-    font-weight: bold;
-    background-color: $white;
-    border: 1px solid $border_button;
-    padding: 0 0.4em;
-    margin: 0 0.1em;
+    @include keyboard;
   }
+}
+
+.api_key {
+  @include keyboard;
 }

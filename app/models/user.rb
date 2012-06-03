@@ -21,6 +21,10 @@ class User < ActiveRecord::Base
     unix_groups.include?('rtp') or unix_groups.include?('eboard') or DEV_MODE_ENABLED
   end
   
+  def api_enabled?
+    !api_key.nil?
+  end
+  
   def email
     username + LOCAL_EMAIL_DOMAIN
   end
