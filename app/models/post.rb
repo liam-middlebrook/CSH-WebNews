@@ -36,6 +36,10 @@ class Post < ActiveRecord::Base
       rstrip
   end
   
+  def self.sticky
+    where('sticky_until is not null and sticky_until > ?', Time.now)
+  end
+  
   def is_sticky?
     !sticky_until.nil? and sticky_until > Time.now
   end
@@ -131,8 +135,16 @@ class Post < ActiveRecord::Base
     return all_in_thread.reduce(false){ |m, post| m || post.authored_by?(user) }
   end
   
+  def self.starred_by_user(user)
+    joins(:starred_post_entries).where(:starred_post_entries => { :user_id => user.id })
+  end
+  
   def starred_by_user?(user)
     starred_users.include?(user)
+  end
+  
+  def self.unread_for_user(user)
+    joins(:unread_post_entries).where(:unread_post_entries => { :user_id => user.id })
   end
   
   def unread_for_user?(user)

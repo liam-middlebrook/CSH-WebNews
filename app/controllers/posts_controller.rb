@@ -100,7 +100,11 @@ class PostsController < ApplicationController
       @starred_only = true
     end
     
-    scope = params[:starred] ? @current_user.starred_posts : Post
+    scope = Post.scoped
+    scope = scope.sticky if params[:sticky]
+    scope = scope.starred_by_user(@current_user) if params[:starred]
+    scope = scope.unread_for_user(@current_user) if params[:unread]
+    scope = scope.where(:newsgroup => @newsgroup.name) if @newsgroup
     @posts_older = scope.where(conditions.join(' and '), *values).order('date DESC').limit(limit)
     @more_older = @posts_older.length > 0 && !@posts_older[limit - 1].nil?
     @posts_older.delete_at(-1) if @posts_older.length == limit
@@ -315,11 +319,6 @@ class PostsController < ApplicationController
       values = []
       error_text = nil
       
-      if @newsgroup
-        conditions << 'newsgroup = ?'
-        values << @newsgroup.name
-      end
-      
       if not params[:keywords].blank?
         begin
           phrases = Shellwords.split(params[:keywords])
@@ -361,9 +360,12 @@ class PostsController < ApplicationController
         end
       end
       
-      if not params[:author].blank?
-        conditions << 'author like ?'
-        values << '%' + params[:author] + '%'
+      if not params[:authors].blank?
+        authors = params[:authors].split(',')
+        conditions << '(' + (['author like ?'] * authors.size).join(' or ') + ')'
+        authors.each do |author|
+          values << '%' + author + '%'
+        end
       end
       
       if not params[:date_from].blank?
