@@ -8,11 +8,9 @@ class ApplicationController < ActionController::Base
   
     def authenticate
       if not Newsgroup.select(true).first
-        set_no_cache
         @no_script = true
         render 'shared/no_groups'
       elsif not request.env[ENV_USERNAME]
-        set_no_cache
         if not User.select(true).first and not params[:no_user_override]
           if DEV_MODE_ENABLED
             User.create!(:username => 'nobody', :real_name => 'Testing User')
@@ -33,7 +31,6 @@ class ApplicationController < ActionController::Base
       maintenance = File.exists?('tmp/maintenance.txt')
       reloading = File.exists?('tmp/reloading.txt')
       if maintenance or reloading
-        set_no_cache
         @no_script = true
         @dialog_title = if reloading
           'WebNews is re-importing all newsgroups'
@@ -123,12 +120,4 @@ class ApplicationController < ActionController::Base
     def form_error(error_text)
       render :partial => 'shared/form_error', :object => error_text
     end
-    
-    def set_no_cache
-      response.headers['Cache-Control'] =
-        'no-store, no-cache, private, must-revalidate, max-age=0'
-      response.headers['Pragma'] = 'no-cache'
-      response.headers['Expires'] = '0'
-      response.headers['Vary'] = '*'
-    end 
 end

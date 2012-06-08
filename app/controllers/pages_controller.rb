@@ -11,7 +11,6 @@ class PagesController < ApplicationController
     respond_to do |wants|
       
       wants.html do
-        set_no_cache
         if request.env[ENV_REALNAME]
           @current_user.real_name = request.env[ENV_REALNAME]
           @current_user.save!
