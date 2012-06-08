@@ -34,20 +34,9 @@
       
       <fieldset>
         <legend>WebNews API</legend>
-        <% if @current_user.api_enabled? %>
-          <p>
-          API access is enabled for your account. Your key is <span class="api_key">b18ea97455ac1b84</span> <a href="#" class="smallbutton">Regenerate</a> <a href="#" class="smallbutton">Disable</a>
-          <br>
-          <% if not @current_user.api_last_access.nil? %>
-            This key was last used by <b><%= @current_user.api_last_agent %></b> at
-            <b><%= @current_user.api_last_access.in_time_zone(@current_user.time_zone).strftime(DATE_FORMAT) %></b>
-          <% else %>
-            This key has not been used by any applications yet.
-          <% end %>
-          </p>
-        <% else %>
-          <p>API access is disabled for your account. <a href="#" class="smallbutton">Enable</a></p>
-        <% end %>
+        <div id="api_settings">
+          <%= render 'api_settings' %>
+        </div>
       </fieldset>
       
       <div class="form_element">

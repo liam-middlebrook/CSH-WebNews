@@ -48,10 +48,6 @@
     margin-bottom: 1.25em;
   }
   
-  fieldset p {
-    margin-bottom: inherit;
-  }
-  
   .form_element {
     margin-bottom: 1em;
   }
@@ -68,6 +64,11 @@
   
   p.explain.close {
     margin-top: -1em;
+  }
+  
+  #api_settings {
+    p { margin-bottom: 0.5em; }
+    p.explain { margin-bottom: 1em; }
   }
   
   #link_markup_explain {
