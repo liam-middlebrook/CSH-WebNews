@@ -9,7 +9,7 @@
   </p>
   <p>
     <% if not @current_user.api_last_access.nil? %>
-      This key was last used by <b><%= @current_user.api_last_agent %></b> at
+      This key was last used by <b><%= @current_user.api_last_agent || '(unknown application)' %></b> at
       <b><%= @current_user.api_last_access.in_time_zone(@current_user.time_zone).strftime(DATE_FORMAT) %></b>
     <% else %>
       This key has not been used by any applications yet.

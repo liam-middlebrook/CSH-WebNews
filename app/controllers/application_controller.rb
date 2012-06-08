@@ -18,10 +18,14 @@ class ApplicationController < ActionController::Base
             @no_script = true
             render 'shared/no_users'
           end
-        elsif not DEV_MODE_ENABLED
+        elsif not DEV_MODE_ENABLED and not params[:api_key]
           respond_to do |wants|
             wants.html { render :file => "#{Rails.root}/public/auth.html", :layout => false }
             wants.js { render 'shared/needs_auth' }
+            wants.json { render :status => :unauthorized, :json => {
+              :reason => 'Missing API key',
+              :details => "API access requires a key to be provided in the 'api_key' parameter"
+            }}
           end
         end
       end
@@ -32,37 +36,62 @@ class ApplicationController < ActionController::Base
       reloading = File.exists?('tmp/reloading.txt')
       if maintenance or reloading
         @no_script = true
-        @dialog_title = if reloading
+        @reason = if reloading
           'WebNews is re-importing all newsgroups'
         else
           'WebNews is down for maintenance'
         end
         @explanation = if reloading
-          "This could take a while.
-          (#{Newsgroup.count - 1} newsgroups completed so far, 
-          started #{File.mtime('tmp/syncing.txt').strftime(SHORT_DATE_FORMAT)})"
+          "This could take a while. (#{Newsgroup.count - 1} newsgroups completed so far, started #{File.mtime('tmp/syncing.txt').strftime(SHORT_DATE_FORMAT)})"
         else
-          File.read('tmp/maintenance.txt')
+          explain = File.read('tmp/maintenance.txt')
+          if explain.blank?
+            "No explanation was provided for this maintenance, but hopefully we'll be back online soon."
+          else
+            explain
+          end
         end
+        
         respond_to do |wants|
           wants.html { render 'shared/maintenance' }
           wants.js { render 'shared/maintenance' }
+          wants.json { render :status => :service_unavailable, :json => {
+            :reason => @reason,
+            :details => @explanation.chomp
+          }}
         end
       end
     end
   
     def get_or_create_user
-      @current_user = DEV_MODE_ENABLED ? User.first :
-        User.find_by_username(request.env[ENV_USERNAME])
-      if @current_user.nil?
-        @current_user = User.create!(
-          :username => request.env[ENV_USERNAME],
-          :real_name => request.env[ENV_REALNAME]
-        )
-        @new_user = true
-      else
-        @old_user = true if @current_user.is_inactive?
-        @current_user.touch
+      if params[:api_key]
+        @current_user = User.find_by_api_key(params[:api_key])
+        if @current_user.nil?
+          render :status => :unauthorized, :json => {
+            :reason => 'Invalid API key',
+            :details => 'The API key you provided does not match any known user'
+          }
+        elsif not params[:api_agent]
+          render :status => :unauthorized, :json => {
+            :reason => 'Missing agent name',
+            :details => "API access requires an agent name to be provided in the 'api_agent' parameter"
+          }
+        else
+          @current_user.update_attributes(:api_last_access => Time.now, :api_last_agent => params[:api_agent])
+        end
+      else # Non-API access, may create the user
+        @current_user = DEV_MODE_ENABLED ? User.first :
+          User.find_by_username(request.env[ENV_USERNAME])
+        if @current_user.nil?
+          @current_user = User.create!(
+            :username => request.env[ENV_USERNAME],
+            :real_name => request.env[ENV_REALNAME]
+          )
+          @new_user = true
+        else
+          @old_user = true if @current_user.is_inactive?
+          @current_user.touch
+        end
       end
     end
     
