@@ -1,4 +1,11 @@
 class UsersController < ApplicationController
+  before_filter :prevent_api_access, :only => [:edit, :update, :update_api]
+  
+  def show
+    render :json => @current_user.as_json(:only =>
+      [:username, :real_name, :created_at, :updated_at, :preferences])
+  end
+  
   def edit
     render 'shared/dialog'
   end

@@ -8,8 +8,9 @@ Webnews::Application.routes.draw do
   
   put '/mark_read', :to => 'pages#mark_read', :as => :mark_read
   
-  get '/settings', :to => 'users#edit',   :as => :edit_user
-  put '/settings', :to => 'users#update', :as => :update_user
+  get '/user',         :to => 'users#show',       :as => :user
+  get '/settings',     :to => 'users#edit',       :as => :edit_user
+  put '/settings',     :to => 'users#update',     :as => :update_user
   put '/settings/api', :to => 'users#update_api', :as => :update_user_api
   
   get '/compose',  :to => 'posts#new',    :as => :new_post
