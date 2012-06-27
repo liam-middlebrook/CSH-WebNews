@@ -100,13 +100,13 @@ end
           The author did not specify where replies should go.
         <% elsif post.followup_newsgroup == @newsgroup %>
           The author specified that replies should go here.
-        <% elsif other_groups.length == 1 and not post.in_newsgroup(post.followup_newsgroup).nil? %>
+        <% elsif other_groups.length == 1 and post.exists_in_followup_newsgroup? %>
           The author specified that replies should go <a href="#!<%=
             post_path(post.followup_newsgroup.name, post.in_newsgroup(post.followup_newsgroup).number)
           %>">there</a>.
         <% else %>
           The author specified that replies should go to
-          <% if not post.in_newsgroup(post.followup_newsgroup).nil? %>
+          <% if post.exists_in_followup_newsgroup? %>
             <a href="#!<%=
               post_path(post.followup_newsgroup.name, post.in_newsgroup(post.followup_newsgroup).number)
             %>"><%= post.followup_newsgroup.name %></a>.

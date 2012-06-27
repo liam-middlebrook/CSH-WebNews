@@ -60,6 +60,10 @@ class Post < ActiveRecord::Base
     Newsgroup.find_by_name(headers[/^Followup-To: (.*)/i, 1])
   end
   
+  def exists_in_followup_newsgroup?
+    !in_newsgroup(followup_newsgroup).nil?
+  end
+  
   def all_newsgroups
     all_newsgroup_names.map{ |name| Newsgroup.find_by_name(name) }.reject(&:nil?)
   end

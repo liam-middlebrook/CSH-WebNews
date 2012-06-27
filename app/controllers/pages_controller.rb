@@ -137,8 +137,10 @@ class PagesController < ApplicationController
       threads.reject! do |thread|
         parent = thread[:parent]
         parent.is_crossposted? and
-          (parent.followup_newsgroup and parent.followup_newsgroup != parent.newsgroup) or
-          (!parent.followup_newsgroup and
+          (parent.followup_newsgroup and
+            parent.followup_newsgroup != parent.newsgroup and
+            parent.exists_in_followup_newsgroup?) or
+          ((!parent.followup_newsgroup or !parent.exists_in_followup_newsgroup?) and
             parent.in_all_newsgroups.length > 1 and
             parent != parent.in_all_newsgroups[0])
       end
