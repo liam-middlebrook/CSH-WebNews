@@ -22,8 +22,8 @@ class ApplicationController < ActionController::Base
           respond_to do |wants|
             wants.html { render :file => "#{Rails.root}/public/auth.html", :layout => false }
             wants.js { render 'shared/needs_auth' }
-            wants.json { render :status => :unauthorized, :json => json_error('Missing API key',
-              "API access requires a key to be provided in the 'api_key' parameter") }
+            wants.json { render :status => :unauthorized, :json => json_error('missing_api_key',
+              'Missing API key', "API access requires a key to be provided in the 'api_key' parameter") }
           end
         end
       end
@@ -54,7 +54,7 @@ class ApplicationController < ActionController::Base
           wants.html { render 'shared/maintenance' }
           wants.js { render 'shared/maintenance' }
           wants.json { render :status => :service_unavailable,
-            :json => json_error(@reason, @explanation.chomp) }
+            :json => json_error('under_maintenance', @reason, @explanation.chomp) }
         end
       end
     end
@@ -63,11 +63,11 @@ class ApplicationController < ActionController::Base
       if params[:api_key]
         @current_user = User.find_by_api_key(params[:api_key])
         if @current_user.nil?
-          render :status => :unauthorized, :json => json_error('Invalid API key',
-            'The API key you provided does not match any known user')
+          render :status => :unauthorized, :json => json_error('invalid_api_key',
+            'Invalid API key', 'The API key you provided does not match any known user')
         elsif not params[:api_agent]
-          render :status => :unauthorized, :json => json_error('Missing app name',
-            "API access requires an app name to be provided in the 'api_agent' parameter")
+          render :status => :unauthorized, :json => json_error('missing_api_agent',
+            'Missing app name', "API access requires an app name to be provided in the 'api_agent' parameter")
         else
           @api_access = true
           @current_user.update_attributes(:api_last_access => Time.now, :api_last_agent => params[:api_agent])
@@ -143,9 +143,10 @@ class ApplicationController < ActionController::Base
       render :partial => 'shared/form_error', :object => error_text
     end
     
-    def json_error(reason, details)
+    def json_error(id, reason, details)
       {
         :error => {
+          :id => id,
           :reason => reason,
           :details => details
         }
