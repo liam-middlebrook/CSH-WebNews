@@ -2,8 +2,9 @@ class UsersController < ApplicationController
   before_filter :prevent_api_access, :only => [:edit, :update, :update_api]
   
   def show
-    render :json => @current_user.as_json(:only =>
-      [:username, :real_name, :created_at, :updated_at, :preferences])
+    render :json => {
+      :user => @current_user.as_json(:except => [:id, :api_key, :api_last_access, :api_last_agent])
+    }
   end
   
   def edit
