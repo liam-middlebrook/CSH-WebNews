@@ -7,6 +7,15 @@ class Post < ActiveRecord::Base
   has_many :starred_users, :through => :starred_post_entries, :source => :user
   before_destroy :kill_parent_id
   
+  def as_json(options = {})
+    except = [:id, :sticky_user_id]
+    except += [:headers, :body] unless options[:with_big_fields]
+    super(
+      :except => except,
+      :include => {:sticky_user => {:only => [:username, :real_name]}}
+    ).update('newsgroup' => newsgroup.name)
+  end
+  
   def author_name
     author[/(.*)<.*>/, 1].andand.gsub(/(\A|[^\\])"/, '\\1').andand.gsub('\\"', '"').andand.rstrip ||
       author[/.* \((.*)\)/, 1] || author

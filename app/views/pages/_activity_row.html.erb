@@ -9,10 +9,7 @@ authors = unread ? thread[:unread_authors] : thread[:authors]
   </td>
   <td class="thread">
     <div class="subject">
-      <a class="<%= unread ?
-          parent.thread_unread_class_for_user(@current_user) :
-          parent.personal_class_for_user(@current_user)
-        %><%= unread ? ' unread' : '' %>"
+      <a class="<%= thread[:personal_class] %><%= unread ? ' unread' : '' %>"
         href="#!<%= post_path(parent.newsgroup.name, parent.number) %>"><%= parent.subject %></a>
     </div>
     <div class="details">

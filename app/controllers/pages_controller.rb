@@ -25,6 +25,17 @@ class PagesController < ApplicationController
         get_next_unread_post
       end
       
+      wants.json do
+        get_activity_feed
+        render :json => {
+          :activity => {
+            :sticky => @sticky_threads,
+            :unread => @unread_threads,
+            :recent => @recent_threads
+          }
+        }
+      end
+      
     end
   end
   
@@ -129,6 +140,12 @@ class PagesController < ApplicationController
             threads[i][:unread_authors] |= [maybe_you(post.author_name)]
           end
         end
+      end
+      
+      threads.map! do |thread|
+        thread.update(:personal_class => thread[:unread] ?
+          thread[:parent].thread_unread_class_for_user(@current_user) :
+          thread[:parent].personal_class_for_user(@current_user))
       end
       
       # Sub-optimal, could result in cross-posted threads with new replies not being shown

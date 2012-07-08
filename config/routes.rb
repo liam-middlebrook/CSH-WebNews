@@ -1,6 +1,7 @@
 Webnews::Application.routes.draw do
   root :to => 'pages#home'
   get '/home', :to => 'pages#home'
+  get '/activity', :to => 'pages#home'
   get '/about', :to => 'pages#about'
   get '/new_user', :to => 'pages#new_user'
   get '/old_user', :to => 'pages#old_user'
