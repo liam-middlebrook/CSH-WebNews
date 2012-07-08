@@ -46,7 +46,7 @@ group_li.removeClass()
 unread = <%= raw group.unread_for_user(@current_user).to_json %>
 
 if unread.count > 0
-  group_li.addClass('unread').addClass(unread.hclass)
+  group_li.addClass('unread').addClass(unread.personal_class)
   group_li.find('.unread_count').text(' (' + unread.count + ')')
 else
   group_li.find('.unread_count').remove()

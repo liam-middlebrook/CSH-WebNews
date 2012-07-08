@@ -2,7 +2,7 @@
   <ul>
     <% groups.each do |group| %>
       <% unread = group.unread_for_user(@current_user) %>
-      <li class="<%= unread[:hclass] %><%= ' read_only' if not group.posting_allowed? %>"
+      <li class="<%= unread[:personal_class] %><%= ' unread' if unread[:count] > 0 %><%= ' read_only' if not group.posting_allowed? %>"
           data-name="<%= group.name %>" data-unread="<%= unread[:count] %>">
         <a href="#!<%= posts_path(group.name) %>">
           <%= group.name %><% if unread[:count] > 0 %><span class="unread_count">

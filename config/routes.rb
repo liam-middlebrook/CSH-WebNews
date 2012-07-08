@@ -21,6 +21,8 @@ Webnews::Application.routes.draw do
   get '/search_entry', :to => 'posts#search_entry', :as => :search_entry
   
   constraints :newsgroup => /[^\/]*/ do
+    get '/newsgroups',                :to => 'newsgroups#index',      :as => :newsgroups
+    get '/newsgroups/:newsgroup',     :to => 'newsgroups#show',       :as => :newsgroup
     get '/:newsgroup/index',          :to => 'posts#index',           :as => :posts
     get '/:newsgroup/:number',        :to => 'posts#show',            :as => :post
     get '/:newsgroup/:number/sticky', :to => 'posts#edit_sticky',     :as => :edit_post_sticky
