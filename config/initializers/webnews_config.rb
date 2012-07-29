@@ -20,6 +20,11 @@ SHORT_DATE_FORMAT = '%-m/%-d %-I:%M%P'
 # Newsgroups matching this regex are excluded from the Recent Activity feed
 RECENT_EXCLUDE = /^(control|csh\.lists|csh\.test)/
 
+# Default and maximum values for the 'limit' parameter to Posts#index
+INDEX_DEF_LIMIT_1 = 8  # Default limit when the request is only in one direction (older or newer)
+INDEX_DEF_LIMIT_2 = 4  # Default limit when the request is for both directions (older and newer)
+INDEX_MAX_LIMIT = 20   # Maximum limit that can be requested with the API
+
 # Set true if the 'whenever' cron jobs have been installed for this instance
 CRON_ENABLED = false
 

@@ -9,42 +9,63 @@ class PostsController < ApplicationController
     @not_found = true if params[:not_found]
     @flat_mode = true if @current_user.thread_mode == :flat
     
-    if params[:showing]
-      @showing = @newsgroup.posts.find_by_number(params[:showing])
-      if @flat_mode
-        @showing_thread = @showing
-      else
-        @showing_thread = @showing.thread_parent
+    if params[:from_number]
+      post_selected = @newsgroup.posts.find_by_number(params[:from_number])
+      if not post_selected
+        render :status => :not_found, :json => json_error('post_not_found', 'Post not found',
+          "Post number '#{params[:from_number]}' in newsgroup '#{params[:newsgroup]}' does not exist") and return
       end
-      @from_older = @showing_thread.date
-      @from_newer = @showing_thread.date
+      thread_selected = post_selected
+      thread_selected = post_selected.thread_parent if not @flat_mode
+      @from_older = (params[:include_older] or not @api_access) ? thread_selected.date : nil
+      @from_newer = (params[:include_newer] or not @api_access) ? thread_selected.date : nil
     end
     
-    limit = (@from_older and @from_newer) ? 5 : 9
-    limit *= 2 if @flat_mode
+    if params[:limit]
+      begin
+        limit = Integer(params[:limit])
+        if not limit.between?(0, INDEX_MAX_LIMIT)
+          limit = [[0, limit].max, INDEX_MAX_LIMIT].min
+          render :status => :bad_request, :json => json_error('limit_outside_range', 'Limit outside range',
+            "The limit value '#{limit}' is outside the acceptable range (0..#{INDEX_MAX_LIMIT})") and return
+        end
+      rescue
+        render :status => :bad_request, :json => json_error('limit_invalid', 'Limit parameter invalid',
+          "The limit value '#{params[:limit]}' could not be parsed as an integer'") and return
+      end
+    end
     
-    if not (@from_older or @from_newer)
+    if not limit
+      limit = (@from_older and @from_newer) ? INDEX_DEF_LIMIT_2 : INDEX_DEF_LIMIT_1
+      limit *= 2 if @flat_mode
+    end
+    
+    limit += 1
+    
+    if not (@from_older or @from_newer or thread_selected)
       @from_older = Post.order('date').last.date + 1.second
     end
     
     if @from_older
+      date_condition = (params[:older_inclusive] ? 'date <= ?' : 'date < ?')
       if @flat_mode
-        @posts_older = @newsgroup.posts.where('date < ?', @from_older).order('date DESC').limit(limit)
+        @posts_older = @newsgroup.posts.where(date_condition, @from_older).order('date DESC').limit(limit)
       else
         @posts_older = @newsgroup.posts.
-          where('parent_id = ? and date < ?', '', @from_older).
+          where("parent_id = ? and #{date_condition}", '', @from_older).
           order('date DESC').limit(limit)
       end
     end
     
     if @from_newer
+      date_condition = (params[:newer_inclusive] ? 'date >= ?' : 'date > ?')
       if @flat_mode
-        @posts_newer = @newsgroup.posts.where('date > ?', @from_newer).order('date').limit(limit)
+        @posts_newer = @newsgroup.posts.where(date_condition, @from_newer).order('date').limit(limit).reverse
       else
         @from_newer = @newsgroup.posts.where(:date => @from_newer).first.thread_parent.date
         @posts_newer = @newsgroup.posts.
-          where('parent_id = ? and date > ?', '', @from_newer).
-          order('date').limit(limit)
+          where("parent_id = ? and #{date_condition}", '', @from_newer).
+          order('date').limit(limit).reverse
       end
     end
     
@@ -59,9 +80,27 @@ class PostsController < ApplicationController
     
     if not @flat_mode
       flatten = (@current_user.thread_mode == :hybrid)
-      @showing_thread = @showing_thread.thread_tree_for_user(@current_user, flatten) if @showing_thread
+      @posts_selected = thread_selected.thread_tree_for_user(@current_user, flatten, @api_access) if thread_selected
       [@posts_older, @posts_newer].each do |posts|
-        posts.map!{ |post| post.thread_tree_for_user(@current_user, flatten) } if posts
+        posts.map!{ |post| post.thread_tree_for_user(@current_user, flatten, @api_access) } if posts
+      end
+    else
+      @posts_selected = {:post => thread_selected} if thread_selected
+      [@posts_older, @posts_newer].each do |posts|
+        posts.map!{ |post| {:post => post} } if posts
+      end
+    end
+    
+    respond_to do |wants|
+      wants.js do
+        # index.js.coffee
+      end
+      wants.json do
+        json = {}
+        json.merge!({ :posts_selected => @posts_selected }) if @posts_selected
+        json.merge!({ :posts_older => @posts_older, :more_older => @more_older }) if @posts_older
+        json.merge!({ :posts_newer => @posts_newer, :more_newer => @more_newer }) if @posts_newer
+        render :json => json
       end
     end
     
@@ -108,6 +147,7 @@ class PostsController < ApplicationController
     @posts_older = scope.where(conditions.join(' and '), *values).order('date DESC').limit(limit)
     @more_older = @posts_older.length > 0 && !@posts_older[limit - 1].nil?
     @posts_older.delete_at(-1) if @posts_older.length == limit
+    @posts_older.map!{ |post| {:post => post} }
     
     get_next_unread_post
     render 'index'
@@ -307,8 +347,18 @@ class PostsController < ApplicationController
     def set_list_layout_and_offset
       if params[:from_older] or params[:from_newer]
         @full_layout = false
-        @from_older = Time.parse(params[:from_older]) rescue nil
-        @from_newer = Time.parse(params[:from_newer]) rescue nil
+        begin
+          @from_older = Time.parse(params[:from_older]) if params[:from_older]
+        rescue
+          render :status => :bad_request, :json => json_error('datetime_invalid', 'Datetime parameter invalid',
+            "The from_older value '#{params[:from_older]}' could not be parsed as a datetime") and return
+        end
+        begin
+          @from_newer = Time.parse(params[:from_newer]) if params[:from_newer]
+        rescue
+          render :status => :bad_request, :json => json_error('datetime_invalid', 'Datetime parameter invalid',
+            "The from_newer value '#{params[:from_newer]}' could not be parsed as a datetime") and return
+        end
       else
         @full_layout = true
       end

@@ -6,10 +6,6 @@ class NewsgroupsController < ApplicationController
   end
   
   def show
-    if @newsgroup
-      render :json => { :newsgroup => @newsgroup.as_json(:for_user => @current_user) }
-    else
-      head :not_found
-    end
+    render :json => { :newsgroup => @newsgroup.as_json(:for_user => @current_user) }
   end
 end

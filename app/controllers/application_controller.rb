@@ -22,7 +22,7 @@ class ApplicationController < ActionController::Base
           respond_to do |wants|
             wants.html { render :file => "#{Rails.root}/public/auth.html", :layout => false }
             wants.js { render 'shared/needs_auth' }
-            wants.json { render :status => :unauthorized, :json => json_error('missing_api_key',
+            wants.json { render :status => :unauthorized, :json => json_error('api_key_missing',
               'Missing API key', "API access requires a key to be provided in the 'api_key' parameter") }
           end
         end
@@ -63,14 +63,22 @@ class ApplicationController < ActionController::Base
       if params[:api_key]
         @current_user = User.find_by_api_key(params[:api_key])
         if @current_user.nil?
-          render :status => :unauthorized, :json => json_error('invalid_api_key',
+          render :status => :unauthorized, :json => json_error('api_key_invalid',
             'Invalid API key', 'The API key you provided does not match any known user')
         elsif not params[:api_agent]
-          render :status => :unauthorized, :json => json_error('missing_api_agent',
+          render :status => :unauthorized, :json => json_error('api_agent_missing',
             'Missing app name', "API access requires an app name to be provided in the 'api_agent' parameter")
         else
           @api_access = true
           @current_user.update_attributes(:api_last_access => Time.now, :api_last_agent => params[:api_agent])
+          if params[:thread_mode]
+            if ['normal', 'flat', 'hybrid'].include?(params[:thread_mode])
+              @current_user.preferences[:thread_mode] = params[:thread_mode].to_sym
+            else
+              render :status => :bad_request, :json => json_error('thread_mode_invalid', 'Invalid thread mode',
+                "The thread_mode value '#{params[:thread_mode]}' is not one of ['normal', 'flat', 'hybrid']")
+            end
+          end
         end
       else # Non-API access, may create the user
         @current_user = DEV_MODE_ENABLED ? User.first :
@@ -106,12 +114,20 @@ class ApplicationController < ActionController::Base
     def get_newsgroup
       if params[:newsgroup]
         @newsgroup = Newsgroup.find_by_name(params[:newsgroup])
+        if @api_access and not @newsgroup
+          render :status => :not_found, :json => json_error('newsgroup_not_found', 'Newsgroup not found',
+            "Newsgroup '#{params[:newsgroup]}' does not exist")
+        end
       end
     end
     
     def get_post
       if params[:newsgroup] and params[:number]
         @post = Post.where(:number => params[:number], :newsgroup => params[:newsgroup]).first
+        if @api_access and not @post
+          render :status => :not_found, :json => json_error('post_not_found', 'Post not found',
+            "Post number '#{params[:number]}' in newsgroup '#{params[:newsgroup]}' does not exist")
+        end
       end
     end
     
@@ -143,14 +159,22 @@ class ApplicationController < ActionController::Base
       render :partial => 'shared/form_error', :object => error_text
     end
     
-    def json_error(id, reason, details)
+    def json_error_or_warning(id, reason, details, warning = false)
       {
-        :error => {
+        (warning ? :warning : :error) => {
           :id => id,
           :reason => reason,
           :details => details
         }
       }
+    end
+    
+    def json_error(id, reason, details)
+      json_error_or_warning(id, reason, details, false)
+    end
+    
+    def json_warning(id, reason, details)
+      json_error_or_warning(id, reason, details, true)
     end
     
     def prevent_api_access

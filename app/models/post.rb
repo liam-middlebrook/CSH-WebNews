@@ -13,7 +13,12 @@ class Post < ActiveRecord::Base
     super(
       :except => except,
       :include => {:sticky_user => {:only => [:username, :real_name]}}
-    ).update('newsgroup' => newsgroup.name)
+    ).
+      update('newsgroup' => newsgroup.name).
+      merge(options[:with_user] ? {
+        :unread => unread_for_user?(options[:with_user]),
+        :personal_class => personal_class_for_user(options[:with_user])
+      } : {})
   end
   
   def author_name
@@ -107,24 +112,26 @@ class Post < ActiveRecord::Base
     Post.where(:thread_id => thread_id, :newsgroup => newsgroup.name).order('date')
   end
   
-  def thread_tree_for_user(user, flatten = false, all_posts = nil)
+  def thread_tree_for_user(user, flatten = false, as_json = false, all_posts = nil)
     all_posts ||= all_in_thread.to_a
     {
-      :post => self,
+      :post => (as_json ? self.as_json(:with_user => user) : self),
       :children => if flatten
         all_posts.reject{ |p| p == self }.map{ |p| {
-          :post => p, :children => [],
+          :post => (as_json ? p.as_json(:with_user => user) : p), :children => []
+        }.merge(as_json ? {} : {
           :unread => p.unread_for_user?(user),
           :personal_class => p.personal_class_for_user(user)
-        }}
+        })}
       else
         all_posts.
           select{ |p| p.parent_id == self.message_id }.
-          map{ |p| p.thread_tree_for_user(user, flatten, all_posts) }
-      end,
+          map{ |p| p.thread_tree_for_user(user, flatten, as_json, all_posts) }
+      end
+    }.merge(as_json ? {} : {
       :unread => self.unread_for_user?(user),
       :personal_class => self.personal_class_for_user(user)
-    }
+    })
   end
   
   def original_parent_id
