@@ -436,7 +436,7 @@ class PostsController < ApplicationController
             :json_details => "The date_from value '#{params[:date_from]}' could not be parsed as a datetime"
           }
         else
-          conditions << 'date > ?'
+          conditions << 'date >= ?'
           values << date_from
         end
       end
@@ -451,7 +451,7 @@ class PostsController < ApplicationController
             :json_details => "The date_to value '#{params[:date_to]}' could not be parsed as a datetime"
           }
         else
-          conditions << 'date < ?'
+          conditions << 'date <= ?'
           values << date_to
         end
       end
