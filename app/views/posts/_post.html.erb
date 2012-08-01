@@ -51,14 +51,17 @@ end
       <%= post.author_name %>
       <% if post.author_is_local? %>
         <%= ' (' + post.author_username + ')' %>
-        <a class="smallbutton" href="#!<%= search_path(:author => post.author_email) %>"
-          title="Search for posts by this user">Posts</a>
+      <% else %>
+        <%= ' <' + post.author_email + '>' if post.author_email %>
+      <% end %>
+      <a class="smallbutton"
+        href="#!<%= search_path(:authors => [post.author_name, post.author_email].compact.join(',')) %>"
+        title="Search for posts by this user">Posts</a>
+      <% if post.author_is_local? %>
         <a class="smallbutton" href="<%= PROFILES_URL + post.author_username %>"
           title="Go to this user's profile page">Profile</a>
         <a class="smallbutton" href="<%= WIKI_USER_URL + post.author_username.capitalize %>"
           title="Go to this user's wiki page">Wiki</a>
-      <% else %>
-        <%= ' <' + post.author_email + '>' if post.author_email %>
       <% end %>
     </span> &mdash;
     <span class="date"><%= post.date.in_time_zone(@current_user.time_zone).strftime(DATE_FORMAT) %></span>
