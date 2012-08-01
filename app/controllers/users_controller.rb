@@ -3,7 +3,7 @@ class UsersController < ApplicationController
   
   def show
     render :json => {
-      :user => @current_user.as_json(:except => [:id, :api_key, :api_last_access, :api_last_agent])
+      :user => @current_user.as_json(:only => [:username, :real_name, :created_at, :updated_at, :preferences])
     }
   end
   
