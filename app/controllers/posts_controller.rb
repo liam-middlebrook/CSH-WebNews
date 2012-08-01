@@ -4,6 +4,7 @@ class PostsController < ApplicationController
   before_filter :get_newsgroups_for_search, :only => :search_entry
   before_filter :get_newsgroups_for_posting, :only => [:new, :create]
   before_filter :set_list_layout_and_offset, :only => [:index, :search]
+  before_filter :set_limit_from_params, :only => [:index, :search]
 
   def index
     @not_found = true if params[:not_found]
@@ -12,7 +13,7 @@ class PostsController < ApplicationController
     if params[:from_number]
       post_selected = @newsgroup.posts.find_by_number(params[:from_number])
       if not post_selected
-        render :status => :not_found, :json => json_error('post_not_found', 'Post not found',
+        render :status => :not_found, :json => json_error('post_not_found',
           "Post number '#{params[:from_number]}' in newsgroup '#{params[:newsgroup]}' does not exist") and return
       end
       thread_selected = post_selected
@@ -21,26 +22,12 @@ class PostsController < ApplicationController
       @from_newer = (params[:include_newer] or not @api_access) ? thread_selected.date : nil
     end
     
-    if params[:limit]
-      begin
-        limit = Integer(params[:limit])
-        if not limit.between?(0, INDEX_MAX_LIMIT)
-          limit = [[0, limit].max, INDEX_MAX_LIMIT].min
-          render :status => :bad_request, :json => json_error('limit_outside_range', 'Limit outside range',
-            "The limit value '#{limit}' is outside the acceptable range (0..#{INDEX_MAX_LIMIT})") and return
-        end
-      rescue
-        render :status => :bad_request, :json => json_error('limit_invalid', 'Limit parameter invalid',
-          "The limit value '#{params[:limit]}' could not be parsed as an integer'") and return
-      end
+    if not @limit
+      @limit = (@from_older and @from_newer) ? INDEX_DEF_LIMIT_2 : INDEX_DEF_LIMIT_1
+      @limit *= 2 if @flat_mode
     end
     
-    if not limit
-      limit = (@from_older and @from_newer) ? INDEX_DEF_LIMIT_2 : INDEX_DEF_LIMIT_1
-      limit *= 2 if @flat_mode
-    end
-    
-    limit += 1
+    @limit += 1
     
     if not (@from_older or @from_newer or thread_selected)
       @from_older = Post.order('date').last.date + 1.second
@@ -49,33 +36,33 @@ class PostsController < ApplicationController
     if @from_older
       date_condition = (params[:older_inclusive] ? 'date <= ?' : 'date < ?')
       if @flat_mode
-        @posts_older = @newsgroup.posts.where(date_condition, @from_older).order('date DESC').limit(limit)
+        @posts_older = @newsgroup.posts.where(date_condition, @from_older).order('date DESC').limit(@limit)
       else
         @posts_older = @newsgroup.posts.
           where("parent_id = ? and #{date_condition}", '', @from_older).
-          order('date DESC').limit(limit)
+          order('date DESC').limit(@limit)
       end
     end
     
     if @from_newer
       date_condition = (params[:newer_inclusive] ? 'date >= ?' : 'date > ?')
       if @flat_mode
-        @posts_newer = @newsgroup.posts.where(date_condition, @from_newer).order('date').limit(limit).reverse
+        @posts_newer = @newsgroup.posts.where(date_condition, @from_newer).order('date').limit(@limit).reverse
       else
         @from_newer = @newsgroup.posts.where(:date => @from_newer).first.thread_parent.date
         @posts_newer = @newsgroup.posts.
           where("parent_id = ? and #{date_condition}", '', @from_newer).
-          order('date').limit(limit).reverse
+          order('date').limit(@limit).reverse
       end
     end
     
     if @posts_older
-      @more_older = @posts_older.length > 0 && !@posts_older[limit - 1].nil?
-      @posts_older.delete_at(-1) if @posts_older.length == limit
+      @more_older = @posts_older.length > 0 && !@posts_older[@limit - 1].nil?
+      @posts_older.delete_at(-1) if @posts_older.length == @limit
     end
     if @posts_newer
-      @more_newer = @posts_newer.length > 0 && !@posts_newer[limit - 1].nil?
-      @posts_newer.delete_at(-1) if @posts_newer.length == limit
+      @more_newer = @posts_newer.length > 0 && !@posts_newer[@limit - 1].nil?
+      @posts_newer.delete_at(-1) if @posts_newer.length == @limit
     end
     
     if not @flat_mode
@@ -91,9 +78,11 @@ class PostsController < ApplicationController
       end
     end
     
+    get_next_unread_post
+    
     respond_to do |wants|
       wants.js do
-        # index.js.coffee
+        # render 'index'
       end
       wants.json do
         json = {}
@@ -103,13 +92,13 @@ class PostsController < ApplicationController
         render :json => json
       end
     end
-    
-    get_next_unread_post
   end
   
   def search
-    limit = 18
-    conditions, values, error_text = build_search_conditions
+    @limit = INDEX_DEF_LIMIT_1 * 2 if not @limit
+    @limit += 1
+    
+    conditions, values, error = build_search_conditions
     
     if @from_older
       conditions << 'date < ?'
@@ -122,16 +111,10 @@ class PostsController < ApplicationController
     
     search_params = params.except(:action, :controller, :source, :commit, :validate, :utf8, :_)
     
-    if params[:validate]
-      if error_text
-        form_error error_text
-      else
-        render :partial => 'search_redirect', :locals => { :search_params => search_params }
-      end
-      return
-    elsif error_text
-      # Should only happen if someone messes with URLs
-      render :nothing => true and return
+    if error
+      json_or_form_error(:bad_request, error[:json_id], error[:json_details], error[:form_text]) and return
+    elsif params[:validate]
+      render :partial => 'search_redirect', :locals => { :search_params => search_params } and return
     end
     
     @search_mode = @flat_mode = true
@@ -144,13 +127,17 @@ class PostsController < ApplicationController
     scope = scope.starred_by_user(@current_user) if params[:starred]
     scope = scope.unread_for_user(@current_user) if params[:unread]
     scope = scope.where(:newsgroup => @newsgroup.name) if @newsgroup
-    @posts_older = scope.where(conditions.join(' and '), *values).order('date DESC').limit(limit)
-    @more_older = @posts_older.length > 0 && !@posts_older[limit - 1].nil?
-    @posts_older.delete_at(-1) if @posts_older.length == limit
+    @posts_older = scope.where(conditions.join(' and '), *values).order('date DESC').limit(@limit)
+    @more_older = @posts_older.length > 0 && !@posts_older[@limit - 1].nil?
+    @posts_older.delete_at(-1) if @posts_older.length == @limit
     @posts_older.map!{ |post| {:post => post} }
     
     get_next_unread_post
-    render 'index'
+    
+    respond_to do |wants|
+      wants.js { render 'index' }
+      wants.json { render :json => { :posts_older => @posts_older, :more_older => @more_older } }
+    end
   end
   
   def search_entry
@@ -350,13 +337,13 @@ class PostsController < ApplicationController
         begin
           @from_older = Time.parse(params[:from_older]) if params[:from_older]
         rescue
-          render :status => :bad_request, :json => json_error('datetime_invalid', 'Datetime parameter invalid',
+          render :status => :bad_request, :json => json_error('datetime_invalid',
             "The from_older value '#{params[:from_older]}' could not be parsed as a datetime") and return
         end
         begin
           @from_newer = Time.parse(params[:from_newer]) if params[:from_newer]
         rescue
-          render :status => :bad_request, :json => json_error('datetime_invalid', 'Datetime parameter invalid',
+          render :status => :bad_request, :json => json_error('datetime_invalid',
             "The from_newer value '#{params[:from_newer]}' could not be parsed as a datetime") and return
         end
       else
@@ -364,10 +351,26 @@ class PostsController < ApplicationController
       end
     end
     
+    def set_limit_from_params
+      if params[:limit]
+        begin
+          @limit = Integer(params[:limit])
+          if not @limit.between?(0, INDEX_MAX_LIMIT)
+            @limit = [[0, @limit].max, INDEX_MAX_LIMIT].min
+            render :status => :bad_request, :json => json_error('limit_outside_range',
+              "The limit value '#{@limit}' is outside the acceptable range (0..#{INDEX_MAX_LIMIT})") and return
+          end
+        rescue
+          render :status => :bad_request, :json => json_error('limit_invalid',
+            "The limit value '#{params[:limit]}' could not be parsed as an integer'") and return
+        end
+      end
+    end
+    
     def build_search_conditions
       conditions = []
       values = []
-      error_text = nil
+      error = nil
       
       if not params[:keywords].blank?
         begin
@@ -406,7 +409,11 @@ class PostsController < ApplicationController
             ) + ')'
           values += keyword_values + exclude_values
         rescue
-          error_text = "Keywords field has unbalanced quotes."
+          error = {
+            :form_text => 'The keywords field has unbalanced quotes.',
+            :json_id => 'keywords_invalid',
+            :json_details => 'The keywords value contains unbalanced quotes'
+          }
         end
       end
       
@@ -423,7 +430,11 @@ class PostsController < ApplicationController
         date_from = 'January 1, ' + date_from if date_from[/^\d{4}$/]
         date_from = Chronic.parse(date_from)
         if not date_from
-          error_text = "Unable to parse \"#{params[:date_from]}\"."
+          error = {
+            :form_text => "Unable to parse \"#{params[:date_from]}\" as a date.",
+            :json_id => 'date_from_invalid',
+            :json_details => "The date_from value '#{params[:date_from]}' could not be parsed as a datetime"
+          }
         else
           conditions << 'date > ?'
           values << date_from
@@ -434,13 +445,17 @@ class PostsController < ApplicationController
         date_to = 'January 1, ' + (date_to.to_i + 1).to_s if date_to[/^\d{4}$/]
         date_to = Chronic.parse(date_to)
         if not date_to
-          error_text = "Unable to parse \"#{params[:date_to]}\"."
+          error = {
+            :form_text => "Unable to parse \"#{params[:date_to]}\" as a date.",
+            :json_id => 'date_to_invalid',
+            :json_details => "The date_to value '#{params[:date_to]}' could not be parsed as a datetime"
+          }
         else
           conditions << 'date < ?'
           values << date_to
         end
       end
       
-      return conditions, values, error_text
+      return conditions, values, error
     end
 end
