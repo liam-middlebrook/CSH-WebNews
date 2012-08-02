@@ -157,6 +157,44 @@ class ApplicationController < ActionController::Base
       @next_unread_post = @current_user.unread_posts.order(order).first
     end
     
+    def get_last_sync_time
+      if File.exists?('tmp/lastsync.txt')
+        @last_sync_time = File.mtime('tmp/lastsync.txt')
+        if @last_sync_time < 2.minutes.ago
+          @sync_warning = "Last sync with the news server was #{view_context.time_ago_in_words(@last_sync_time)} ago."
+        end
+      else
+        @sync_warning = 'The initial news server sync was interrupted and could not be resumed. Some newsgroups and/or posts may be missing.'
+        @sync_incomplete = true
+      end
+    end
+    
+    def cronless_clean_unread
+      if not File.exists?('tmp/lastclean.txt') or
+          File.mtime('tmp/lastclean.txt') < 1.day.ago
+        FileUtils.touch('tmp/lastclean.txt')
+        User.clean_unread!
+      end
+    end
+    
+    def cronless_sync_all
+      if not File.exists?('tmp/syncing.txt') and
+          (not File.exists?('tmp/lastsync.txt') or
+            File.mtime('tmp/lastsync.txt') < 1.minute.ago)
+        begin
+          Newsgroup.sync_all!
+        rescue
+          logger.error "\n\n### SYNC ERROR ###"
+          logger.error $!.message
+          logger.error "##################\n\n"
+        end
+      end
+    end
+    
+    def maybe_you(name)
+      name == @current_user.real_name ? 'you' : name
+    end
+    
     def form_error(error_text)
       render :partial => 'shared/form_error', :object => error_text
     end
@@ -182,6 +220,20 @@ class ApplicationController < ActionController::Base
       respond_to do |wants|
         wants.js { form_error(form_text) }
         wants.json { render :status => status, :json => json_error(id, details) }
+      end
+    end
+    
+    def json_sync_warning
+      if @sync_warning
+        {
+          :warning => {
+            :id => 'sync_outdated',
+            :last_sync => @last_sync_time,
+            :details => @sync_warning
+          }
+        }
+      else
+        {}
       end
     end
     

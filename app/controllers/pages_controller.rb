@@ -161,40 +161,4 @@ class PagesController < ApplicationController
       
       return threads.sort{ |x,y| y[:date] <=> x[:date] }
     end
-    
-    def cronless_clean_unread
-      if not File.exists?('tmp/lastclean.txt') or
-          File.mtime('tmp/lastclean.txt') < 1.day.ago
-        FileUtils.touch('tmp/lastclean.txt')
-        User.clean_unread!
-      end
-    end
-    
-    def cronless_sync_all
-      if not File.exists?('tmp/syncing.txt') and
-          (not File.exists?('tmp/lastsync.txt') or
-            File.mtime('tmp/lastsync.txt') < 1.minute.ago)
-        begin
-          Newsgroup.sync_all!
-        rescue
-          logger.error "\n\n### SYNC ERROR ###"
-          logger.error $!.message
-          logger.error "##################\n\n"
-        end
-      end
-    end
-    
-    def get_last_sync_time
-      if File.exists?('tmp/lastsync.txt')
-        @last_sync_time = File.mtime('tmp/lastsync.txt')
-        @show_sync_warning = true if @last_sync_time < 2.minutes.ago
-      else
-        @show_sync_warning = true
-        @no_complete_sync = true
-      end
-    end
-    
-    def maybe_you(name)
-      name == @current_user.real_name ? 'you' : name
-    end
 end

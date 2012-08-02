@@ -26,7 +26,7 @@ if window.loaded_location == 'home'
 <% end %>
 
 $('#sync_warning').remove()
-<% if @show_sync_warning %>
+<% if @sync_warning %>
 $('#groups_list h2').after('<%= j render("shared/sync_warning") %>')
 <% end %>
 
