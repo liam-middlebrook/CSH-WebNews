@@ -20,5 +20,5 @@ newsgroup_name = @newsgroup ? @newsgroup.name : post.newsgroup.name
   </td>
   <% if @search_mode and not @newsgroup %><td><%= newsgroup_name %></td><% end %>
   <td><%= post.author_name %></td>
-  <td><%= post.date.in_time_zone(@current_user.time_zone).strftime(DATE_FORMAT) %></td>
+  <td><%= post.date.strftime(DATE_FORMAT) %></td>
 </tr>

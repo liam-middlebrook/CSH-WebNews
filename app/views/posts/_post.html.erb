@@ -14,7 +14,7 @@ end
       <div class="sticky_explain">
         Stickied by
         <%= post.sticky_user.real_name %><br>until
-        <%= post.sticky_until.in_time_zone(@current_user.time_zone).strftime(DATE_FORMAT) %>
+        <%= post.sticky_until.strftime(DATE_FORMAT) %>
       </div>
     <% end %>
     <% if not @search_mode and @newsgroup.posting_allowed? %>
@@ -64,7 +64,7 @@ end
           title="Go to this user's wiki page">Wiki</a>
       <% end %>
     </span> &mdash;
-    <span class="date"><%= post.date.in_time_zone(@current_user.time_zone).strftime(DATE_FORMAT) %></span>
+    <span class="date"><%= post.date.strftime(DATE_FORMAT) %></span>
     <a id="show_headers_button" class="smallbutton toggle" href="#"
       data-selector="#post_view .headers" data-text="Hide Headers">Show Headers</a>
   </div>

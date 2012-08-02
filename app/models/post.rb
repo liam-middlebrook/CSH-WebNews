@@ -9,16 +9,21 @@ class Post < ActiveRecord::Base
   
   def as_json(options = {})
     except = [:id, :sticky_user_id]
-    except += [:headers, :body] unless options[:with_big_fields]
-    super(
+    except += [:headers, :body] unless options[:with_all]
+    
+    json = super(
       :except => except,
       :include => {:sticky_user => {:only => [:username, :real_name]}}
-    ).
-      update('newsgroup' => newsgroup.name).
-      merge(options[:with_user] ? {
+    ).update(:newsgroup => newsgroup.name)
+    
+    if options[:with_user]
+      json.merge!({
         :unread => unread_for_user?(options[:with_user]),
         :personal_class => personal_class_for_user(options[:with_user])
-      } : {})
+      })
+    end
+    
+    return json
   end
   
   def author_name

@@ -94,6 +94,8 @@ class ApplicationController < ActionController::Base
           @current_user.touch
         end
       end
+      Time.zone = @current_user.time_zone
+      Chronic.time_class = Time.zone
     end
     
     def get_newsgroups_for_nav

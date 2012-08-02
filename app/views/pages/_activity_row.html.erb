@@ -5,7 +5,7 @@ authors = unread ? thread[:unread_authors] : thread[:authors]
 %>
 <tr<% if mode == :sticky %> class="sticky"<% end %>>
   <td class="date">
-    <%= thread[:date].in_time_zone(@current_user.time_zone).strftime(SHORT_DATE_FORMAT) %>
+    <%= thread[:date].strftime(SHORT_DATE_FORMAT) %>
   </td>
   <td class="thread">
     <div class="subject">
