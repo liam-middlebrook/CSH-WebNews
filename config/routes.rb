@@ -1,11 +1,14 @@
 Webnews::Application.routes.draw do
   root :to => 'pages#home'
-  get '/home', :to => 'pages#home'
-  get '/activity', :to => 'pages#home'
-  get '/about', :to => 'pages#about'
-  get '/new_user', :to => 'pages#new_user'
-  get '/old_user', :to => 'pages#old_user'
+  
+  get '/home',      :to => 'pages#home'
+  get '/activity',  :to => 'pages#home'
+  get '/unread',    :to => 'pages#unread'
   get '/check_new', :to => 'pages#check_new'
+  
+  get '/about',     :to => 'pages#about'
+  get '/new_user',  :to => 'pages#new_user'
+  get '/old_user',  :to => 'pages#old_user'
   
   put '/mark_read', :to => 'pages#mark_read', :as => :mark_read
   

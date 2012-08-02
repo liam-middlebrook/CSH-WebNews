@@ -8,13 +8,15 @@ class Post < ActiveRecord::Base
   before_destroy :kill_parent_id
   
   def as_json(options = {})
-    except = [:id, :sticky_user_id]
-    except += [:headers, :body] unless options[:with_all]
+    if options[:minimal]
+      json = { :number => number }
+    else
+      except = [:id, :newsgroup, :sticky_user_id]
+      except += [:headers, :body] unless options[:with_all]
+      json = super(:except => except, :include => {:sticky_user => {:only => [:username, :real_name]}})
+    end
     
-    json = super(
-      :except => except,
-      :include => {:sticky_user => {:only => [:username, :real_name]}}
-    ).update(:newsgroup => newsgroup.name)
+    json[:newsgroup] = newsgroup.name
     
     if options[:with_user]
       json.merge!({
