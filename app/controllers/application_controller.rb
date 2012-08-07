@@ -130,6 +130,9 @@ class ApplicationController < ActionController::Base
           render :status => :not_found, :json => json_error('post_not_found',
             "Post number '#{params[:number]}' in newsgroup '#{params[:newsgroup]}' does not exist")
         end
+      elsif params[:number] and @api_access
+        render :status => :bad_request, :json => json_error('newsgroup_missing',
+          "Both the 'newsgroup' and 'number' parameters are required to uniquely identify a post")
       end
     end
     

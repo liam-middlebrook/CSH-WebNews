@@ -28,4 +28,14 @@ class UsersController < ApplicationController
       @current_user.update_attributes(:api_key => key, :api_last_access => nil, :api_last_agent => nil)
     end
   end
+  
+  def unread_counts
+    render :json => {
+      :unread_counts => {
+        :normal => @current_user.unread_count,
+        :in_thread => @current_user.unread_count_in_thread,
+        :in_reply => @current_user.unread_count_in_reply
+      }
+    }
+  end
 end

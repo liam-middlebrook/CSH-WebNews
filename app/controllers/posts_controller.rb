@@ -1,5 +1,5 @@
 class PostsController < ApplicationController
-  before_filter :get_newsgroup, :only => [:index, :search, :search_entry, :show, :new]
+  before_filter :get_newsgroup, :only => [:index, :search, :search_entry, :next_unread, :show, :new]
   before_filter :get_post, :except => [:index, :search, :search_entry, :create]
   before_filter :get_newsgroups_for_search, :only => :search_entry
   before_filter :get_newsgroups_for_posting, :only => [:new, :create]
@@ -142,6 +142,13 @@ class PostsController < ApplicationController
   
   def search_entry
     render 'shared/dialog'
+  end
+  
+  def next_unread
+    get_next_unread_post
+    render :json => {
+      :post => @next_unread_post.as_json(:for_user => @current_user, :with_all => true)
+    }
   end
   
   def show

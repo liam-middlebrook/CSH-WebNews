@@ -51,17 +51,6 @@ class PagesController < ApplicationController
     render 'shared/dialog'
   end
   
-  def unread
-    render :json => {
-      :unread_counts => {
-        :normal => @current_user.unread_count,
-        :in_thread => @current_user.unread_count_in_thread,
-        :in_reply => @current_user.unread_count_in_reply
-      },
-      :next_unread => get_next_unread_post().as_json(:minimal => true)
-    }
-  end
-  
   def check_new
     if not CRON_ENABLED
       cronless_sync_all

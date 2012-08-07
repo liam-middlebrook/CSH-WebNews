@@ -3,7 +3,6 @@ Webnews::Application.routes.draw do
   
   get '/home',      :to => 'pages#home'
   get '/activity',  :to => 'pages#home'
-  get '/unread',    :to => 'pages#unread'
   get '/check_new', :to => 'pages#check_new'
   
   get '/about',     :to => 'pages#about'
@@ -12,13 +11,15 @@ Webnews::Application.routes.draw do
   
   put '/mark_read', :to => 'pages#mark_read', :as => :mark_read
   
-  get '/user',         :to => 'users#show',       :as => :user
-  get '/settings',     :to => 'users#edit',       :as => :edit_user
-  put '/settings',     :to => 'users#update',     :as => :update_user
-  put '/settings/api', :to => 'users#update_api', :as => :update_user_api
+  get '/user',          :to => 'users#show',          :as => :user
+  get '/settings',      :to => 'users#edit',          :as => :edit_user
+  put '/settings',      :to => 'users#update',        :as => :update_user
+  put '/settings/api',  :to => 'users#update_api',    :as => :update_user_api
+  get '/unread_counts', :to => 'users#unread_counts'
   
-  get '/compose',  :to => 'posts#new',    :as => :new_post
-  post '/compose', :to => 'posts#create', :as => :create_post
+  get '/compose',     :to => 'posts#new',         :as => :new_post
+  post '/compose',    :to => 'posts#create',      :as => :create_post
+  get '/next_unread', :to => 'posts#next_unread'
   
   get '/search',   :to => 'posts#search', :as => :search
   get '/search_entry', :to => 'posts#search_entry', :as => :search_entry
