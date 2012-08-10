@@ -1,5 +1,5 @@
 class PostsController < ApplicationController
-  before_filter :get_newsgroup, :only => [:index, :search, :search_entry, :next_unread, :show, :new]
+  before_filter :get_newsgroup, :only => [:index, :search, :search_entry, :next_unread, :mark_read, :show, :new]
   before_filter :get_post, :except => [:index, :search, :search_entry, :create]
   before_filter :get_newsgroups_for_search, :only => :search_entry
   before_filter :get_newsgroups_for_posting, :only => [:new, :create]
@@ -317,6 +317,29 @@ class PostsController < ApplicationController
   def destroy_confirm
     @admin_cancel = !@post.authored_by?(@current_user)
     render 'shared/dialog'
+  end
+  
+  def mark_read
+    if params[:mark_unread]
+      if @post and not @post.unread_for_user?(@current_user)
+        UnreadPostEntry.create!(
+          :user => @current_user, :newsgroup => @post.newsgroup, :post => @post,
+          :personal_level => PERSONAL_CODES[@post.personal_class_for_user(@current_user)],
+          :user_created => true
+        )
+      end
+    else
+      if params[:thread_id]
+        @current_user.unread_post_entries.
+          where(:post_id => Post.where(:thread_id => params[:thread_id])).destroy_all
+      elsif params[:newsgroup]
+        @current_user.unread_post_entries.
+          where(:newsgroup_id => Newsgroup.find_by_name(params[:newsgroup]).id).destroy_all
+      elsif params[:all_posts]
+        @current_user.unread_post_entries.destroy_all
+      end
+    end
+    get_next_unread_post
   end
   
   def edit_sticky

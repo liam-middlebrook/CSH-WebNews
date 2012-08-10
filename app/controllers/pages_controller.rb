@@ -1,7 +1,7 @@
 class PagesController < ApplicationController
   before_filter :get_newsgroups_for_nav, :only => [:home, :check_new]
-  before_filter :get_newsgroup, :only => [:check_new, :mark_read]
-  before_filter :get_post, :only => [:check_new, :mark_read]
+  before_filter :get_newsgroup, :only => :check_new
+  before_filter :get_post, :only => :check_new
 
   def home
     if params[:no_user_override]
@@ -62,29 +62,6 @@ class PagesController < ApplicationController
       @dashboard_active = true
       get_activity_feed
     end
-  end
-  
-  def mark_read
-    if params[:mark_unread]
-      if @post and not @post.unread_for_user?(@current_user)
-        UnreadPostEntry.create!(
-          :user => @current_user, :newsgroup => @post.newsgroup, :post => @post,
-          :personal_level => PERSONAL_CODES[@post.personal_class_for_user(@current_user)],
-          :user_created => true
-        )
-      end
-    else
-      if params[:thread_id]
-        @current_user.unread_post_entries.
-          where(:post_id => Post.where(:thread_id => params[:thread_id])).destroy_all
-      elsif params[:newsgroup]
-        @current_user.unread_post_entries.
-          where(:newsgroup_id => Newsgroup.find_by_name(params[:newsgroup]).id).destroy_all
-      elsif params[:all_posts]
-        @current_user.unread_post_entries.destroy_all
-      end
-    end
-    get_next_unread_post
   end
   
   private

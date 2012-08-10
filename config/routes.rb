@@ -9,8 +9,6 @@ Webnews::Application.routes.draw do
   get '/new_user',  :to => 'pages#new_user'
   get '/old_user',  :to => 'pages#old_user'
   
-  put '/mark_read', :to => 'pages#mark_read', :as => :mark_read
-  
   get '/user',          :to => 'users#show',          :as => :user
   get '/settings',      :to => 'users#edit',          :as => :edit_user
   put '/settings',      :to => 'users#update',        :as => :update_user
@@ -20,6 +18,7 @@ Webnews::Application.routes.draw do
   get '/compose',     :to => 'posts#new',         :as => :new_post
   post '/compose',    :to => 'posts#create',      :as => :create_post
   get '/next_unread', :to => 'posts#next_unread'
+  put '/mark_read',   :to => 'posts#mark_read',   :as => :mark_read
   
   get '/search',   :to => 'posts#search', :as => :search
   get '/search_entry', :to => 'posts#search_entry', :as => :search_entry
