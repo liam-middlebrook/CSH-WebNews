@@ -308,7 +308,11 @@ class Post < ActiveRecord::Base
     
     body.rstrip!
     
-    date = Time.parse(headers[/^Date: (.*)/i, 1])
+    date = Time.parse(
+      headers[/^Injection-Date: (.*)/i, 1] ||
+      headers[/^NNTP-Posting-Date: (.*)/i, 1] ||
+      headers[/^Date: (.*)/i, 1]
+    )
     author = headers[/^From: (.*)/i, 1]
     subject = headers[/^Subject: (.*)/i, 1]
     message_id = headers[/^Message-ID: (.*)/i, 1]
