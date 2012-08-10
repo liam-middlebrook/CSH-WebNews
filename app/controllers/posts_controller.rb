@@ -108,6 +108,16 @@ class PostsController < ApplicationController
       conditions << 'newsgroup not like ?'
       values << 'control%'
     end
+    if params[:unread] and params[:personal_class]
+      min_level = PERSONAL_CODES[params[:personal_class].to_sym]
+      if min_level
+        conditions << 'unread_post_entries.personal_level >= ?'
+        values << min_level
+      else
+        render :status => :bad_request, :json => json_error('personal_class_invalid',
+          "'#{params[:personal_class]}' is not a valid personal class") and return
+      end
+    end
     
     search_params = params.except(:action, :controller, :source, :commit, :validate, :utf8, :_)
     
