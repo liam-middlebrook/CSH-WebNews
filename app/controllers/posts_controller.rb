@@ -332,8 +332,10 @@ class PostsController < ApplicationController
         post.update_attributes(:sticky_user => @current_user, :sticky_until => sticky_until)
       end
     else
-      @post.in_all_newsgroups.each do |post|
-        post.update_attributes(:sticky_until => nil)
+      if not @post.sticky_until.nil?
+        @post.in_all_newsgroups.each do |post|
+          post.update_attributes(:sticky_user => @current_user, :sticky_until => Time.now - 1.second)
+        end
       end
     end
   end
