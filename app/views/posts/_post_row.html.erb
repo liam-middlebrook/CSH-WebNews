@@ -15,7 +15,15 @@ newsgroup_name = @newsgroup ? @newsgroup.name : post.newsgroup.name
   <td>
     <% (level - 1).times do %><div class="indent"><% end %>
     <span class="expander<%= expanded ? ' expanded' : '' %>">&nbsp;</span>
-    <a href="#<%= @search_mode ? '~' : '!' %><%= post_path(newsgroup_name, post.number) %><%= @search_mode ? '?search_mode=true' : '' %>"><%= @search_mode || @current_user.thread_mode != :normal ? post.subject : post.first_line %></a>
+    <a href="#<%= @search_mode ? '~' : '!' %><%=
+      post_path(newsgroup_name, post.number) + (@search_mode ? '?search_mode=true' : '')
+    %>"><%=
+      if not @search_mode and @current_user.thread_mode == :normal and post.parent_id != '' and post.subject[/^Re:/i]
+        post.first_line
+      else
+        post.subject
+      end
+    %></a>
     <% (level - 1).times do %></div><% end %>
   </td>
   <% if @search_mode and not @newsgroup %><td><%= newsgroup_name %></td><% end %>

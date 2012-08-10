@@ -45,6 +45,18 @@ class Post < ActiveRecord::Base
     !author_email[LOCAL_EMAIL_DOMAIN].nil? if author_email
   end
   
+  def first_line
+    body.each_line do |line|
+      if not (line.blank? or line[/^>/] or line[/(wrote|writes):$/] or
+          line[/^In article/] or line[/^On.*\d{4}.*:/] or line[/wrote in message/] or
+          line[/news:.*\.\.\.$/] or line[/^\W*snip\W*$/])
+        first = line.sub(/ +$/, '')
+        first = first.rstrip + '...' if first[/\w\n/]
+        return first.rstrip
+      end
+    end
+  end
+  
   def quoted_body
     author_name + " wrote:\n\n" +
       sigless_body.split("\n").map{ |line| '>' + line }.join("\n") + "\n\n"
@@ -207,7 +219,7 @@ class Post < ActiveRecord::Base
     # Sub-optimal, should re-parent to next reference up the chain
     # (but posts getting canceled when they already have replies is rare)
     Post.where(:parent_id => message_id).each do |post|
-      post.update_attributes(:parent_id => '', :thread_id => post.message_id, :first_line => post.subject)
+      post.update_attributes(:parent_id => '', :thread_id => post.message_id)
     end
   end
   
@@ -298,7 +310,7 @@ class Post < ActiveRecord::Base
     
     date = Time.parse(headers[/^Date: (.*)/i, 1])
     author = headers[/^From: (.*)/i, 1]
-    subject = first_line = headers[/^Subject: (.*)/i, 1]
+    subject = headers[/^Subject: (.*)/i, 1]
     message_id = headers[/^Message-ID: (.*)/i, 1]
     references = headers[/^References: (.*)/i, 1].to_s.split.map{ |r| r[/<.*>/] }
     
@@ -333,19 +345,6 @@ class Post < ActiveRecord::Base
       thread_id = parent.thread_id
     end
     
-    if subject[/^Re:/i] and parent_id != ''
-      body.each_line do |line|
-        if not (line.blank? or line[/^>/] or line[/(wrote|writes):$/] or
-            line[/^In article/] or line[/^On.*\d{4}.*:/] or line[/wrote in message/] or
-            line[/news:.*\.\.\.$/] or line[/^\W*snip\W*$/])
-          first_line = line.sub(/ +$/, '')
-          first_line = first_line.rstrip + '...' if first_line[/\w\n/]
-          first_line.rstrip!
-          break
-        end
-      end
-    end
-    
     create!(:newsgroup => newsgroup,
             :number => number,
             :subject => subject,
@@ -355,7 +354,6 @@ class Post < ActiveRecord::Base
             :parent_id => parent_id,
             :thread_id => thread_id,
             :stripped => stripped,
-            :first_line => first_line,
             :headers => headers,
             :body => body)
   end
