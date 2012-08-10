@@ -146,19 +146,35 @@ class PostsController < ApplicationController
   
   def next_unread
     get_next_unread_post
+    if params[:mark_read]
+      was_unread = @next_unread_post.mark_read_for_user(@current_user)
+    end
     render :json => {
       :post => @next_unread_post.as_json(:for_user => @current_user, :with_all => true)
-    }
+    }.merge(params[:mark_read] ? { :was_unread => was_unread } : {})
   end
   
   def show
-    @search_mode = (params[:search_mode] ? true : false)
-    if @post
-      @post_was_unread = @post.mark_read_for_user(@current_user)
-      get_next_unread_post
-      @admin_cancel = true if @current_user.is_admin? and not @post.authored_by?(@current_user)
-    else
-      @not_found = true
+    respond_to do |wants|
+      wants.js do
+        @search_mode = (params[:search_mode] ? true : false)
+        if @post
+          @post_was_unread = @post.mark_read_for_user(@current_user)
+          get_next_unread_post
+          @admin_cancel = true if @current_user.is_admin? and not @post.authored_by?(@current_user)
+        else
+          @not_found = true
+        end
+      end
+      
+      wants.json do
+        if params[:mark_read]
+          was_unread = @post.mark_read_for_user(@current_user)
+        end
+        render :json => {
+          :post => @post.as_json(:for_user => @current_user, :with_all => true)
+        }.merge(params[:mark_read] ? { :was_unread => was_unread } : {})
+      end
     end
   end
   
