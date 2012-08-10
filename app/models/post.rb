@@ -11,15 +11,31 @@ class Post < ActiveRecord::Base
     if options[:minimal]
       json = { :number => number }
     else
-      except = [:id, :newsgroup, :sticky_user_id]
-      except += [:headers, :body] unless options[:with_all]
-      json = super(:except => except, :include => {:sticky_user => {:only => [:username, :real_name]}})
+      only = [:number, :subject, :date, :stripped]
+      only += [:body] if options[:with_all]
+      only += [:headers] if options[:with_headers]
+      json = super(
+        :only => only,
+        :include => {:sticky_user => {:only => [:username, :real_name]}},
+        :methods => [:author_name, :author_email]
+      )
+      if options[:with_all]
+        json[:parent] = original_parent ?
+          original_parent.as_json(:minimal => true) :
+          parent.as_json(:minimal => true)
+        json[:thread_parent] = thread_parent.as_json(:minimal => true) if not thread_parent == self
+        json[:reparented] = is_reparented? && !is_orphaned?
+        json[:orphaned] = is_orphaned? && !original_parent
+        json[:followup_to] = followup_newsgroup.name if followup_newsgroup
+        json[:cross_posts] = (in_all_newsgroups - [self]).map{ |post| post.as_json(:minimal => true) }
+      end
     end
     
     json[:newsgroup] = newsgroup.name
     
     if options[:with_user]
       json.merge!({
+        :starred => starred_by_user?(options[:with_user]),
         :unread => unread_for_user?(options[:with_user]),
         :personal_class => personal_class_for_user(options[:with_user])
       })

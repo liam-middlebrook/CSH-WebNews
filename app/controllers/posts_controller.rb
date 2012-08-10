@@ -160,7 +160,9 @@ class PostsController < ApplicationController
       was_unread = @next_unread_post.mark_read_for_user(@current_user)
     end
     render :json => {
-      :post => @next_unread_post.as_json(:for_user => @current_user, :with_all => true)
+      :post => @next_unread_post.as_json(
+        :with_user => @current_user, :with_all => true, :with_headers => params[:with_headers]
+      )
     }.merge(params[:mark_read] ? { :was_unread => was_unread } : {})
   end
   
@@ -182,7 +184,9 @@ class PostsController < ApplicationController
           was_unread = @post.mark_read_for_user(@current_user)
         end
         render :json => {
-          :post => @post.as_json(:for_user => @current_user, :with_all => true)
+          :post => @post.as_json(
+            :with_user => @current_user, :with_all => true, :with_headers => params[:with_headers]
+          )
         }.merge(params[:mark_read] ? { :was_unread => was_unread } : {})
       end
     end
