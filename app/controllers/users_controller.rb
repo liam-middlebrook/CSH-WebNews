@@ -3,7 +3,8 @@ class UsersController < ApplicationController
   
   def show
     render :json => {
-      :user => @current_user.as_json(:only => [:username, :real_name, :created_at, :updated_at, :preferences])
+      :user => @current_user.as_json(:only => [:username, :real_name, :created_at, :updated_at]).
+        merge({ :preferences => @current_user.preferences.slice(:thread_mode, :time_zone) })
     }
   end
   
