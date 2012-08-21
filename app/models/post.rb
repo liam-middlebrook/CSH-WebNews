@@ -34,11 +34,11 @@ class Post < ActiveRecord::Base
     json[:newsgroup] = newsgroup.name
     
     if options[:with_user]
-      json.merge!({
+      json.merge!(
         :starred => starred_by_user?(options[:with_user]),
         :unread => unread_for_user?(options[:with_user]),
         :personal_class => personal_class_for_user(options[:with_user])
-      })
+      )
     end
     
     return json

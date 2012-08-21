@@ -86,9 +86,9 @@ class PostsController < ApplicationController
       end
       wants.json do
         json = {}
-        json.merge!({ :posts_selected => @posts_selected }) if @posts_selected
-        json.merge!({ :posts_older => @posts_older, :more_older => @more_older }) if @posts_older
-        json.merge!({ :posts_newer => @posts_newer, :more_newer => @more_newer }) if @posts_newer
+        json.merge!(:posts_selected => @posts_selected) if @posts_selected
+        json.merge!(:posts_older => @posts_older, :more_older => @more_older) if @posts_older
+        json.merge!(:posts_newer => @posts_newer, :more_newer => @more_newer) if @posts_newer
         render :json => json
       end
     end

@@ -120,7 +120,7 @@ class PagesController < ApplicationController
       end
       
       threads.map! do |thread|
-        thread.update(:personal_class => thread[:unread] ?
+        thread.merge(:personal_class => thread[:unread] ?
           thread[:parent].thread_unread_class_for_user(@current_user) :
           thread[:parent].personal_class_for_user(@current_user))
       end
