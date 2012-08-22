@@ -237,7 +237,7 @@ $('a.mark_read').live 'click', ->
   thread_id = $('#posts_list .selected').attr('data-thread')
   
   if thread_id and scope == 'thread'
-    path += '?thread_id=' + encodeURIComponent(thread_id)
+    path += '?in_thread=true'
     path += '&newsgroup=' + encodeURIComponent(newsgroup) + '&number=' + number
     abort_active_scroll()
     after_func = -> $('#posts_list').scroll()

@@ -82,7 +82,7 @@ class PostsController < ApplicationController
     
     respond_to do |wants|
       wants.js do
-        # render 'index'
+        # js template
       end
       wants.json do
         json = {}
@@ -321,25 +321,43 @@ class PostsController < ApplicationController
   
   def mark_read
     if params[:mark_unread]
-      if @post and not @post.unread_for_user?(@current_user)
-        UnreadPostEntry.create!(
-          :user => @current_user, :newsgroup => @post.newsgroup, :post => @post,
-          :personal_level => PERSONAL_CODES[@post.personal_class_for_user(@current_user)],
-          :user_created => true
-        )
+      if @post
+        if not @post.unread_for_user?(@current_user)
+          UnreadPostEntry.create!(
+            :user => @current_user, :newsgroup => @post.newsgroup, :post => @post,
+            :personal_level => PERSONAL_CODES[@post.personal_class_for_user(@current_user)],
+            :user_created => true
+          )
+        end
+      else
+        render :status => :bad_request, :json => json_error('number_missing',
+          "mark_unread can only be used with a single post, identified by 'newsgroup' and 'number' parameters")
+        return
       end
     else
-      if params[:thread_id]
-        @current_user.unread_post_entries.
-          where(:post_id => Post.where(:thread_id => params[:thread_id])).destroy_all
-      elsif params[:newsgroup]
-        @current_user.unread_post_entries.
-          where(:newsgroup_id => Newsgroup.find_by_name(params[:newsgroup]).id).destroy_all
+      if @post
+        if params[:in_thread]
+          @current_user.unread_post_entries.where(:post_id => Post.where(:thread_id => @post.thread_id)).destroy_all
+        else
+          @post.mark_read_for_user(@current_user)
+        end
+      elsif @newsgroup
+        @current_user.unread_post_entries.where(:newsgroup_id => @newsgroup.id).destroy_all
       elsif params[:all_posts]
         @current_user.unread_post_entries.destroy_all
+      else
+        render :status => :bad_request, :json => json_error('newsgroup_missing',
+          "This method requires at least a 'newsgroup' parameter or an 'all_posts' parameter")
+        return
       end
     end
-    get_next_unread_post
+    
+    if @api_access
+      head :ok
+    else
+      get_next_unread_post
+      # js template
+    end
   end
   
   def edit_sticky
