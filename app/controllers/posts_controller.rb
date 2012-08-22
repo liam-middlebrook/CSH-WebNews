@@ -328,6 +328,8 @@ class PostsController < ApplicationController
             :personal_level => PERSONAL_CODES[@post.personal_class_for_user(@current_user)],
             :user_created => true
           )
+        else
+          @current_user.unread_post_entries.find_by_post_id(@post).update_attributes!(:user_created => true)
         end
       else
         render :status => :bad_request, :json => json_error('number_missing',

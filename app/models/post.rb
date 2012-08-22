@@ -36,7 +36,7 @@ class Post < ActiveRecord::Base
     if options[:with_user]
       json.merge!(
         :starred => starred_by_user?(options[:with_user]),
-        :unread => unread_for_user?(options[:with_user]),
+        :unread_class => unread_class_for_user(options[:with_user]),
         :personal_class => personal_class_for_user(options[:with_user])
       )
     end
@@ -199,7 +199,20 @@ class Post < ActiveRecord::Base
   end
   
   def unread_for_user?(user)
-    unread_users.include?(user)
+    !unread_class_for_user(user).nil?
+  end
+  
+  def unread_class_for_user(user)
+    entry = user.unread_post_entries.find_by_post_id(self)
+    if entry
+      if entry.user_created
+        :manual
+      else
+        :auto
+      end
+    else
+      nil
+    end
   end
   
   def mark_read_for_user(user)
