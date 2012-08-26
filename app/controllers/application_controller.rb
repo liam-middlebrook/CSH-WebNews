@@ -22,8 +22,8 @@ class ApplicationController < ActionController::Base
           respond_to do |wants|
             wants.html { render :file => "#{Rails.root}/public/auth.html", :layout => false }
             wants.js { render 'shared/needs_auth' }
-            wants.json { render :status => :unauthorized, :json => json_error('api_key_missing',
-              "API access requires a key to be provided in the 'api_key' parameter") }
+            wants.json { json_error :unauthorized, 'api_key_missing',
+              "API access requires a key to be provided in the 'api_key' parameter" }
           end
         end
       end
@@ -53,8 +53,7 @@ class ApplicationController < ActionController::Base
         respond_to do |wants|
           wants.html { render 'shared/maintenance' }
           wants.js { render 'shared/maintenance' }
-          wants.json { render :status => :service_unavailable,
-            :json => json_error('under_maintenance', @reason + '. ' + @explanation.chomp) }
+          wants.json { json_error :service_unavailable, 'under_maintenance', @reason + '. ' + @explanation.chomp }
         end
       end
     end
@@ -63,11 +62,11 @@ class ApplicationController < ActionController::Base
       if params[:api_key]
         @current_user = User.find_by_api_key(params[:api_key])
         if @current_user.nil?
-          render :status => :unauthorized, :json => json_error('api_key_invalid',
-            "The API key '#{params[:api_key]}' does not match any known user")
+          json_error :unauthorized, 'api_key_invalid',
+            "The API key '#{params[:api_key]}' does not match any known user"
         elsif not params[:api_agent]
-          render :status => :unauthorized, :json => json_error('api_agent_missing',
-            "API access requires an app name to be provided in the 'api_agent' parameter")
+          json_error :unauthorized, 'api_agent_missing',
+            "API access requires an app name to be provided in the 'api_agent' parameter"
         else
           @api_access = true
           @current_user.update_attributes(:api_last_access => Time.now, :api_last_agent => params[:api_agent])
@@ -75,8 +74,8 @@ class ApplicationController < ActionController::Base
             if ['normal', 'flat', 'hybrid'].include?(params[:thread_mode])
               @current_user.preferences[:thread_mode] = params[:thread_mode].to_sym
             else
-              render :status => :bad_request, :json => json_error('thread_mode_invalid',
-                "The thread_mode value '#{params[:thread_mode]}' is not one of ['normal', 'flat', 'hybrid']")
+              json_error :bad_request, 'thread_mode_invalid',
+                "The thread_mode value '#{params[:thread_mode]}' is not one of ['normal', 'flat', 'hybrid']"
             end
           end
         end
@@ -119,8 +118,7 @@ class ApplicationController < ActionController::Base
       if params[:newsgroup]
         @newsgroup = Newsgroup.find_by_name(params[:newsgroup])
         if @api_access and not @newsgroup
-          render :status => :not_found, :json => json_error('newsgroup_not_found',
-            "Newsgroup '#{params[:newsgroup]}' does not exist")
+          json_error :not_found, 'newsgroup_not_found', "Newsgroup '#{params[:newsgroup]}' does not exist"
         end
       end
     end
@@ -129,12 +127,12 @@ class ApplicationController < ActionController::Base
       if params[:newsgroup] and params[:number]
         @post = Post.where(:number => params[:number], :newsgroup => params[:newsgroup]).first
         if @api_access and not @post
-          render :status => :not_found, :json => json_error('post_not_found',
-            "Post number '#{params[:number]}' in newsgroup '#{params[:newsgroup]}' does not exist")
+          json_error :not_found, 'post_not_found',
+            "Post number '#{params[:number]}' in newsgroup '#{params[:newsgroup]}' does not exist"
         end
       elsif params[:number] and @api_access
-        render :status => :bad_request, :json => json_error('newsgroup_missing',
-          "Both the 'newsgroup' and 'number' parameters are required to uniquely identify a post")
+        json_error :bad_request, 'newsgroup_missing',
+          "Both the 'newsgroup' and 'number' parameters are required to uniquely identify a post"
       end
     end
     
@@ -204,28 +202,24 @@ class ApplicationController < ActionController::Base
       render :partial => 'shared/form_error', :object => error_text
     end
     
-    def json_error(id, details)
-      json_error_or_warning(id, details, false)
+    def json_error(status, id, details)
+      render :status => status, :json => json_error_object(id, details)
     end
     
-    def json_warning(id, details)
-      json_error_or_warning(id, details, true)
+    def generic_error(status, id, details, form_text)
+      respond_to do |wants|
+        wants.js { form_error(form_text) }
+        wants.json { render :status => status, :json => json_error_object(id, details) }
+      end
     end
     
-    def json_error_or_warning(id, details, warning = false)
+    def json_error_object(id, details)
       {
-        (warning ? :warning : :error) => {
+        :error => {
           :id => id,
           :details => details
         }
       }
-    end
-    
-    def json_or_form_error(status, id, details, form_text)
-      respond_to do |wants|
-        wants.js { form_error(form_text) }
-        wants.json { render :status => status, :json => json_error(id, details) }
-      end
     end
     
     def json_sync_warning

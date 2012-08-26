@@ -13,8 +13,8 @@ class PostsController < ApplicationController
     if params[:from_number]
       post_selected = @newsgroup.posts.find_by_number(params[:from_number])
       if not post_selected
-        render :status => :not_found, :json => json_error('post_not_found',
-          "Post number '#{params[:from_number]}' in newsgroup '#{params[:newsgroup]}' does not exist") and return
+        json_error :not_found, 'post_not_found',
+          "Post number '#{params[:from_number]}' in newsgroup '#{params[:newsgroup]}' does not exist" and return
       end
       thread_selected = post_selected
       thread_selected = post_selected.thread_parent if not @flat_mode
@@ -114,15 +114,15 @@ class PostsController < ApplicationController
         conditions << 'unread_post_entries.personal_level >= ?'
         values << min_level
       else
-        render :status => :bad_request, :json => json_error('personal_class_invalid',
-          "'#{params[:personal_class]}' is not a valid personal class") and return
+        json_error :bad_request, 'personal_class_invalid',
+          "'#{params[:personal_class]}' is not a valid personal class" and return
       end
     end
     
     search_params = params.except(:action, :controller, :source, :commit, :validate, :utf8, :_)
     
     if error
-      json_or_form_error(:bad_request, error[:json_id], error[:json_details], error[:form_text]) and return
+      generic_error(:bad_request, error[:json_id], error[:json_details], error[:form_text]) and return
     elsif params[:validate]
       render :partial => 'search_redirect', :locals => { :search_params => search_params } and return
     end
@@ -332,8 +332,8 @@ class PostsController < ApplicationController
           @current_user.unread_post_entries.find_by_post_id(@post).update_attributes!(:user_created => true)
         end
       else
-        render :status => :bad_request, :json => json_error('number_missing',
-          "mark_unread can only be used with a single post, identified by 'newsgroup' and 'number' parameters")
+        json_error :bad_request, 'number_missing',
+          "mark_unread can only be used with a single post, identified by 'newsgroup' and 'number' parameters"
         return
       end
     else
@@ -348,8 +348,8 @@ class PostsController < ApplicationController
       elsif params[:all_posts]
         @current_user.unread_post_entries.destroy_all
       else
-        render :status => :bad_request, :json => json_error('newsgroup_missing',
-          "This method requires at least a 'newsgroup' parameter or an 'all_posts' parameter")
+        json_error :bad_request, 'newsgroup_missing',
+          "This method requires at least a 'newsgroup' parameter or an 'all_posts' parameter"
         return
       end
     end
@@ -419,14 +419,14 @@ class PostsController < ApplicationController
         begin
           @from_older = Time.parse(params[:from_older]) if params[:from_older]
         rescue
-          render :status => :bad_request, :json => json_error('datetime_invalid',
-            "The from_older value '#{params[:from_older]}' could not be parsed as a datetime") and return
+          json_error :bad_request, 'datetime_invalid',
+            "The from_older value '#{params[:from_older]}' could not be parsed as a datetime" and return
         end
         begin
           @from_newer = Time.parse(params[:from_newer]) if params[:from_newer]
         rescue
-          render :status => :bad_request, :json => json_error('datetime_invalid',
-            "The from_newer value '#{params[:from_newer]}' could not be parsed as a datetime") and return
+          json_error :bad_request, 'datetime_invalid',
+            "The from_newer value '#{params[:from_newer]}' could not be parsed as a datetime" and return
         end
       else
         @full_layout = true
@@ -439,12 +439,12 @@ class PostsController < ApplicationController
           @limit = Integer(params[:limit])
           if not @limit.between?(0, INDEX_MAX_LIMIT)
             @limit = [[0, @limit].max, INDEX_MAX_LIMIT].min
-            render :status => :bad_request, :json => json_error('limit_outside_range',
-              "The limit value '#{@limit}' is outside the acceptable range (0..#{INDEX_MAX_LIMIT})") and return
+            json_error :bad_request, 'limit_outside_range',
+              "The limit value '#{@limit}' is outside the acceptable range (0..#{INDEX_MAX_LIMIT})" and return
           end
         rescue
-          render :status => :bad_request, :json => json_error('limit_invalid',
-            "The limit value '#{params[:limit]}' could not be parsed as an integer'") and return
+          json_error :bad_request, 'limit_invalid',
+            "The limit value '#{params[:limit]}' could not be parsed as an integer'" and return
         end
       end
     end
