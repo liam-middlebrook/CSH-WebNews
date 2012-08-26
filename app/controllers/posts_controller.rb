@@ -197,8 +197,14 @@ class PostsController < ApplicationController
     if @post
       @new_post.subject = 'Re: ' + @post.subject.sub(/^Re: ?/, '')
       @new_post.body = @post.quoted_body
+    elsif @api_access
+      json_error :bad_request, 'number_missing',
+        "This method requires a post, identified by 'newsgroup' and 'number' parameters" and return
     end
-    render 'shared/dialog'
+    respond_to do |wants|
+      wants.js { render 'shared/dialog' }
+      wants.json { render :json => { :new_post => { :subject => @new_post.subject, :body => @new_post.body } } }
+    end
   end
   
   def create
