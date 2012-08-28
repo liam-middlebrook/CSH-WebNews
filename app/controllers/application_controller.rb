@@ -115,22 +115,24 @@ class ApplicationController < ActionController::Base
     end
     
     def get_newsgroup
-      if params[:newsgroup]
-        @newsgroup = Newsgroup.find_by_name(params[:newsgroup])
+      name = params[:newsgroup] || params[:post].andand[:newsgroup]
+      if name
+        @newsgroup = Newsgroup.find_by_name(name)
         if @api_access and not @newsgroup
-          json_error :not_found, 'newsgroup_not_found', "Newsgroup '#{params[:newsgroup]}' does not exist"
+          json_error :not_found, 'newsgroup_not_found', "Newsgroup '#{name}' does not exist"
         end
       end
     end
     
     def get_post
-      if params[:newsgroup] and params[:number]
-        @post = Post.where(:number => params[:number], :newsgroup => params[:newsgroup]).first
+      number = params[:number] || params[:from_number]
+      if params[:newsgroup] and number
+        @post = Post.where(:number => number, :newsgroup => params[:newsgroup]).first
         if @api_access and not @post
           json_error :not_found, 'post_not_found',
-            "Post number '#{params[:number]}' in newsgroup '#{params[:newsgroup]}' does not exist"
+            "Post number '#{number}' in newsgroup '#{params[:newsgroup]}' does not exist"
         end
-      elsif params[:number] and @api_access
+      elsif number and @api_access
         json_error :bad_request, 'newsgroup_missing',
           "Both the 'newsgroup' and 'number' parameters are required to uniquely identify a post"
       end
@@ -206,9 +208,9 @@ class ApplicationController < ActionController::Base
       render :status => status, :json => json_error_object(id, details)
     end
     
-    def generic_error(status, id, details, form_text)
+    def generic_error(status, id, details)
       respond_to do |wants|
-        wants.js { form_error(form_text) }
+        wants.js { form_error(details) }
         wants.json { render :status => status, :json => json_error_object(id, details) }
       end
     end

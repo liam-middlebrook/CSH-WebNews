@@ -11,7 +11,7 @@ class Post < ActiveRecord::Base
     if options[:minimal]
       json = { :number => number }
     else
-      only = [:number, :subject, :date, :stripped]
+      only = [:number, :subject, :date, :sticky_until]
       only += [:body] if options[:with_all]
       only += [:headers] if options[:with_headers]
       json = super(
@@ -20,6 +20,7 @@ class Post < ActiveRecord::Base
         :methods => [:author_name, :author_email]
       )
       if options[:with_all]
+        json[:stripped] = stripped
         json[:parent] = original_parent ?
           original_parent.as_json(:minimal => true) :
           parent.as_json(:minimal => true)

@@ -2,7 +2,7 @@
   <h2><%= params[:number] ? 'Post Reply' : 'Post New' %></h2>
   
   <%= form_for @new_post,
-      :url => create_post_path, :html => { :method => 'post'}, :remote => true do |f| %>
+      :url => create_post_path, :html => { :method => 'post' }, :remote => true do |f| %>
     
     <% if @post %>
       <div class="form_element with_links">
@@ -55,8 +55,8 @@
     <p class="explain close">Drafts are saved automatically in your browser's local storage. Saved drafts will not be available if you switch browsers or devices.<br>Need to reference a bunch of long URLs? WebNews auto-links &quot;footnote&quot; style URL references. <a href="#" class="smallbutton toggle" title="Show me how!" data-selector="#link_markup_explain">?</a></p>
     
     <% if @post %>
-      <%= f.hidden_field :reply_newsgroup, :value => @post.newsgroup.name %>
-      <%= f.hidden_field :reply_number, :value => @post.number %>
+      <%= hidden_field_tag :reply_newsgroup, :value => @post.newsgroup.name %>
+      <%= hidden_field_tag :reply_number, :value => @post.number %>
     <% end %>
     
     <p id="link_markup_explain">This is an example of using footnotes to reference web sites[1] or other news posts[2]. WebNews translates the inline numbers into clickable links when displaying the post.<br><br>[1] https://wiki.csh.rit.edu/wiki/News<br>[2] https://webnews.csh.rit.edu/#!/csh.noise/8487</p>

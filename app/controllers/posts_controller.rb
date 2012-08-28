@@ -1,8 +1,8 @@
 class PostsController < ApplicationController
-  before_filter :get_newsgroup, :only => [:index, :search, :search_entry, :next_unread, :mark_read, :show, :new]
-  before_filter :get_post, :except => [:index, :search, :search_entry, :create]
+  before_filter :get_newsgroup
+  before_filter :get_post, :except => [:search, :search_entry, :create]
   before_filter :get_newsgroups_for_search, :only => :search_entry
-  before_filter :get_newsgroups_for_posting, :only => [:new, :create]
+  before_filter :get_newsgroups_for_posting, :only => :new
   before_filter :set_list_layout_and_offset, :only => [:index, :search]
   before_filter :set_limit_from_params, :only => [:index, :search]
 
@@ -10,14 +10,9 @@ class PostsController < ApplicationController
     @not_found = true if params[:not_found]
     @flat_mode = true if @current_user.thread_mode == :flat
     
-    if params[:from_number]
-      post_selected = @newsgroup.posts.find_by_number(params[:from_number])
-      if not post_selected
-        json_error :not_found, 'post_not_found',
-          "Post number '#{params[:from_number]}' in newsgroup '#{params[:newsgroup]}' does not exist" and return
-      end
-      thread_selected = post_selected
-      thread_selected = post_selected.thread_parent if not @flat_mode
+    if @post
+      thread_selected = @post
+      thread_selected = @post.thread_parent if not @flat_mode
       @from_older = (params[:include_older] or not @api_access) ? thread_selected.date : nil
       @from_newer = (params[:include_newer] or not @api_access) ? thread_selected.date : nil
     end
@@ -122,7 +117,7 @@ class PostsController < ApplicationController
     search_params = params.except(:action, :controller, :source, :commit, :validate, :utf8, :_)
     
     if error
-      generic_error(:bad_request, error[:json_id], error[:json_details], error[:form_text]) and return
+      generic_error(:bad_request, error[0], error[1]) and return
     elsif params[:validate]
       render :partial => 'search_redirect', :locals => { :search_params => search_params } and return
     end
@@ -210,59 +205,69 @@ class PostsController < ApplicationController
   def create
     post_newsgroups = []
     @sync_error = nil
+    body = params[:body] || params[:post].andand[:body]
+    subject = params[:subject] || params[:post].andand[:subject]
   
-    if params[:post][:subject].blank?
-      form_error "You must enter a subject line for your post." and return
+    if subject.blank?
+      generic_error :bad_request, 'subject_missing', "Posting requires a subject line" and return
     end
     
-    newsgroup = @newsgroups.where_posting_allowed.find_by_name(params[:post][:newsgroup])
-    if newsgroup.nil?
-      form_error "The specified newsgroup is either nonexistent or read-only." and return
+    if not @newsgroup
+      generic_error :bad_request, 'newsgroup_missing', "Posting requires a newsgroup" and return
+    elsif not @newsgroup.posting_allowed?
+      generic_error :bad_request, 'newsgroup_locked',
+        "Newsgroup '#{@newsgroup.name}' does not allow posting" and return
     end
-    post_newsgroups << newsgroup
+    post_newsgroups << @newsgroup
     
-    if params[:crosspost_to] and params[:crosspost_to] != ''
-      crosspost_to = @newsgroups.where_posting_allowed.find_by_name(params[:crosspost_to])
+    if not params[:crosspost_to].blank?
+      crosspost_to = Newsgroup.find_by_name(params[:crosspost_to])
       if crosspost_to.nil?
-        form_error "The specified cross-post newsgroup is either nonexistent or read-only." and return
-      elsif crosspost_to == newsgroup
-        form_error "The specified cross-post newsgroup is the same as the primary newsgroup." and return
+        generic_error :not_found, 'newsgroup_not_found',
+          "Cross-post newsgroup '#{params[:crosspost_to]}' does not exist" and return
+      elsif not crosspost_to.posting_allowed?
+        generic_error :forbidden, 'newsgroup_locked',
+          "Cross-post newsgroup '#{crosspost_to.name}' does not allow posting" and return
+      elsif crosspost_to == @newsgroup
+        generic_error :bad_request, 'newsgroup_duplicated',
+          "Cross-post newsgroup '#{crosspost_to.name}' is the same as the primary newsgroup" and return
       end
       post_newsgroups << crosspost_to
     end
     
     # TODO: Generalize the concept of "extra cross-post newsgroups" as a configuration option
     if params[:crosspost_sysadmin]
-      n = @newsgroups.where_posting_allowed.find_by_name('csh.lists.sysadmin')
+      n = Newsgroup.find_by_name('csh.lists.sysadmin')
       if post_newsgroups.include?(n)
-        form_error "You specified 'also to csh.lists.sysadmin', but that newsgroup is already selected." and return
+        generic_error :bad_request, 'newsgroup_duplicated',
+          "csh.lists.sysadmin is selected twice for cross-posting" and return
       end
       post_newsgroups << n
     end
     
     if params[:crosspost_alumni]
-      n = @newsgroups.where_posting_allowed.find_by_name('csh.lists.alumni')
+      n = Newsgroup.find_by_name('csh.lists.alumni')
       if post_newsgroups.include?(n)
-        form_error "You specified 'also to csh.lists.alumni', but that newsgroup is already selected." and return
+        generic_error :bad_request, 'newsgroup_duplicated',
+          "csh.lists.alumni is selected twice for cross-posting" and return
       end
       post_newsgroups << n
     end
     
     reply_newsgroup = reply_post = nil
-    if params[:post][:reply_newsgroup]
-      reply_newsgroup = Newsgroup.find_by_name(params[:post][:reply_newsgroup])
-      reply_post = Post.where(:newsgroup => params[:post][:reply_newsgroup],
-        :number => params[:post][:reply_number]).first
+    if params[:reply_newsgroup]
+      reply_newsgroup = Newsgroup.find_by_name(params[:reply_newsgroup])
+      reply_post = Post.where(:newsgroup => params[:reply_newsgroup], :number => params[:reply_number]).first
       if reply_post.nil?
-        form_error "The post you are trying to reply to doesn't exist; it may have been canceled. Try refreshing the newsgroup." and return
+        generic_error :not_found, 'post_not_found', "Can't reply to nonexistent post number '#{params[:reply_number]}' in newsgroup '#{params[:reply_newsgroup]}'" and return
       end
     end
     
     post_string = Post.build_message(
       :user => @current_user,
       :newsgroups => post_newsgroups.map(&:name),
-      :subject => params[:post][:subject],
-      :body => params[:post][:body],
+      :subject => subject,
+      :body => body.to_s,
       :reply_post => reply_post
     )
     
@@ -272,7 +277,7 @@ class PostsController < ApplicationController
         new_message_id = nntp.post(post_string)[1][/<.*?>/]
       end
     rescue
-      form_error 'Error: ' + $!.message and return
+      generic_error :internal_server_error, 'nntp_post_error', 'NNTP server error: ' + $!.message and return
     end
     
     begin
@@ -280,12 +285,23 @@ class PostsController < ApplicationController
         post_newsgroups.each{ |n| Newsgroup.sync_group!(nntp, n.name, n.status) }
       end
     rescue
-      @sync_error = "Your post was accepted by the news server, but an error occurred while attempting to sync the newsgroup it was posted to. This may be a transient issue: Wait a couple minutes and manually refresh the newsgroup, and you should see your post.\n\nThe exact error was: #{$!.message}"
+      @sync_error = "Your post was accepted by the news server and does not need to be resubmitted, but an error occurred while resyncing the newsgroups: #{$!.message}"
     end
     
-    @new_post = Post.find_by_message_id(new_message_id)
+    @new_post = @newsgroup.posts.find_by_message_id(new_message_id)
     if not @new_post
-      @sync_error = "Your post was accepted by the news server, but doesn't appear to actually exist; it may have been held for moderation or silently discarded (though neither of these should ever happen on CSH news). Wait a couple minutes and manually refresh the newsgroup to make sure this isn't a glitch in WebNews."
+      @sync_error = "Your post was accepted by the news server, but it appears to have been held for moderation or silently discarded; contact the server administrators before attempting to post again"
+    end
+    
+    respond_to do |wants|
+      wants.js {}
+      wants.json do
+        if @sync_error
+          json_error :internal_server_error, 'nntp_sync_error', @sync_error
+        else
+          render :json => { :post => @new_post.as_json(:minimal => true) }
+        end
+      end
     end
   end
   
@@ -497,11 +513,7 @@ class PostsController < ApplicationController
             ) + ')'
           values += keyword_values + exclude_values
         rescue
-          error = {
-            :form_text => 'The keywords field has unbalanced quotes.',
-            :json_id => 'keywords_invalid',
-            :json_details => 'The keywords value contains unbalanced quotes'
-          }
+          error = ['keywords_invalid', 'The keywords string contains an unbalanced quote']
         end
       end
       
@@ -518,11 +530,7 @@ class PostsController < ApplicationController
         date_from = 'January 1, ' + date_from if date_from[/^\d{4}$/]
         date_from = Chronic.parse(date_from)
         if not date_from
-          error = {
-            :form_text => "Unable to parse \"#{params[:date_from]}\" as a date.",
-            :json_id => 'date_from_invalid',
-            :json_details => "The date_from value '#{params[:date_from]}' could not be parsed as a datetime"
-          }
+          error = ['date_from_invalid', "The start date '#{params[:date_from]}' could not be parsed"]
         else
           conditions << 'date >= ?'
           values << date_from
@@ -533,11 +541,7 @@ class PostsController < ApplicationController
         date_to = 'January 1, ' + (date_to.to_i + 1).to_s if date_to[/^\d{4}$/]
         date_to = Chronic.parse(date_to)
         if not date_to
-          error = {
-            :form_text => "Unable to parse \"#{params[:date_to]}\" as a date.",
-            :json_id => 'date_to_invalid',
-            :json_details => "The date_to value '#{params[:date_to]}' could not be parsed as a datetime"
-          }
+          error = ['date_to_invalid', "The end date '#{params[:date_to]}' could not be parsed"]
         else
           conditions << 'date <= ?'
           values << date_to
