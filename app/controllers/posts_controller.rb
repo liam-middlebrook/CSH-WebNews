@@ -307,15 +307,27 @@ class PostsController < ApplicationController
   
   def destroy
     if @post.nil?
-      form_error "The post you are trying to cancel doesn't exist; it may have already been canceled. Try manually refreshing the newsgroup." and return
+      # API case handled by get_post
+      form_error "The post you are trying to cancel doesn't exist" and return
     end
     
     if not @post.newsgroup.posting_allowed?
-      form_error "The newsgroup containing the post you are trying to cancel is read-only. Posts in read-only newsgroups cannot be canceled." and return
+      generic_error :bad_request, 'newsgroup_locked',
+        "Posts in read-only newsgroups cannot be canceled" and return
     end
     
     if not @post.authored_by?(@current_user) and not @current_user.is_admin?
-      form_error "You are not the author of this post; you cannot cancel it without admin privileges." and return
+      generic_error :forbidden, 'requires_admin',
+        "Admin privileges are required to cancel a post that you did not author" and return
+    end
+    
+    if @post.children.count != 0
+      generic_error :bad_request, 'post_has_replies', "Posts that have replies cannot be canceled" and return
+    end
+    
+    if params[:confirm_cancel].blank?
+      generic_error :bad_request, 'confirm_cancel_missing',
+        "The 'confirm_cancel' parameter must be present when calling this method" and return
     end
     
     begin
@@ -323,7 +335,7 @@ class PostsController < ApplicationController
         nntp.post(@post.build_cancel_message(@current_user, params[:reason]))
       end
     rescue
-      form_error 'Error: ' + $!.message and return
+      generic_error :internal_server_error, 'nntp_post_error', 'NNTP server error: ' + $!.message and return
     end
     
     begin
@@ -332,7 +344,18 @@ class PostsController < ApplicationController
         Newsgroup.sync_group!(nntp, 'control.cancel', 'n')
       end
     rescue
-      @sync_error = "Your cancel was accepted by the news server, but an error occurred while attempting to sync the local post database. This may be a transient issue: Wait a couple minutes and manually refresh the newsgroup, and the post should be gone.\n\nThe exact error was: #{$!.message}"
+      @sync_error = "Your cancel was accepted by the news server and does not need to be resubmitted, but an error occurred while resyncing the newsgroups: #{$!.message}"
+    end
+    
+    respond_to do |wants|
+      wants.js {}
+      wants.json do
+        if @sync_error
+          json_error :internal_server_error, 'nntp_sync_error', @sync_error
+        else
+          head :ok
+        end
+      end
     end
   end
   
