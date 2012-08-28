@@ -8,7 +8,11 @@ class Newsgroup < ActiveRecord::Base
   def as_json(options = {})
     if options[:for_user]
       unread = unread_for_user(options[:for_user])
-      super(:except => :id).merge(:unread_count => unread[:count], :unread_class => unread[:personal_class])
+      super(:except => :id).merge(
+        :unread_count => unread[:count],
+        :unread_class => unread[:personal_class],
+        :newest_date => Post.last.andand.date
+      )
     else
       super(:except => :id)
     end
