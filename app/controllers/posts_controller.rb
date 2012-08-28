@@ -376,11 +376,9 @@ class PostsController < ApplicationController
       end
     end
     
-    if @api_access
-      head :ok
-    else
-      get_next_unread_post
-      # js template
+    respond_to do |wants|
+      wants.js { get_next_unread_post }
+      wants.json { head :ok }
     end
   end
   
@@ -390,22 +388,32 @@ class PostsController < ApplicationController
   
   def update_sticky
     if not @current_user.is_admin?
-      form_error "You cannot sticky or unsticky posts without admin privileges." and return
+      generic_error :forbidden, 'requires_admin',
+        "Admin privileges are required to sticky or unsticky posts" and return
     end
     
     if @post.nil?
-      form_error "The post you are trying to sticky doesn't exist; it may have been canceled. Try manually refreshing the newsgroup." and return
+      # API case handled by get_post
+      form_error "The post you are trying to sticky doesn't exist" and return
+    elsif @post != @post.thread_parent
+      generic_error :bad_request, 'post_not_stickable',
+        "Only the initial post in a thread can be made sticky" and return
     end
     
-    if params[:do_sticky]
-      Chronic.time_class = Time.find_zone(@current_user.time_zone)
+    if params[:do_sticky] or (@api_access and not params[:unstick])
+      if params[:sticky_until].blank?
+        generic_error :bad_request, 'sticky_until_missing',
+          "An expiration date is required to make a post sticky" and return
+      end
       t = Chronic.parse(params[:sticky_until])
       if t.nil?
-        form_error "Unable to parse \"#{params[:sticky_until]}\"." and return
+        generic_error :bad_request, 'sticky_until_invalid',
+          "The expiration date '#{params[:sticky_until]}' could not be parsed" and return
       end
       sticky_until = t - t.sec - ((((t.min + 15) % 30) - 15) * 1.minute)
-      if sticky_until < Time.now
-        form_error "You must enter a time that is in the future, when rounded to the nearest half-hour." and return
+      if sticky_until <= Time.now
+        generic_error :bad_request, 'sticky_until_unacceptable',
+          "The expiration date must be in the future, when rounded to the nearest half-hour" and return
       end
       @post.in_all_newsgroups.each do |post|
         post.update_attributes(:sticky_user => @current_user, :sticky_until => sticky_until)
@@ -416,6 +424,11 @@ class PostsController < ApplicationController
           post.update_attributes(:sticky_user => @current_user, :sticky_until => Time.now - 1.second)
         end
       end
+    end
+    
+    respond_to do |wants|
+      wants.js {}
+      wants.json { head :ok }
     end
   end
   
@@ -461,7 +474,7 @@ class PostsController < ApplicationController
           @limit = Integer(params[:limit])
           if not @limit.between?(0, INDEX_MAX_LIMIT)
             @limit = [[0, @limit].max, INDEX_MAX_LIMIT].min
-            json_error :bad_request, 'limit_outside_range',
+            json_error :bad_request, 'limit_unacceptable',
               "The limit value '#{@limit}' is outside the acceptable range (0..#{INDEX_MAX_LIMIT})" and return
           end
         rescue
