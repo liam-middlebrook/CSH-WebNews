@@ -434,7 +434,8 @@ class PostsController < ApplicationController
   
   def update_star
     if @post.nil?
-      @star_error = "The post you are trying to star/unstar doesn't exist; it may have been canceled. Try manually refreshing the newsgroup." and return
+      # API case handled by get_post
+      @star_error = "The post you are trying to star/unstar doesn't exist" and return
     end
     
     if @post.starred_by_user?(@current_user)
@@ -443,6 +444,11 @@ class PostsController < ApplicationController
     else
       StarredPostEntry.create!(:user => @current_user, :post => @post)
       @starred = true
+    end
+    
+    respond_to do |wants|
+      wants.js {}
+      wants.json { render :json => { :starred => @starred } }
     end
   end
   
