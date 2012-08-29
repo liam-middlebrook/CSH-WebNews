@@ -1,0 +1,26 @@
+<% if @current_user.api_enabled? %>
+  <p>
+    API access is enabled for your account. Your key is
+    <span class="api_key"><%= @current_user.api_key %></span>
+    <span id="update_api_buttons">
+      <a href="#~<%= update_user_api_path(:enable => true) %>" class="smallbutton update_api_settings">Regenerate</a>
+      <a href="#~<%= update_user_api_path(:disable => true) %>" class="smallbutton update_api_settings">Disable</a>
+    </span>
+  </p>
+  <p>
+    <% if not @current_user.api_last_access.nil? %>
+      This key was last used by <b><%= @current_user.api_last_agent || '(unknown application)' %></b> at
+      <b><%= @current_user.api_last_access.strftime(DATE_FORMAT) %></b>
+    <% else %>
+      This key has not been used by any applications yet.
+    <% end %>
+  </p>
+  <p class="explain">Your API key is equivalent to your username and password: Anyone who knows it can log into WebNews, view the contents of newsgroups, and post as you. Only give your key to applications you trust, and generate a new one if you suspect it has been compromised.</p>
+<% else %>
+  <p>
+    API access is disabled for your account.
+    <span id="update_api_buttons">
+      <a href="#~<%= update_user_api_path(:enable => true) %>" class="smallbutton update_api_settings">Enable</a>
+    </span>
+  </p>
+<% end %>

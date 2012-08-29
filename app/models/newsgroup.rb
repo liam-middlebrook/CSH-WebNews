@@ -5,6 +5,19 @@ class Newsgroup < ActiveRecord::Base
   default_scope :order => 'name'
   scope :where_posting_allowed, where(:status => 'y')
   
+  def as_json(options = {})
+    if options[:for_user]
+      unread = unread_for_user(options[:for_user])
+      super(:except => :id).merge(
+        :unread_count => unread[:count],
+        :unread_class => unread[:personal_class],
+        :newest_date => posts.order(:date).last.andand.date
+      )
+    else
+      super(:except => :id)
+    end
+  end
+  
   def is_control?
     true if name[/^control\./]
   end
@@ -14,13 +27,11 @@ class Newsgroup < ActiveRecord::Base
   end
   
   def unread_for_user(user)
-    hclass = ''
+    personal_class = ''
     count = unread_post_entries.where(:user_id => user.id).count
     max_level = unread_post_entries.where(:user_id => user.id).maximum(:personal_level)
-    if max_level
-      hclass = 'unread ' + PERSONAL_CLASSES[max_level]
-    end
-    return { :count => count, :hclass => hclass }
+    personal_class = PERSONAL_CLASSES[max_level] if max_level
+    return { :count => count, :personal_class => personal_class }
   end
   
   def self.reimport!(post)

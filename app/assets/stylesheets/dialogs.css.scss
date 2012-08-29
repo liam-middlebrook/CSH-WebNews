@@ -66,6 +66,11 @@
     margin-top: -1em;
   }
   
+  #api_settings {
+    p { margin-bottom: 0.5em; }
+    p.explain { margin-bottom: 1em; }
+  }
+  
   #link_markup_explain {
     font-family: monospace;
     margin-top: 0.5em;
@@ -133,11 +138,10 @@ table.hotkeys {
   }
   
   .key {
-    font-family: monospace;
-    font-weight: bold;
-    background-color: $white;
-    border: 1px solid $border_button;
-    padding: 0 0.4em;
-    margin: 0 0.1em;
+    @include keyboard;
   }
+}
+
+.api_key {
+  @include keyboard;
 }

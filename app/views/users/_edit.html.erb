@@ -32,6 +32,13 @@
         </div>
       </fieldset>
       
+      <fieldset>
+        <legend>WebNews API</legend>
+        <div id="api_settings">
+          <%= render 'api_settings' %>
+        </div>
+      </fieldset>
+      
       <div class="form_element">
         <%= p.label :time_zone, 'Display post times in this time zone:' %>
         <%= p.time_zone_select :time_zone,

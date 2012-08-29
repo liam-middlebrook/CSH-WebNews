@@ -1,7 +1,7 @@
 class PagesController < ApplicationController
   before_filter :get_newsgroups_for_nav, :only => [:home, :check_new]
-  before_filter :get_newsgroup, :only => [:check_new, :mark_read]
-  before_filter :get_post, :only => [:check_new, :mark_read]
+  before_filter :get_newsgroup, :only => :check_new
+  before_filter :get_post, :only => :check_new
 
   def home
     if params[:no_user_override]
@@ -11,7 +11,6 @@ class PagesController < ApplicationController
     respond_to do |wants|
       
       wants.html do
-        set_no_cache
         if request.env[ENV_REALNAME]
           @current_user.real_name = request.env[ENV_REALNAME]
           @current_user.save!
@@ -24,6 +23,17 @@ class PagesController < ApplicationController
       wants.js do
         get_activity_feed
         get_next_unread_post
+      end
+      
+      wants.json do
+        get_activity_feed
+        render :json => {
+          :activity => {
+            :sticky => @sticky_threads,
+            :unread => @unread_threads,
+            :recent => @recent_threads
+          }
+        }
       end
       
     end
@@ -52,29 +62,6 @@ class PagesController < ApplicationController
       @dashboard_active = true
       get_activity_feed
     end
-  end
-  
-  def mark_read
-    if params[:mark_unread]
-      if @post and not @post.unread_for_user?(@current_user)
-        UnreadPostEntry.create!(
-          :user => @current_user, :newsgroup => @post.newsgroup, :post => @post,
-          :personal_level => PERSONAL_CODES[@post.personal_class_for_user(@current_user)],
-          :user_created => true
-        )
-      end
-    else
-      if params[:thread_id]
-        @current_user.unread_post_entries.
-          where(:post_id => Post.where(:thread_id => params[:thread_id])).destroy_all
-      elsif params[:newsgroup]
-        @current_user.unread_post_entries.
-          where(:newsgroup_id => Newsgroup.find_by_name(params[:newsgroup]).id).destroy_all
-      elsif params[:all_posts]
-        @current_user.unread_post_entries.destroy_all
-      end
-    end
-    get_next_unread_post
   end
   
   private
@@ -132,6 +119,12 @@ class PagesController < ApplicationController
         end
       end
       
+      threads.map! do |thread|
+        thread.merge(:personal_class => thread[:unread] ?
+          thread[:parent].thread_unread_class_for_user(@current_user) :
+          thread[:parent].personal_class_for_user(@current_user))
+      end
+      
       # Sub-optimal, could result in cross-posted threads with new replies not being shown
       # if the replies are not in the thread's "primary" newsgroup (rarely happens)
       threads.reject! do |thread|
@@ -146,41 +139,5 @@ class PagesController < ApplicationController
       end
       
       return threads.sort{ |x,y| y[:date] <=> x[:date] }
-    end
-    
-    def cronless_clean_unread
-      if not File.exists?('tmp/lastclean.txt') or
-          File.mtime('tmp/lastclean.txt') < 1.day.ago
-        FileUtils.touch('tmp/lastclean.txt')
-        User.clean_unread!
-      end
-    end
-    
-    def cronless_sync_all
-      if not File.exists?('tmp/syncing.txt') and
-          (not File.exists?('tmp/lastsync.txt') or
-            File.mtime('tmp/lastsync.txt') < 1.minute.ago)
-        begin
-          Newsgroup.sync_all!
-        rescue
-          logger.error "\n\n### SYNC ERROR ###"
-          logger.error $!.message
-          logger.error "##################\n\n"
-        end
-      end
-    end
-    
-    def get_last_sync_time
-      if File.exists?('tmp/lastsync.txt')
-        @last_sync_time = File.mtime('tmp/lastsync.txt')
-        @show_sync_warning = true if @last_sync_time < 2.minutes.ago
-      else
-        @show_sync_warning = true
-        @no_complete_sync = true
-      end
-    end
-    
-    def maybe_you(name)
-      name == @current_user.real_name ? 'you' : name
     end
 end

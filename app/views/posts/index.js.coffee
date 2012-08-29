@@ -1,12 +1,12 @@
 <% if @full_layout %>
 
-<% if not @showing %>
+<% if not @posts_selected %>
 document.title = '<%= @search_mode ? 'Search Results' : @newsgroup.name %>'
 $('#next_unread').attr('href', '<%= next_unread_href %>')
 <% if not @not_found %>$('#post_view').empty()<% end %>
 <% end %>
 
-if <%= @showing ? 'true' : 'false' %> or <%= @search_mode ? 'true' : 'false' %> or
+if <%= @posts_selected ? 'true' : 'false' %> or <%= @search_mode ? 'true' : 'false' %> or
     window.loaded_location != '<%= @search_mode ? "dummy_location" : @newsgroup.name %>'
 
   set_loaded_location()
@@ -14,8 +14,8 @@ if <%= @showing ? 'true' : 'false' %> or <%= @search_mode ? 'true' : 'false' %> 
   $('#group_view').html '<%= j render(
     :partial => "posts_list", :layout => "list_layout", :locals => {
       :posts =>
-        (@posts_newer ? @posts_newer.reverse : []) +
-        (@showing_thread ? [@showing_thread] : []) +
+        (@posts_newer ? @posts_newer : []) +
+        (@posts_selected ? [@posts_selected] : []) +
         (@posts_older ? @posts_older : [])
       }
     ) %>'
@@ -57,7 +57,7 @@ if <%= @showing ? 'true' : 'false' %> or <%= @search_mode ? 'true' : 'false' %> 
           window.active_scroll_load = $.getScript request_path
   
   $('#posts_list').scroll()
-  $('#posts_list').focus() if not <%= @showing ? 'true' : 'false' %>
+  $('#posts_list').focus() if not <%= @posts_selected ? 'true' : 'false' %>
   
 else
   $('#posts_list').scrollTop(0)
@@ -77,7 +77,7 @@ for unread in from_tr.nextAll('.unread[data-level!="1"]')
 
 <% if @posts_newer %>
 $('#posts_list tbody').prepend '<%=
-  j render(:partial => "posts_list", :locals => { :posts => @posts_newer.reverse }) %>'
+  j render(:partial => "posts_list", :locals => { :posts => @posts_newer }) %>'
 from_tr = $('#posts_list tr[data-date="<%= @from_newer %>"]').prevAll('[data-level="1"]').first()
 tr_height = from_tr.height()
 from_tr.prevAll().andSelf().find('.expanded').removeClass('expanded').addClass('expandable')

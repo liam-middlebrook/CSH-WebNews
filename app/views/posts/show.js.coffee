@@ -31,7 +31,7 @@ document.title = '<%= @newsgroup.name %> \u00bb <%= raw j(@post.subject) %>'
 
 if $('#posts_list tr[data-id="<%= @post.id %>"]').length == 0
   $('#group_view').empty().append(chunks.spinner.clone())
-  $.getScript '<%= posts_path(@newsgroup.name) %>?showing=<%= @post.number %>', -> select_post(true)
+  $.getScript '<%= posts_path(@newsgroup.name) %>?from_number=<%= @post.number %>', -> select_post(true)
   $('#post_view .content').focus()
 else
   select_post(false)
@@ -46,7 +46,7 @@ group_li.removeClass()
 unread = <%= raw group.unread_for_user(@current_user).to_json %>
 
 if unread.count > 0
-  group_li.addClass('unread').addClass(unread.hclass)
+  group_li.addClass('unread').addClass(unread.personal_class)
   group_li.find('.unread_count').text(' (' + unread.count + ')')
 else
   group_li.find('.unread_count').remove()

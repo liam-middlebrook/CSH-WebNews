@@ -8,8 +8,6 @@
         options_for_select(
           @newsgroups.map{ |n| [n.name, n.name] }, @newsgroup ? @newsgroup.name : nil
         ), :prompt => '(all newsgroups)' %>
-        <%= check_box_tag :starred, 'true', params[:starred] %>
-        <%= label_tag :starred, 'only search starred' %>
     </div>
     
     <div class="form_element inline_inputs aligned_field">
@@ -20,8 +18,8 @@
     </div>
     
     <div class="form_element inline_inputs aligned_field">
-      <%= label_tag :author, 'By author:' %><%= text_field_tag :author, params[:author] %>
-      <p class="explain">Enter all or part of a full name, username, or email address</p>
+      <%= label_tag :authors, 'By authors:' %><%= text_field_tag :authors, params[:authors] %>
+      <p class="explain">Enter full or partial usernames, real names, or email addresses, separated by commas</p>
     </div>
     
     <div class="form_element inline_inputs aligned_field">
@@ -30,6 +28,16 @@
       <%= label_tag :date_to, 'to' %>
       <%= text_field_tag :date_to, params[:date_to], :class => 'date', :placeholder => 'right now' %>
       <p class="explain">Enter absolute dates ("9/17/2011") or relative dates ("3 weeks ago")</p>
+    </div>
+    
+    <div class="form_element inline_inputs aligned_field">
+      Limit search to:
+      <%= check_box_tag :starred, 'true', params[:starred] %>
+      <%= label_tag :starred, 'my starred posts' %>
+      <%= check_box_tag :unread, 'true', params[:unread] %>
+      <%= label_tag :unread, 'my unread posts' %>
+      <%= check_box_tag :sticky, 'true', params[:sticky] %>
+      <%= label_tag :sticky, 'sticky posts' %>
     </div>
     
     <%= hidden_field_tag :validate, true %>

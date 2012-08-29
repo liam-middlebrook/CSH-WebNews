@@ -7,6 +7,44 @@ class Post < ActiveRecord::Base
   has_many :starred_users, :through => :starred_post_entries, :source => :user
   before_destroy :kill_parent_id
   
+  def as_json(options = {})
+    if options[:minimal]
+      json = { :number => number }
+    else
+      only = [:number, :subject, :date, :sticky_until]
+      only += [:body] if options[:with_all]
+      only += [:headers] if options[:with_headers]
+      json = super(
+        :only => only,
+        :include => {:sticky_user => {:only => [:username, :real_name]}},
+        :methods => [:author_name, :author_email]
+      )
+      if options[:with_all]
+        json[:stripped] = stripped
+        json[:parent] = original_parent ?
+          original_parent.as_json(:minimal => true) :
+          parent.as_json(:minimal => true)
+        json[:thread_parent] = thread_parent.as_json(:minimal => true) if not thread_parent == self
+        json[:reparented] = is_reparented? && !is_orphaned?
+        json[:orphaned] = is_orphaned? && !original_parent
+        json[:followup_to] = followup_newsgroup.name if followup_newsgroup
+        json[:cross_posts] = (in_all_newsgroups - [self]).map{ |post| post.as_json(:minimal => true) }
+      end
+    end
+    
+    json[:newsgroup] = newsgroup.name
+    
+    if options[:with_user]
+      json.merge!(
+        :starred => starred_by_user?(options[:with_user]),
+        :unread_class => unread_class_for_user(options[:with_user]),
+        :personal_class => personal_class_for_user(options[:with_user])
+      )
+    end
+    
+    return json
+  end
+  
   def author_name
     author[/(.*)<.*>/, 1].andand.gsub(/(\A|[^\\])"/, '\\1').andand.gsub('\\"', '"').andand.rstrip ||
       author[/.* \((.*)\)/, 1] || author
@@ -24,6 +62,18 @@ class Post < ActiveRecord::Base
     !author_email[LOCAL_EMAIL_DOMAIN].nil? if author_email
   end
   
+  def first_line
+    body.each_line do |line|
+      if not (line.blank? or line[/^>/] or line[/(wrote|writes):$/] or
+          line[/^In article/] or line[/^On.*\d{4}.*:/] or line[/wrote in message/] or
+          line[/news:.*\.\.\.$/] or line[/^\W*snip\W*$/])
+        first = line.sub(/ +$/, '')
+        first = first.rstrip + '...' if first[/\w\n/]
+        return first.rstrip
+      end
+    end
+  end
+  
   def quoted_body
     author_name + " wrote:\n\n" +
       sigless_body.split("\n").map{ |line| '>' + line }.join("\n") + "\n\n"
@@ -34,6 +84,10 @@ class Post < ActiveRecord::Base
       sub(/(.*)\n-- \n.*/m, '\\1').            # '-- ' on its own line and all following text ("standard" sig)
       sub(/\n\n[-~].*[[:alpha:]].*\n*\z/, ''). # Non-blank final lines starting with [-~] and containing a letter
       rstrip
+  end
+  
+  def self.sticky
+    where('sticky_until is not null and sticky_until > ?', Time.now)
   end
   
   def is_sticky?
@@ -98,24 +152,26 @@ class Post < ActiveRecord::Base
     Post.where(:thread_id => thread_id, :newsgroup => newsgroup.name).order('date')
   end
   
-  def thread_tree_for_user(user, flatten = false, all_posts = nil)
+  def thread_tree_for_user(user, flatten = false, as_json = false, all_posts = nil)
     all_posts ||= all_in_thread.to_a
     {
-      :post => self,
+      :post => (as_json ? self.as_json(:with_user => user) : self),
       :children => if flatten
         all_posts.reject{ |p| p == self }.map{ |p| {
-          :post => p, :children => [],
+          :post => (as_json ? p.as_json(:with_user => user) : p), :children => []
+        }.merge(as_json ? {} : {
           :unread => p.unread_for_user?(user),
           :personal_class => p.personal_class_for_user(user)
-        }}
+        })}
       else
         all_posts.
           select{ |p| p.parent_id == self.message_id }.
-          map{ |p| p.thread_tree_for_user(user, flatten, all_posts) }
-      end,
+          map{ |p| p.thread_tree_for_user(user, flatten, as_json, all_posts) }
+      end
+    }.merge(as_json ? {} : {
       :unread => self.unread_for_user?(user),
       :personal_class => self.personal_class_for_user(user)
-    }
+    })
   end
   
   def original_parent_id
@@ -135,12 +191,33 @@ class Post < ActiveRecord::Base
     return all_in_thread.reduce(false){ |m, post| m || post.authored_by?(user) }
   end
   
+  def self.starred_by_user(user)
+    joins(:starred_post_entries).where(:starred_post_entries => { :user_id => user.id })
+  end
+  
   def starred_by_user?(user)
     starred_users.include?(user)
   end
   
+  def self.unread_for_user(user)
+    joins(:unread_post_entries).where(:unread_post_entries => { :user_id => user.id })
+  end
+  
   def unread_for_user?(user)
-    unread_users.include?(user)
+    !unread_class_for_user(user).nil?
+  end
+  
+  def unread_class_for_user(user)
+    entry = user.unread_post_entries.find_by_post_id(self)
+    if entry
+      if entry.user_created
+        :manual
+      else
+        :auto
+      end
+    else
+      nil
+    end
   end
   
   def mark_read_for_user(user)
@@ -176,7 +253,7 @@ class Post < ActiveRecord::Base
     # Sub-optimal, should re-parent to next reference up the chain
     # (but posts getting canceled when they already have replies is rare)
     Post.where(:parent_id => message_id).each do |post|
-      post.update_attributes(:parent_id => '', :thread_id => post.message_id, :first_line => post.subject)
+      post.update_attributes(:parent_id => '', :thread_id => post.message_id)
     end
   end
   
@@ -265,9 +342,13 @@ class Post < ActiveRecord::Base
     
     body.rstrip!
     
-    date = Time.parse(headers[/^Date: (.*)/i, 1])
+    date = Time.parse(
+      headers[/^Injection-Date: (.*)/i, 1] ||
+      headers[/^NNTP-Posting-Date: (.*)/i, 1] ||
+      headers[/^Date: (.*)/i, 1]
+    )
     author = headers[/^From: (.*)/i, 1]
-    subject = first_line = headers[/^Subject: (.*)/i, 1]
+    subject = headers[/^Subject: (.*)/i, 1]
     message_id = headers[/^Message-ID: (.*)/i, 1]
     references = headers[/^References: (.*)/i, 1].to_s.split.map{ |r| r[/<.*>/] }
     
@@ -302,19 +383,6 @@ class Post < ActiveRecord::Base
       thread_id = parent.thread_id
     end
     
-    if subject[/^Re:/i] and parent_id != ''
-      body.each_line do |line|
-        if not (line.blank? or line[/^>/] or line[/(wrote|writes):$/] or
-            line[/^In article/] or line[/^On.*\d{4}.*:/] or line[/wrote in message/] or
-            line[/news:.*\.\.\.$/] or line[/^\W*snip\W*$/])
-          first_line = line.sub(/ +$/, '')
-          first_line = first_line.rstrip + '...' if first_line[/\w\n/]
-          first_line.rstrip!
-          break
-        end
-      end
-    end
-    
     create!(:newsgroup => newsgroup,
             :number => number,
             :subject => subject,
@@ -324,7 +392,6 @@ class Post < ActiveRecord::Base
             :parent_id => parent_id,
             :thread_id => thread_id,
             :stripped => stripped,
-            :first_line => first_line,
             :headers => headers,
             :body => body)
   end

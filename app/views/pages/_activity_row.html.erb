@@ -5,14 +5,11 @@ authors = unread ? thread[:unread_authors] : thread[:authors]
 %>
 <tr<% if mode == :sticky %> class="sticky"<% end %>>
   <td class="date">
-    <%= thread[:date].in_time_zone(@current_user.time_zone).strftime(SHORT_DATE_FORMAT) %>
+    <%= thread[:date].strftime(SHORT_DATE_FORMAT) %>
   </td>
   <td class="thread">
     <div class="subject">
-      <a class="<%= unread ?
-          parent.thread_unread_class_for_user(@current_user) :
-          parent.personal_class_for_user(@current_user)
-        %><%= unread ? ' unread' : '' %>"
+      <a class="<%= thread[:personal_class] %><%= unread ? ' unread' : '' %>"
         href="#!<%= post_path(parent.newsgroup.name, parent.number) %>"><%= parent.subject %></a>
     </div>
     <div class="details">

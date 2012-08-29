@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120505165046) do
+ActiveRecord::Schema.define(:version => 20120809215745) do
 
   create_table "newsgroups", :force => true do |t|
     t.string "name"
@@ -30,7 +30,6 @@ ActiveRecord::Schema.define(:version => 20120505165046) do
     t.boolean  "stripped"
     t.integer  "sticky_user_id"
     t.datetime "sticky_until"
-    t.string   "first_line"
     t.text     "headers"
     t.text     "body"
   end
@@ -65,6 +64,11 @@ ActiveRecord::Schema.define(:version => 20120505165046) do
     t.text     "preferences"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "api_key"
+    t.datetime "api_last_access"
+    t.string   "api_last_agent"
   end
+
+  add_index "users", ["api_key"], :name => "index_users_on_api_key"
 
 end
