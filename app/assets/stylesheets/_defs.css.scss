@@ -30,12 +30,3 @@ $link_hover: #77c;
   white-space: nowrap;
   text-overflow: ellipsis;
 }
-
-@mixin keyboard {
-  font-family: monospace;
-  font-weight: bold;
-  background-color: $white;
-  border: 1px solid $border_button;
-  padding: 0 0.4em;
-  margin: 0 0.1em;
-}
