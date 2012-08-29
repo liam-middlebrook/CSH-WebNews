@@ -36,6 +36,7 @@ if $('#posts_list tr[data-id="<%= @post.id %>"]').length == 0
 else
   select_post(false)
   $('#posts_list .selected').removeClass('unread')
+  if document.activeElement != $('#posts_list')[0] then $('#post_view .content').focus()
 
 <% if @post_was_unread %>
 reset_check_timeout()
