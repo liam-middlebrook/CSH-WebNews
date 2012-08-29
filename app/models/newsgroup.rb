@@ -87,9 +87,9 @@ class Newsgroup < ActiveRecord::Base
       post = Post.import!(newsgroup, number, head, body)
       if not full_reload
         User.active.each do |user|
-          if not post.authored_by?(user) and user.unread_in_group?(newsgroup)
-            UnreadPostEntry.create!(:user => user, :newsgroup => newsgroup, :post => post,
-              :personal_level => PERSONAL_CODES[post.personal_class_for_user(user)])
+          level = PERSONAL_CODES[post.personal_class_for_user(user)]
+          if not post.authored_by?(user) and user.unread_in_group?(newsgroup) and level >= user.unread_level
+            UnreadPostEntry.create!(:user => user, :newsgroup => newsgroup, :post => post, :personal_level => level)
           end
         end
       end

@@ -95,6 +95,24 @@
     &:first-child { margin-left: 0; }
   }
   
+  .user_radio_block {
+    input[type=radio] {
+      margin-top: 0.5em;
+      margin-left: 1em;
+      &:first-child { margin-top: 0; }
+    }
+  }
+  
+  .user_check_block {
+    position: absolute;
+    left: 50%;
+    input {
+      margin-top: 0.5em;
+      margin-left: 1em;
+      &:first-child { margin-top: 0; }
+    }
+  }
+  
   input[type=text], textarea {
     width: 99%;
   }

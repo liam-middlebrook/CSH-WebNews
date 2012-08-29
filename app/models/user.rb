@@ -37,6 +37,10 @@ class User < ActiveRecord::Base
     preferences[:thread_mode].andand.to_sym || :normal
   end
   
+  def unread_level
+    preferences[:unread_level].andand.to_i || 0
+  end
+  
   def unread_in_test?
     (preferences[:unread_in_test] == '1') || false
   end

@@ -19,6 +19,10 @@ class UsersController < ApplicationController
         UnreadPostEntry.where(:user_id => @current_user.id, :newsgroup_id => newsgroup.id).delete_all
       end
     end
+    UnreadPostEntry.where(
+      'user_id = ? and personal_level < ?',
+      @current_user.id, @current_user.unread_level
+    ).delete_all
   end
   
   def update_api

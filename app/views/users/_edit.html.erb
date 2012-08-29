@@ -17,18 +17,26 @@
       </fieldset>
       
       <fieldset>
-        <legend>Unread post options</legend>
-        <div class="form_element">
+        <legend>Show unread posts</legend>
+        <div class="user_check_block">
           <%= p.check_box :unread_in_test, :checked => @current_user.unread_in_test? %>
-          <%= p.label :unread_in_test, 'Show unread posts in csh.test' %>
-        </div>
-        <div class="form_element">
+          <%= p.label :unread_in_test, 'in csh.test' %><br>
           <%= p.check_box :unread_in_control, :checked => @current_user.unread_in_control? %>
-          <%= p.label :unread_in_control, 'Show unread posts in control groups (e.g. control.cancel)' %>
+          <%= p.label :unread_in_control, 'in control groups (e.g. control.cancel)' %><br>
+          <%= p.check_box :unread_in_lists, :checked => @current_user.unread_in_lists? %>
+          <%= p.label :unread_in_lists, 'in mailing list groups (e.g. csh.lists.alumni)' %>
         </div>
         <div class="form_element">
-          <%= p.check_box :unread_in_lists, :checked => @current_user.unread_in_lists? %>
-          <%= p.label :unread_in_lists, 'Show unread posts in mailing list groups (e.g. csh.lists.alumni)' %>
+          <div class="user_radio_block">
+            <%= p.radio_button :unread_level, 0, :checked => @current_user.unread_level == 0 %>
+            <%= p.label :unread_level, 'Always', :value => 0 %><br>
+            <%= p.radio_button :unread_level, 1, :checked => @current_user.unread_level == 1 %>
+            <%= p.label :unread_level, 'Only in threads I\'ve posted in', :value => 1 %><br>
+            <%= p.radio_button :unread_level, 2, :checked => @current_user.unread_level == 2 %>
+            <%= p.label :unread_level, 'Only direct replies to my posts', :value => 2 %><br>
+            <%= p.radio_button :unread_level, 3, :checked => @current_user.unread_level == 3 %>
+            <%= p.label :unread_level, 'Never', :value => 3 %>
+          </div>
         </div>
       </fieldset>
       
@@ -40,7 +48,7 @@
       </fieldset>
       
       <div class="form_element">
-        <%= p.label :time_zone, 'Display post times in this time zone:' %>
+        <%= p.label :time_zone, 'Display all times in this time zone:' %>
         <%= p.time_zone_select :time_zone,
           ActiveSupport::TimeZone.us_zones, :default => @current_user.time_zone %>
       </div>
