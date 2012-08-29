@@ -1,12 +1,12 @@
 source 'http://rubygems.org'
 
-gem 'rails', '3.2.3'
+gem 'rails', '3.2.8'
 
 gem 'sqlite3', :groups => [:development, :test]
 gem 'mysql2', :group => :production
 
 gem 'rails_autolink'
-gem 'chronic', :git => 'git://github.com/mojombo/chronic.git'
+gem 'chronic', '>= 0.7.0'
 gem 'andand'
 gem 'whenever'
 
