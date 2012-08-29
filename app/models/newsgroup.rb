@@ -11,7 +11,7 @@ class Newsgroup < ActiveRecord::Base
       super(:except => :id).merge(
         :unread_count => unread[:count],
         :unread_class => unread[:personal_class],
-        :newest_date => Post.last.andand.date
+        :newest_date => posts.order(:date).last.andand.date
       )
     else
       super(:except => :id)
