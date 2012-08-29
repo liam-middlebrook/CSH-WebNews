@@ -181,7 +181,7 @@ class PostsController < ApplicationController
         render :json => {
           :post => @post.as_json(
             :with_user => @current_user, :with_all => true, :with_headers => params[:with_headers]
-          )
+          ).merge(params[:html_body] ? { :body => view_context.post_html_body(@post) } : {})
         }.merge(params[:mark_read] ? { :was_unread => was_unread } : {})
       end
     end

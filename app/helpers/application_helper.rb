@@ -57,13 +57,17 @@ module ApplicationHelper
       if quoted and quoted.length <= 800 and quoted.scan("\n").length <= 10
         return post_html_body(post, false)
       else
-        html_body.gsub!("#{MARK_STRING}1\n",
-          '<a href="#"
-            id="show_quote_button" class="smallbutton showquote toggle"
-            data-selector="#post_view .fullquote"
-            data-text="Hide quoted text">Show quoted text</a>' +
-            "\n" + '<div class="fullquote">'
-        )
+        if @api_access
+          html_body.gsub!("#{MARK_STRING}1\n", '<div class="quoted_text">')
+        else
+          html_body.gsub!("#{MARK_STRING}1\n",
+            '<a href="#"
+              id="show_quote_button" class="smallbutton showquote toggle"
+              data-selector="#post_view .fullquote"
+              data-text="Hide quoted text">Show quoted text</a>' +
+              "\n" + '<div class="fullquote">'
+          )
+        end
         html_body.gsub!(/#{MARK_STRING}2(\n|\z)/, '</div>')
       end
     end
