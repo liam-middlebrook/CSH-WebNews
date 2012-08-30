@@ -2,7 +2,7 @@ xml.instruct! :xml, :version => '1.0'
 xml.rss :version => '2.0' do
   xml.channel do
     xml.title 'WebNews Search Feed'
-    xml.link root_url
+    xml.link root_url + '#!' + search_path(@search_params)
     xml.pubDate @posts_older.first[:post].date.to_s(:rfc822) if not @posts_older.empty?
     xml.description 'RSS version of the WebNews search API'
     xml.ttl 1

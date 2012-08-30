@@ -118,7 +118,8 @@ class PostsController < ApplicationController
       end
     end
     
-    @search_params = params.except(:action, :controller, :source, :commit, :validate, :utf8, :_)
+    @search_params = params.except(:api_key, :api_agent,
+      :format, :action, :controller, :source, :commit, :validate, :utf8, :_)
     
     if error
       generic_error(:bad_request, error[0], error[1]) and return
