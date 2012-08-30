@@ -22,7 +22,7 @@ class ApplicationController < ActionController::Base
           respond_to do |wants|
             wants.html { render :file => "#{Rails.root}/public/auth.html", :layout => false }
             wants.js { render 'shared/needs_auth' }
-            wants.json { json_error :unauthorized, 'api_key_missing',
+            wants.any { generic_error :unauthorized, 'api_key_missing',
               "API access requires a key to be provided in the 'api_key' parameter" }
           end
         end
@@ -51,9 +51,8 @@ class ApplicationController < ActionController::Base
         end
         
         respond_to do |wants|
-          wants.html { render 'shared/maintenance' }
-          wants.js { render 'shared/maintenance' }
-          wants.json { json_error :service_unavailable, 'under_maintenance', @reason + '. ' + @explanation.chomp }
+          wants.any(:html, :js) { render 'shared/maintenance' }
+          wants.any { generic_error :service_unavailable, 'under_maintenance', @reason + '. ' + @explanation.chomp }
         end
       end
     end
@@ -62,19 +61,20 @@ class ApplicationController < ActionController::Base
       if params[:api_key]
         @current_user = User.find_by_api_key(params[:api_key])
         if @current_user.nil?
-          json_error :unauthorized, 'api_key_invalid',
+          generic_error :unauthorized, 'api_key_invalid',
             "The API key '#{params[:api_key]}' does not match any known user"
         elsif not params[:api_agent]
-          json_error :unauthorized, 'api_agent_missing',
+          generic_error :unauthorized, 'api_agent_missing',
             "API access requires an app name to be provided in the 'api_agent' parameter"
         else
           @api_access = true
+          @api_rss = request.format.rss?
           @current_user.update_attributes(:api_last_access => Time.now, :api_last_agent => params[:api_agent])
           if params[:thread_mode]
             if ['normal', 'flat', 'hybrid'].include?(params[:thread_mode])
               @current_user.preferences[:thread_mode] = params[:thread_mode].to_sym
             else
-              json_error :bad_request, 'thread_mode_invalid',
+              generic_error :bad_request, 'thread_mode_invalid',
                 "The thread_mode value '#{params[:thread_mode]}' is not one of ['normal', 'flat', 'hybrid']"
             end
           end
@@ -116,24 +116,24 @@ class ApplicationController < ActionController::Base
     
     def get_newsgroup
       name = params[:newsgroup] || params[:post].andand[:newsgroup]
-      if name
+      if not name.blank?
         @newsgroup = Newsgroup.find_by_name(name)
         if @api_access and not @newsgroup
-          json_error :not_found, 'newsgroup_not_found', "Newsgroup '#{name}' does not exist"
+          generic_error :not_found, 'newsgroup_not_found', "Newsgroup '#{name}' does not exist"
         end
       end
     end
     
     def get_post
       number = params[:number] || params[:from_number]
-      if params[:newsgroup] and number
+      if not params[:newsgroup].blank? and not number.blank?
         @post = Post.where(:number => number, :newsgroup => params[:newsgroup]).first
         if @api_access and not @post
-          json_error :not_found, 'post_not_found',
+          generic_error :not_found, 'post_not_found',
             "Post number '#{number}' in newsgroup '#{params[:newsgroup]}' does not exist"
         end
       elsif number and @api_access
-        json_error :bad_request, 'newsgroup_missing',
+        generic_error :bad_request, 'newsgroup_missing',
           "Both the 'newsgroup' and 'number' parameters are required to uniquely identify a post"
       end
     end
@@ -200,8 +200,14 @@ class ApplicationController < ActionController::Base
       name == @current_user.real_name ? 'you' : name
     end
     
-    def form_error(error_text)
-      render :partial => 'shared/form_error', :object => error_text
+    def form_error(details)
+      @error_details = details
+      render 'shared/form_error'
+    end
+    
+    def rss_error(status, id, details)
+      @error_id, @error_details = id, details
+      render 'shared/rss_error', :status => status
     end
     
     def json_error(status, id, details)
@@ -211,7 +217,8 @@ class ApplicationController < ActionController::Base
     def generic_error(status, id, details)
       respond_to do |wants|
         wants.js { form_error(details) }
-        wants.json { render :status => status, :json => json_error_object(id, details) }
+        wants.rss { rss_error(status, id, details) }
+        wants.json { json_error(status, id, details) }
       end
     end
     

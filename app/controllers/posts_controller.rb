@@ -90,12 +90,16 @@ class PostsController < ApplicationController
   end
   
   def search
-    @limit = INDEX_DEF_LIMIT_1 * 2 if not @limit
-    @limit += 1
+    if @api_rss
+      @limit = INDEX_RSS_LIMIT
+    else
+      @limit = INDEX_DEF_LIMIT_1 * 2 if not @limit
+      @limit += 1
+    end
     
     conditions, values, error = build_search_conditions
     
-    if @from_older
+    if @from_older and not @api_rss
       conditions << 'date < ?'
       values << @from_older
     end
@@ -109,21 +113,21 @@ class PostsController < ApplicationController
         conditions << 'unread_post_entries.personal_level >= ?'
         values << min_level
       else
-        json_error :bad_request, 'personal_class_invalid',
+        generic_error :bad_request, 'personal_class_invalid',
           "'#{params[:personal_class]}' is not a valid personal class" and return
       end
     end
     
-    search_params = params.except(:action, :controller, :source, :commit, :validate, :utf8, :_)
+    @search_params = params.except(:action, :controller, :source, :commit, :validate, :utf8, :_)
     
     if error
       generic_error(:bad_request, error[0], error[1]) and return
     elsif params[:validate]
-      render :partial => 'search_redirect', :locals => { :search_params => search_params } and return
+      render :partial => 'search_redirect' and return
     end
     
     @search_mode = @flat_mode = true
-    if search_params.include?(:starred) and search_params.reject{ |k,v| v.blank? }.length == 1
+    if @search_params.include?(:starred) and @search_params.reject{ |k,v| v.blank? }.length == 1
       @starred_only = true
     end
     
@@ -133,14 +137,17 @@ class PostsController < ApplicationController
     scope = scope.unread_for_user(@current_user) if params[:unread]
     scope = scope.where(:newsgroup => @newsgroup.name) if @newsgroup
     @posts_older = scope.where(conditions.join(' and '), *values).order('date DESC').limit(@limit)
-    @more_older = @posts_older.length > 0 && !@posts_older[@limit - 1].nil?
-    @posts_older.delete_at(-1) if @posts_older.length == @limit
+    if not @api_rss
+      @more_older = @posts_older.length > 0 && !@posts_older[@limit - 1].nil?
+      @posts_older.delete_at(-1) if @posts_older.length == @limit
+    end
     @posts_older.map!{ |post| {:post => post} }
     
     get_next_unread_post
     
     respond_to do |wants|
       wants.js { render 'index' }
+      wants.rss { render 'search' }
       wants.json { render :json => { :posts_older => @posts_older, :more_older => @more_older } }
     end
   end
@@ -193,7 +200,7 @@ class PostsController < ApplicationController
       @new_post.subject = 'Re: ' + @post.subject.sub(/^Re: ?/, '')
       @new_post.body = @post.quoted_body
     elsif @api_access
-      json_error :bad_request, 'number_missing',
+      generic_error :bad_request, 'number_missing',
         "This method requires a post, identified by 'newsgroup' and 'number' parameters" and return
     end
     respond_to do |wants|
@@ -377,7 +384,7 @@ class PostsController < ApplicationController
           @current_user.unread_post_entries.find_by_post_id(@post).update_attributes!(:user_created => true)
         end
       else
-        json_error :bad_request, 'number_missing',
+        generic_error :bad_request, 'number_missing',
           "mark_unread can only be used with a single post, identified by 'newsgroup' and 'number' parameters"
         return
       end
@@ -393,7 +400,7 @@ class PostsController < ApplicationController
       elsif params[:all_posts]
         @current_user.unread_post_entries.destroy_all
       else
-        json_error :bad_request, 'newsgroup_missing',
+        generic_error :bad_request, 'newsgroup_missing',
           "This method requires at least a 'newsgroup' parameter or an 'all_posts' parameter"
         return
       end
@@ -483,13 +490,13 @@ class PostsController < ApplicationController
         begin
           @from_older = Time.parse(params[:from_older]) if params[:from_older]
         rescue
-          json_error :bad_request, 'datetime_invalid',
+          generic_error :bad_request, 'datetime_invalid',
             "The from_older value '#{params[:from_older]}' could not be parsed as a datetime" and return
         end
         begin
           @from_newer = Time.parse(params[:from_newer]) if params[:from_newer]
         rescue
-          json_error :bad_request, 'datetime_invalid',
+          generic_error :bad_request, 'datetime_invalid',
             "The from_newer value '#{params[:from_newer]}' could not be parsed as a datetime" and return
         end
       else
@@ -503,11 +510,11 @@ class PostsController < ApplicationController
           @limit = Integer(params[:limit])
           if not @limit.between?(0, INDEX_MAX_LIMIT)
             @limit = [[0, @limit].max, INDEX_MAX_LIMIT].min
-            json_error :bad_request, 'limit_unacceptable',
+            generic_error :bad_request, 'limit_unacceptable',
               "The limit value '#{@limit}' is outside the acceptable range (0..#{INDEX_MAX_LIMIT})" and return
           end
         rescue
-          json_error :bad_request, 'limit_invalid',
+          generic_error :bad_request, 'limit_invalid',
             "The limit value '#{params[:limit]}' could not be parsed as an integer'" and return
         end
       end

@@ -24,6 +24,7 @@ RECENT_EXCLUDE = /^(control|csh\.lists|csh\.test)/
 INDEX_DEF_LIMIT_1 = 8  # Default limit when the request is only in one direction (older or newer)
 INDEX_DEF_LIMIT_2 = 4  # Default limit when the request is for both directions (older and newer)
 INDEX_MAX_LIMIT = 20   # Maximum limit that can be requested with the API
+INDEX_RSS_LIMIT = 10   # Limit for the built-in search RSS feed
 
 # Set true if the 'whenever' cron jobs have been installed for this instance
 CRON_ENABLED = false

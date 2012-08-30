@@ -6,6 +6,17 @@
     <a id="revise_search_button" class="button" href="#?<%= search_entry_path %>?<%=
       request.fullpath.split('?')[1] %>"><%= @starred_only ? 'Search' : 'Revise Search' %></a>
     <% if @starred_only %><a class="button refresh" href="#">Refresh</a><% end %>
+    <a id="rss_feed_button" class="button" title="Get an RSS feed of this search" href="<%=
+      if @current_user.api_enabled?
+        search_path({
+          :format => :rss, :api_key => @current_user.api_key, :api_agent => 'WebNews Search Feed'
+        }.merge(@search_params))
+      else
+        '#'
+      end
+    %>" <% if not @current_user.api_enabled? %>
+      onclick="alert('This feature requires API access to be enabled in the Settings dialog.'); return false;"
+    <% end %>>&nbsp;</a>
   <% else %>
     <a class="refresh new_posts" href="#!<%= posts_path(@newsgroup.name) %>"></a>
     <% if @newsgroup.posting_allowed? %>
