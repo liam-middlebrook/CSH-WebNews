@@ -91,7 +91,7 @@ class PostsController < ApplicationController
   
   def search
     if @api_rss
-      @limit = INDEX_RSS_LIMIT
+      @limit = INDEX_RSS_LIMIT if not @limit
     else
       @limit = INDEX_DEF_LIMIT_1 * 2 if not @limit
       @limit += 1
@@ -508,10 +508,10 @@ class PostsController < ApplicationController
       if params[:limit]
         begin
           @limit = Integer(params[:limit])
-          if not @limit.between?(0, INDEX_MAX_LIMIT)
-            @limit = [[0, @limit].max, INDEX_MAX_LIMIT].min
+          max_limit = @api_rss ? INDEX_RSS_LIMIT : INDEX_MAX_LIMIT
+          if not @limit.between?(0, max_limit)
             generic_error :bad_request, 'limit_unacceptable',
-              "The limit value '#{@limit}' is outside the acceptable range (0..#{INDEX_MAX_LIMIT})" and return
+              "The limit value '#{@limit}' is outside the acceptable range (0..#{max_limit})" and return
           end
         rescue
           generic_error :bad_request, 'limit_invalid',
