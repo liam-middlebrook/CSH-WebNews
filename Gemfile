@@ -11,7 +11,7 @@ gem 'andand'
 gem 'whenever'
 
 # ExecJS engine
-gem 'therubyracer', :platform => :ruby
+gem 'therubyracer', '>= 0.11.0beta8', :platform => :ruby
 
 # Asset template engines
 gem 'sass-rails'
