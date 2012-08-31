@@ -10,6 +10,7 @@ xml.rss :version => '2.0' do
     for thread in @posts_older
       post = thread[:post]
       xml.item do
+        xml.category post.newsgroup.name
         xml.title post.subject
         xml.author (post.author_email ? "#{post.author_email} (#{post.author_name})" : post.author_name)
         xml.description { xml.cdata! simple_format(post.body) }
