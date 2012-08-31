@@ -284,8 +284,10 @@ class Post < ActiveRecord::Base
   end
   
   def self.build_message(p)
+    p[:subject].encode!('US-ASCII', :invalid => :replace, :undef => :replace).gsub(/[\t\r\n\f]/, '')
+    p[:api_agent].encode!('US-ASCII', :invalid => :replace, :undef => :replace).gsub(/[\t\r\n\f]/, '') rescue nil
     m = "From: #{p[:user].real_name} <#{p[:user].email}>"
-    m += "\nSubject: #{p[:subject].encode('US-ASCII', :invalid => :replace, :undef => :replace)}"
+    m += "\nSubject: #{p[:subject]}"
     m += "\nNewsgroups: #{p[:newsgroups].join(',')}"
     m += "\nFollowup-To: #{p[:newsgroups].first}" if p[:newsgroups].size > 1
     if p[:reply_post]
@@ -294,7 +296,11 @@ class Post < ActiveRecord::Base
       m += "\nReferences: #{existing_refs + p[:reply_post].message_id}"
     end
     m += "\nContent-Type: text/plain; charset=utf-8; format=flowed"
-    m += "\nUser-Agent: CSH-WebNews"
+    if p[:api_agent]
+      m += "\nUser-Agent: CSH-WebNews-API (#{p[:api_agent]})"
+    else
+      m += "\nUser-Agent: CSH-WebNews"
+    end
     
     m += "\n\n#{flowed_encode(p[:body].rstrip)}\n"
     return m

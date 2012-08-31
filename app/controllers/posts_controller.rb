@@ -276,7 +276,8 @@ class PostsController < ApplicationController
       :newsgroups => post_newsgroups.map(&:name),
       :subject => subject,
       :body => body.to_s,
-      :reply_post => reply_post
+      :reply_post => reply_post,
+      :api_agent => params[:api_agent]
     )
     
     new_message_id = nil
