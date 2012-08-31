@@ -32,7 +32,7 @@
     <% end %>
     
     <% if not @post %>
-      <div class="form_element crosspost_options">
+      <div class="form_element inline_inputs crosspost_options">
         <%= label_tag :crosspost_to, 'Cross-post to:' %>
         <%= select_tag :crosspost_to,
           options_from_collection_for_select(@newsgroups, :name, :name), :include_blank => true %>
