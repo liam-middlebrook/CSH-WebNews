@@ -27,10 +27,10 @@ class UsersController < ApplicationController
   
   def update_api
     if params[:disable]
-      @current_user.update_attributes(:api_key => nil, :api_last_access => nil, :api_last_agent => nil)
+      @current_user.update_attributes(:api_key => nil, :api_data => nil)
     elsif params[:enable]
       key = SecureRandom.hex(8) until !key.nil? && User.find_by_api_key(key).nil?
-      @current_user.update_attributes(:api_key => key, :api_last_access => nil, :api_last_agent => nil)
+      @current_user.update_attributes(:api_key => key, :api_data => nil)
     end
   end
   

@@ -69,7 +69,11 @@ class ApplicationController < ActionController::Base
         else
           @api_access = true
           @api_rss = request.format.rss?
-          @current_user.update_attributes(:api_last_access => Time.now, :api_last_agent => params[:api_agent])
+          @current_user.update_attributes(:api_data => {
+            :last_access => Time.now,
+            :last_agent => params[:api_agent],
+            :last_ip => request.remote_ip
+          })
           if params[:thread_mode]
             if ['normal', 'flat', 'hybrid'].include?(params[:thread_mode])
               @current_user.preferences[:thread_mode] = params[:thread_mode].to_sym

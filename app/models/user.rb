@@ -5,6 +5,7 @@ class User < ActiveRecord::Base
   has_many :starred_posts, :through => :starred_post_entries, :source => :post
   
   serialize :preferences, Hash
+  serialize :api_data, Hash
   
   scope :active, where('updated_at >= ?', 3.months.ago)
   scope :inactive, where('updated_at < ?', 3.months.ago)

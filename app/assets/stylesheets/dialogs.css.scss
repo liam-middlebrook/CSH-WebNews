@@ -172,12 +172,14 @@ table.hotkeys {
   }
 }
 
-table.hotkeys .key,
-.keyboard, .api_key {
-  font-family: monospace;
-  font-weight: bold;
-  background-color: $white;
+table.hotkeys .key, .keyboard, .api_key, .api_data {
   border: 1px solid $border_button;
   padding: 0 0.4em;
   margin: 0 0.1em;
+  font-weight: bold;
+}
+
+table.hotkeys .key, .keyboard, .api_key {
+  background-color: $white;
+  font-family: monospace;
 }

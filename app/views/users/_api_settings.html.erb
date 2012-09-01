@@ -8,9 +8,11 @@
     </span>
   </p>
   <p>
-    <% if not @current_user.api_last_access.nil? %>
-      This key was last used by <b><%= @current_user.api_last_agent || '(unknown application)' %></b> at
-      <b><%= @current_user.api_last_access.strftime(DATE_FORMAT) %></b>
+    <% if not @current_user.api_data[:last_access].nil? %>
+      Most recent access:
+      <span class="api_data"><%= @current_user.api_data[:last_agent] || '(unknown application)' %></span>
+      at <span class="api_data"><%= @current_user.api_data[:last_access].strftime(DATE_FORMAT) %></span>
+      from <span class="api_data"><%= @current_user.api_data[:last_ip] %></span>
     <% else %>
       This key has not been used by any applications yet.
     <% end %>
