@@ -51,6 +51,10 @@ class PagesController < ApplicationController
     render 'shared/dialog'
   end
   
+  def rss_caution
+    render 'shared/dialog'
+  end
+  
   def check_new
     if not CRON_ENABLED
       cronless_sync_all

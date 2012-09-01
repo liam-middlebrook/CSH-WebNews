@@ -5,9 +5,10 @@ Webnews::Application.routes.draw do
   get '/activity',  :to => 'pages#home'
   get '/check_new', :to => 'pages#check_new'
   
-  get '/about',     :to => 'pages#about'
-  get '/new_user',  :to => 'pages#new_user'
-  get '/old_user',  :to => 'pages#old_user'
+  get '/about',       :to => 'pages#about'
+  get '/new_user',    :to => 'pages#new_user'
+  get '/old_user',    :to => 'pages#old_user'
+  get '/rss_caution', :to => 'pages#rss_caution'
   
   get '/user',          :to => 'users#show',          :as => :user
   get '/settings',      :to => 'users#edit',          :as => :edit_user

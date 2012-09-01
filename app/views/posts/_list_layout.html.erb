@@ -8,9 +8,9 @@
     <% if @starred_only %><a class="button refresh" href="#">Refresh</a><% end %>
     <a id="rss_feed_button" class="button" title="Get an RSS feed of this search" href="<%=
       if @current_user.api_enabled?
-        search_path({
+        '#?/rss_caution?dest=' + u(search_path({
           :format => :rss, :api_key => @current_user.api_key, :api_agent => 'WebNews Search Feed'
-        }.merge(@search_params))
+        }.merge(@search_params)))
       else
         '#'
       end
