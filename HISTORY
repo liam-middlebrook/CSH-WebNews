@@ -1,10 +1,10 @@
 Selected major changes to WebNews are listed below.
 This list does not include minor changes or bug fixes.
 
-2011-08-10 -- First official beta release
+2011-08-10 -- First official "beta" release
 2011-08-12 -- Added Mark All Read feature
 2011-08-25 -- Added draft feature and post canceling
-2011-09-18 -- Added search feature
+2011-09-18 -- Added search feature, removed "beta" tag
 2011-10-13 -- Added Flat and Hybrid message views
 2011-11-26 -- Overhauled dashboard layout
 2011-11-27 -- Added quote collapsing feature
@@ -13,3 +13,4 @@ This list does not include minor changes or bug fixes.
 2012-01-14 -- Improved local development support
 2012-03-04 -- Added admin role, sticky posts, and cross-posting
 2012-05-05 -- Added starred posts and Mark Thread Read
+2012-09-01 -- Added WebNews JSON API and RSS search feeds
