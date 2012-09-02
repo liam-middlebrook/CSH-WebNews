@@ -96,10 +96,11 @@ jQuery.ajaxScript = (method, url, success = null) ->
 
 @set_draft_interval = ->
   $('a.resume_draft').show()
-  window.draft_save_timer = setInterval (->
-    localStorage['draft_html'] = $('#dialog').outerHTML()
-    localStorage['draft_form'] = JSON.stringify($('#dialog form').serializeArray())
-  ), draft_save_interval
+  window.draft_save_timer = setInterval save_draft, draft_save_interval
+
+@save_draft = ->
+  localStorage['draft_html'] = $('#dialog').outerHTML()
+  localStorage['draft_form'] = JSON.stringify($('#dialog form').serializeArray())
 
 @clear_draft_interval = ->
   clearInterval(window.draft_save_timer)
@@ -287,8 +288,7 @@ $('#crosspost_toggle').live 'click', ->
   $('.crosspost_options input').val([])
 
 $('a.minimize_draft').live 'click', ->
-  localStorage['draft_html'] = $('#dialog').outerHTML()
-  localStorage['draft_form'] = JSON.stringify($('#dialog form').serializeArray())
+  save_draft()
 
 $('a.dialog_cancel').live 'click', ->
   clear_draft_interval()

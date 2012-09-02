@@ -4,6 +4,7 @@ clear_draft_interval()
 alert('<%= j @sync_error %>')
 $('#dialog .buttons').show()
 $('#dialog .loading').text('')
+save_draft()
 <% else %>
 localStorage.removeItem('draft_html')
 localStorage.removeItem('draft_form')
