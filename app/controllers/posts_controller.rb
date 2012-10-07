@@ -569,7 +569,7 @@ class PostsController < ApplicationController
       end
       
       if not params[:authors].blank?
-        authors = params[:authors].split(',')
+        authors = params[:authors].split(',').map(&:strip)
         conditions << '(' + (['author like ?'] * authors.size).join(' or ') + ')'
         authors.each do |author|
           values << '%' + author + '%'
