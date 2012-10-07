@@ -104,10 +104,9 @@ $ ->
       click $('.dialog_cancel')
   key 'alt+m', 'dialog', ->
     # Need this so it doesn't double-trigger... why only here?
-    setTimeout (-> click $('.minimize_draft')), 1
+    setTimeout (-> click $('.buttons .minimize_draft')), 1
   key 'alt+m', 'main', ->
-    if $('.resume_draft').is(':visible')
-      click $('.resume_draft')
+    click $('.resume_draft')
   key 'alt+s', 'dialog', ->
     click $('#dialog form input[type="submit"]')
   

@@ -23,9 +23,10 @@ jQuery.ajaxScript = (method, url, success = null) ->
   }
 
 @click = (elem, extra_data = null) ->
-  $(elem).trigger('click', extra_data)
-  if (href = $(elem).attr('href')) and href[0..1] == '#!'
-    location.hash = href[1..-1]
+  if $(elem).is(':visible')
+    $(elem).trigger('click', extra_data)
+    if (href = $(elem).attr('href')) and href[0..1] == '#!'
+      location.hash = href[1..-1]
 
 @delay_click_group = (group_li) ->
   clearTimeout(window.delay_click_timeout)
