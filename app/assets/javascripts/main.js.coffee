@@ -307,6 +307,12 @@ $('a.resume_draft').live 'click', ->
   $('#post_body').putCursorAtEnd() if $('#post_body').val() != ''
   set_draft_interval()
 
+$('#new_post [type="submit"]').live 'click', (e) ->
+  body = $('#new_post #post_body').first().val()
+  if $.trim(body).length == 0 and not confirm('Really submit this post with no content?')
+    e.stopImmediatePropagation()
+    return false
+
 $('[type="submit"]').live 'click', ->
   $('#dialog .buttons').hide()
   $('#dialog .loading').text('Working...')
