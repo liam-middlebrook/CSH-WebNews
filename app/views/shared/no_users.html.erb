@@ -1,7 +1,7 @@
 <div id="overlay_dimmer"></div>
 <div id="dialog">
   <h2>No users exist in the database</h2>
-  <p><b>If you don't have Webauth set up</b> and want to create (and log in as) a test user for development purposes, set <code>DEV_MODE_ENABLED = true</code> in <code>config/initializers/webnews_config.rb</code>, then click the Refresh button below.</p>
+  <p><b>If you don't have Webauth set up</b> and want to create (and log in as) a test user for development purposes, set <code>DEVELOPMENT_MODE = true</code> in <code>config/initializers/webnews_config.rb</code>, then click the Refresh button below.</p>
   <p><b>If you <i>do</i> have Webauth set up</b> and want to proceed with authentication, click the Attempt Webauth button below. If you enter an infinite refresh loop, something isn't set up correctly.</p>
   <div class="buttons">
     <a class="button" href="#" onclick="location.reload(true); return false;">Refresh</a>

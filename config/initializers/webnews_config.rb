@@ -26,8 +26,9 @@ INDEX_DEF_LIMIT_2 = 4  # Default limit when the request is for both directions (
 INDEX_MAX_LIMIT = 20   # Maximum limit that can be requested with the API
 INDEX_RSS_LIMIT = 10   # Maximum limit for the built-in search RSS feed
 
-# Set true if the 'whenever' cron jobs have been installed for this instance
-CRON_ENABLED = false
+# Set true to enable 'lazy' news syncing without having to install the cron jobs
+# (Note: Does not enable cronless versions of the other cron jobs, see config/schedule.rb)
+CRONLESS_SYNC = false
 
-# Set true to disable authentication and auto-login as a testing admin user
-DEV_MODE_ENABLED = false
+# Set true to disable authentication and auto-login as a test user with admin privileges
+DEVELOPMENT_MODE = false

@@ -12,13 +12,13 @@ class ApplicationController < ActionController::Base
         render 'shared/no_groups'
       elsif not request.env[ENV_USERNAME]
         if not User.select(true).first and not params[:no_user_override]
-          if DEV_MODE_ENABLED
+          if DEVELOPMENT_MODE
             User.create!(:username => 'nobody', :real_name => 'Testing User')
           else
             @no_script = true
             render 'shared/no_users'
           end
-        elsif not DEV_MODE_ENABLED and not params[:api_key]
+        elsif not DEVELOPMENT_MODE and not params[:api_key]
           respond_to do |wants|
             wants.html { render :file => "#{Rails.root}/public/auth.html", :layout => false }
             wants.js { render 'shared/needs_auth' }
@@ -84,7 +84,7 @@ class ApplicationController < ActionController::Base
           end
         end
       else # Non-API access, may create the user
-        @current_user = DEV_MODE_ENABLED ? User.first :
+        @current_user = DEVELOPMENT_MODE ? User.first :
           User.find_by_username(request.env[ENV_USERNAME])
         if @current_user.nil?
           @current_user = User.create!(
@@ -178,18 +178,10 @@ class ApplicationController < ActionController::Base
       end
     end
     
-    def cronless_clean_unread
-      if not File.exists?('tmp/lastclean.txt') or
-          File.mtime('tmp/lastclean.txt') < 1.day.ago
-        FileUtils.touch('tmp/lastclean.txt')
-        User.clean_unread!
-      end
-    end
-    
     def cronless_sync_all
-      if not File.exists?('tmp/syncing.txt') and
-          (not File.exists?('tmp/lastsync.txt') or
-            File.mtime('tmp/lastsync.txt') < 1.minute.ago)
+      if CRONLESS_SYNC and not File.exists?('tmp/syncing.txt') and (
+        not File.exists?('tmp/lastsync.txt') or File.mtime('tmp/lastsync.txt') < 1.minute.ago
+      )
         begin
           Newsgroup.sync_all!
         rescue

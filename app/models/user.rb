@@ -19,7 +19,7 @@ class User < ActiveRecord::Base
   end
   
   def is_admin?
-    unix_groups.include?('rtp') or unix_groups.include?('eboard') or DEV_MODE_ENABLED
+    DEVELOPMENT_MODE or unix_groups.include?('rtp') or unix_groups.include?('eboard')
   end
   
   def api_enabled?

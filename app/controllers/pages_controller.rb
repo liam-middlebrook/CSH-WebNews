@@ -15,7 +15,7 @@ class PagesController < ApplicationController
           @current_user.real_name = request.env[ENV_REALNAME]
           @current_user.save!
         end
-        cronless_sync_all if not CRON_ENABLED
+        cronless_sync_all
         get_last_sync_time
         get_next_unread_post
       end
@@ -56,10 +56,7 @@ class PagesController < ApplicationController
   end
   
   def check_new
-    if not CRON_ENABLED
-      cronless_sync_all
-      cronless_clean_unread
-    end
+    cronless_sync_all
     get_last_sync_time
     get_next_unread_post
     if params[:location] == '#!/home'
