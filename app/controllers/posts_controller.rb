@@ -293,13 +293,12 @@ class PostsController < ApplicationController
       Net::NNTP.start(NEWS_SERVER) do |nntp|
         post_newsgroups.each{ |n| Newsgroup.sync_group!(nntp, n.name, n.status) }
       end
+      @new_post = @newsgroup.posts.find_by_message_id(new_message_id)
+      if not @new_post
+        @sync_error = "Your post was accepted by the news server, but it appears to have been held for moderation or silently discarded; contact the server administrators before attempting to post again"
+      end
     rescue
       @sync_error = "Your post was accepted by the news server and does not need to be resubmitted, but an error occurred while resyncing the newsgroups: #{$!.message}"
-    end
-    
-    @new_post = @newsgroup.posts.find_by_message_id(new_message_id)
-    if not @new_post
-      @sync_error = "Your post was accepted by the news server, but it appears to have been held for moderation or silently discarded; contact the server administrators before attempting to post again"
     end
     
     respond_to do |wants|
