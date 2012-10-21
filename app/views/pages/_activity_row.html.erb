@@ -1,48 +1,38 @@
-<%
-parent = thread[:parent]
-unread = thread[:unread]
-authors = unread ? thread[:unread_authors] : thread[:authors]
-%>
-<tr<% if mode == :sticky %> class="sticky"<% end %>>
-  <td class="date">
-    <%= thread[:date].strftime(SHORT_DATE_FORMAT) %>
+<% linked_post = (unread_count > 0) ? next_unread : newest_post %>
+
+<tr<% if thread_parent.is_sticky? %> class="sticky"<% end %>>
+  <td>
+    <%= newest_post.date.strftime(SHORT_DATE_FORMAT) %>
   </td>
-  <td class="thread">
-    <div class="subject">
-      <a class="<%= thread[:personal_class] %><%= unread ? ' unread' : '' %>"
-        href="#!<%= post_path(parent.newsgroup.name, parent.number) %>"><%= parent.subject %></a>
-    </div>
-    <div class="details">
-      <% if thread[:posts] == 1 and thread[:parent] == thread[:oldest] %>
-        Posted
-      <% else %>
-        <% if unread %>
-          <a href="#!<%= post_path(thread[:oldest_unread].newsgroup.name, thread[:oldest_unread].number) %>">
-            <%= pluralize(thread[:unread_posts], 'unread post') %>
-          </a>
-        <% elsif mode == :recent %>
-          <%= pluralize(thread[:posts], 'recent post') %>
-        <% else %>
-          <%= pluralize(thread[:posts], 'post') %>
-        <% end %>
+  <td>
+    <%= maybe_you(newest_post.author_name, true) %>
+    <% if newest_post == thread_parent %>
+      posted
+    <% else %>
+      replied in
+    <% end %>
+  </td>
+  <td class="post_count">
+    <span class="counter"><%= post_count %></span>
+  </td>
+  <td class="unread_count">
+    <% if unread_count > 0 %>
+      <span class="counter unread <%= personal_class %>"><%= unread_count %></span>
+    <% end %>
+  </td>
+  <td class="subject">
+    <a class="<%= personal_class %><%= unread_count > 0 ? ' unread' : '' %>"
+      href="#!<%= post_path(linked_post.newsgroup.name, linked_post.number) %>"><%= thread_parent.subject %></a>
+    <span class="byline">
+      <% if newest_post != thread_parent %>
+        by <%= maybe_you(thread_parent.author_name) %>
       <% end %>
-      
-      by <%= authors.first %>
-      <% if authors.size > 1 %>
-        and
-        <% if authors.size == 2 %>
-          <%= authors.last %>
-        <% else %>
-          <%= pluralize(authors.size - 1, 'other') %>
-        <% end %>
-      <% end %>
-      
       in
-      <% if parent.is_crossposted?(true) %>
+      <% if cross_posted %>
         multiple newsgroups
       <% else %>
-        <a href="#!<%= posts_path(parent.newsgroup.name) %>"><%= parent.newsgroup.name %></a>
+        <%= thread_parent.newsgroup.name %>
       <% end %>
-    </div>
+    </span>
   </td>
 </tr>

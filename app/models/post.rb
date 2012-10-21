@@ -145,19 +145,27 @@ class Post < ActiveRecord::Base
   end
   
   def children
-    Post.where(:parent_id => message_id, :newsgroup => newsgroup.name).order('date')
+    Post.where(:parent_id => message_id, :newsgroup => newsgroup.name)
   end
   
   def thread_parent
-    message_id == thread_id ? self : Post.where(:message_id => thread_id, :newsgroup => newsgroup.name).first
+    message_id == thread_id ? self : all_in_thread.order('date').first
   end
   
   def all_in_thread
     Post.where(:thread_id => thread_id, :newsgroup => newsgroup.name).order('date')
   end
   
+  def post_count_in_thread
+    all_in_thread.count
+  end
+  
+  def unread_count_in_thread_for_user(user)
+    user.unread_post_entries.where(:post_id => all_in_thread.pluck(:id)).count
+  end
+  
   def thread_tree_for_user(user, flatten = false, as_json = false, all_posts = nil)
-    all_posts ||= all_in_thread.to_a
+    all_posts ||= all_in_thread.order('date').to_a
     {
       :post => (as_json ? self.as_json(:with_user => user) : self),
       :children => if flatten
@@ -192,7 +200,7 @@ class Post < ActiveRecord::Base
   
   def user_in_thread?(user)
     return true if authored_by?(user)
-    return all_in_thread.reduce(false){ |m, post| m || post.authored_by?(user) }
+    return all_in_thread.any?{ |post| post.authored_by?(user) }
   end
   
   def self.starred_by_user(user)
@@ -238,7 +246,7 @@ class Post < ActiveRecord::Base
   
   def thread_unread_for_user?(user)
     return true if unread_for_user?(user)
-    return all_in_thread.reduce(false){ |m, post| m || post.unread_for_user?(user) }
+    return all_in_thread.any?{ |post| post.unread_for_user?(user) }
   end
   
   def personal_class_for_user(user, check_thread = true)
@@ -249,7 +257,7 @@ class Post < ActiveRecord::Base
     end
   end
   
-  def thread_unread_class_for_user(user)
+  def unread_personal_class_for_user(user)
     PERSONAL_CLASSES[user.unread_posts.where(:thread_id => thread_id).maximum(:personal_level)]
   end
   

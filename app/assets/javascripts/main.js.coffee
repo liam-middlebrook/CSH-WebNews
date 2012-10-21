@@ -45,14 +45,6 @@ jQuery.ajaxScript = (method, url, success = null) ->
     click post_tr, false
   ), delay_click_time
 
-@align_activity_tables = ->
-  tables = $('table.activity')
-  if tables.length > 1
-    max_width = Math.max(($(table).width() for table in tables)...)
-    max_date_width = Math.max(($(table).find('td.date').first().width() for table in tables)...)
-    $(table).width(max_width) for table in tables
-    $(table).find('td.date').first().width(max_date_width) for table in tables
-
 @fix_post_header = ->
   if $('#post_header').length > 0
     $('#post_view .content').css('top', $('#post_header').outerHeight() + 'px');
@@ -357,7 +349,6 @@ $(window).resize ->
   fix_post_header()
 
 $(document).ajaxComplete ->
-  align_activity_tables()
   fix_post_header()
   target_external_links()
   for a in $('.toggle')

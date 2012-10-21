@@ -1,27 +1,19 @@
-<% if @sticky_threads.length > 0 %>
-  <h3>Sticky Threads</h3>
-  <table class="activity">
-    <% @sticky_threads.each do |thread| %>
-      <%= render :partial => 'activity_row', :locals => { :thread => thread, :mode => :sticky } %>
-    <% end %>
-  </table>
-<% end %>
+<h3>Recent Activity</h3>
 
-<% if @unread_threads.length > 0 %>
-  <h3>Unread Activity</h3>
+<% if @activity.any? %>
   <table class="activity">
-    <% @unread_threads.each do |thread| %>
-      <%= render :partial => 'activity_row', :locals => { :thread => thread, :mode => :unread } %>
+    <% @activity.each do |item| %>
+      <%= render :partial => 'activity_row', :locals => {
+        :newest_post => item[:newest_post],
+        :thread_parent => item[:thread_parent],
+        :next_unread => item[:next_unread],
+        :post_count => item[:post_count],
+        :unread_count => item[:unread_count],
+        :personal_class => item[:personal_class],
+        :cross_posted => item[:cross_posted]
+      } %>
     <% end %>
   </table>
-<% end %>
-
-<% if @recent_threads.length > 0 %>
-  <h3>Recent Activity</h3>
-  <p class="explain">over the past 7 days (excluding control, lists, and csh.test)</p>
-  <table class="activity">
-    <% @recent_threads.each do |thread| %>
-      <%= render :partial => 'activity_row', :locals => { :thread => thread, :mode => :recent } %>
-    <% end %>
-  </table>
+<% else %>
+  <p>There is no recent activity to display.</p>
 <% end %>

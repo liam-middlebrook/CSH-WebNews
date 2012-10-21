@@ -27,7 +27,7 @@ class Newsgroup < ActiveRecord::Base
   end
   
   def unread_for_user(user)
-    personal_class = ''
+    personal_class = nil
     count = unread_post_entries.where(:user_id => user.id).count
     max_level = unread_post_entries.where(:user_id => user.id).maximum(:personal_level)
     personal_class = PERSONAL_CLASSES[max_level] if max_level

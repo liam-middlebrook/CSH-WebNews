@@ -135,11 +135,6 @@
     margin-bottom: 2em;
   }
   
-  p.explain {
-    margin-top: -1em;
-    margin-bottom: 1em;
-  }
-  
   table.activity {
     line-height: 1.5;
     margin-bottom: 2em;
@@ -159,10 +154,43 @@
         padding: 5px;
         padding-right: 10px;
         
-        .subject {
+        &.subject {
           white-space: normal;
           text-indent: -16px;
           padding-left: 16px;
+        }
+        
+        .counter {
+          border: 1px solid $border_button;
+          border-radius: 2px;
+          padding: 0 3px;
+        }
+        
+        &.post_count {
+          text-align: right;
+          padding-right: 0;
+          
+          .counter {
+            padding-right: 4px;
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+          }
+        }
+        
+        &.unread_count {
+          padding-left: 0;
+          padding-right: 5px;
+          
+          .counter {
+            padding-left: 4px;
+            border-left: none;
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+          }
+        }
+        
+        .byline {
+          white-space: nowrap;
         }
       }
     }

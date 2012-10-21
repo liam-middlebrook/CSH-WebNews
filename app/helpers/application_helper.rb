@@ -1,5 +1,13 @@
 module ApplicationHelper
 
+  def maybe_you(name, capitalize = false)
+    if name == @current_user.real_name
+      capitalize ? 'You' : 'you'
+    else
+      name
+    end
+  end
+
   def next_unread_href
     if @next_unread_post
       '#!' + post_path(@next_unread_post.newsgroup.name, @next_unread_post.number)

@@ -192,10 +192,6 @@ class ApplicationController < ActionController::Base
       end
     end
     
-    def maybe_you(name)
-      name == @current_user.real_name ? 'you' : name
-    end
-    
     def form_error(details)
       @error_details = details
       render 'shared/form_error'

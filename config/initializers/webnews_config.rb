@@ -17,8 +17,8 @@ ENV_REALNAME = 'WEBAUTH_LDAP_CN'
 DATE_FORMAT = '%-m/%-d/%Y %-I:%M%P'
 SHORT_DATE_FORMAT = '%-m/%-d %-I:%M%P'
 
-# Newsgroups matching this regex are excluded from the Recent Activity feed
-RECENT_EXCLUDE = /^(control|csh\.lists|csh\.test)/
+# Newsgroups matching this regex are excluded from the activity feed
+ACTIVITY_EXCLUDE = /^(control|csh\.lists|csh\.test)/
 
 # Default and maximum values for the 'limit' parameter to Posts#index
 INDEX_DEF_LIMIT_1 = 8  # Default limit when the request is only in one direction (older or newer)
