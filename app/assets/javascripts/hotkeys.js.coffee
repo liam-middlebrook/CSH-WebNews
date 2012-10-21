@@ -76,7 +76,7 @@ $ ->
   key 'shift+i', 'main', -> click $('#mark_thread_read_button')
   
   # Toolbar functions
-  key 'esc, h', 'main', -> click $('#home_button')
+  key 'esc', 'main', -> click $('#home_button')
   key 'n', 'main', -> click $('#next_unread')
   key 'shift+s', 'main', -> click $('#starred_button')
   key 'shift+`', 'main', -> click $('#settings_button')
@@ -88,7 +88,7 @@ $ ->
         return
   key 'c', 'main', -> click $('#group_view .new_draft')
   key 'r', 'main', -> click $('#post_view .new_draft')
-  key 'd', 'main', -> click $('#show_headers_button')
+  key 'h', 'main', -> click $('#show_headers_button')
   key 'u', 'main', -> click $('#mark_unread_button')
   key 't', 'main', -> click $('#sticky_post_button')
   key 'shift+3', 'main', -> click $('#cancel_post_button')
