@@ -234,7 +234,9 @@ $('a.mark_read').live 'click', ->
     path += '?in_thread=true'
     path += '&newsgroup=' + encodeURIComponent(newsgroup) + '&number=' + number
     abort_active_scroll()
-    after_func = -> $('#posts_list').scroll()
+    after_func = ->
+      reset_check_timeout(0)
+      $('#posts_list').scroll()
     $('#posts_list tr[data-thread="' + thread_id + '"]').removeClass('unread')
   else if newsgroup and scope == 'newsgroup'
     path += '?newsgroup=' + encodeURIComponent(newsgroup)
@@ -255,6 +257,7 @@ $('a.mark_read').live 'click', ->
       after_func = -> window.onhashchange()
     else
       abort_active_scroll()
+      $('#posts_list tbody tr').removeClass('unread')
       after_func = -> $('#posts_list').scroll()
   
   $.ajaxScript 'PUT', path, after_func
