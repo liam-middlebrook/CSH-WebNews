@@ -376,11 +376,7 @@ class PostsController < ApplicationController
     if params[:mark_unread]
       if @post
         if not @post.unread_for_user?(@current_user)
-          UnreadPostEntry.create!(
-            :user => @current_user, :newsgroup => @post.newsgroup, :post => @post,
-            :personal_level => PERSONAL_CODES[@post.personal_class_for_user(@current_user)],
-            :user_created => true
-          )
+          @post.mark_unread_for_user(@current_user, true)
         else
           @current_user.unread_post_entries.find_by_post_id(@post).update_attributes!(:user_created => true)
         end

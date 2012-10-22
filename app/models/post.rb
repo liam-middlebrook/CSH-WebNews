@@ -244,6 +244,16 @@ class Post < ActiveRecord::Base
     return was_unread
   end
   
+  def mark_unread_for_user(user, user_created)
+    UnreadPostEntry.create!(
+      :user => user,
+      :newsgroup => newsgroup,
+      :post => self,
+      :personal_level => PERSONAL_CODES[personal_class_for_user(user)],
+      :user_created => user_created
+    )
+  end
+
   def thread_unread_for_user?(user)
     return true if unread_for_user?(user)
     return all_in_thread.any?{ |post| post.unread_for_user?(user) }
