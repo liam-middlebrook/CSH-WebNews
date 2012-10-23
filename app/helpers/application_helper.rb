@@ -24,6 +24,32 @@ module ApplicationHelper
     end
   end
   
+  def home_unread_line
+    unread = @current_user.unread_count
+    unread_thread = @current_user.unread_count_in_thread
+    unread_reply = @current_user.unread_count_in_reply
+    
+    if unread == 0
+      unread_line = 'You have no unread posts.'
+    else
+      unread_line = "You have <span class=\"unread\">#{pluralize(unread, 'unread post')}</span>"
+      if unread_thread + unread_reply > 0
+        unread_line += ' ('
+        if unread_thread > 0
+          unread_line += "<span class=\"mine_in_thread\">#{unread_thread} in threads you've posted in</span>"
+          unread_line += ', ' if unread_reply > 0
+        end
+        if unread_reply > 0
+          unread_line += "<span class=\"mine_reply\">#{unread_reply} in reply to your posts</span>"
+        end
+        unread_line += ')'
+      end
+      unread_line += '.'
+    end
+    
+    return unread_line
+  end
+  
   def post_html_body(post, quote_collapse = true)
     pre_body = post.body.dup
     parent = post.parent

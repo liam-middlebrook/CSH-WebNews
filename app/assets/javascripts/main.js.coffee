@@ -4,6 +4,7 @@
 @draft_save_interval = 2000
 @delay_click_time = 300
 window.loaded_location = false
+window.first_load = true
 window.active_navigation = false
 window.active_scroll_load = false
 window.active_check_new = false
@@ -158,15 +159,21 @@ window.onhashchange = ->
   if location.hash.substring(0, 3) == '#!/'
     window.active_navigation.abort() if window.active_navigation
     window.active_navigation = $.getScript location.hash.replace('#!/', '')
-    
     new_location = location.hash.split('/')[1]
+    
     if new_location != window.loaded_location
       abort_active_scroll()
       clear_loaded_location()
-      $('#group_view').empty().append(chunks.spinner.clone())
+      
       $('#post_view').empty()
       $('#groups_list .selected').removeClass('selected')
       $('#groups_list [data-name="' + new_location + '"]').addClass('selected')
+      if new_location == 'home' and window.first_load == true
+        $('#group_view').append(chunks.spinner.clone())
+      else
+        $('#group_view').empty().append(chunks.spinner.clone())
+      window.first_load = false
+      
       if new_location == 'home'
         $('#group_view').css('bottom', '0')
         $('#group_view').css('border-bottom', '0')
@@ -252,8 +259,9 @@ $('a.mark_read').live 'click', ->
     $('#next_unread').attr('href', '#')
     if window.loaded_location == 'home'
       document.title = 'CSH WebNews'
-      $('#unread_line').text('Marked all posts read. Reloading activity feed...')
-      $('#activity_feeds').remove()
+      $('#unread_line').text('You have no unread posts.')
+      $('#activity_feed').text('Reloading activity feed...')
+      $('#group_view').append(chunks.spinner.clone())
       after_func = -> window.onhashchange()
     else
       abort_active_scroll()
