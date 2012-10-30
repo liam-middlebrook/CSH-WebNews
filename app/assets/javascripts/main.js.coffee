@@ -220,10 +220,20 @@ $('a.new_draft').live 'click', (e) ->
     e.stopImmediatePropagation()
     return false
 
+$('a.post_reply').live 'click', (e) ->
+  selected_text = window.getSelection().toString().replace(/\r\n/g, "\n").replace(/\r/g, "\n")
+  selected_index = $('.content .body').text().indexOf(selected_text)
+  if selected_index >= 0 and selected_text.length > 0
+    $(this).attr('data-href-append', '&quote_start=' + selected_index + '&quote_length=' + selected_text.length)
+
 $('a[href^="#?/"]').live 'click', ->
   key.setScope('intermediate')
   init_dialog()
-  $.getScript @href.replace('#?/', '')
+  request_path = @href.replace('#?/', '')
+  if $(this).attr('data-href-append')
+    request_path += $(this).attr('data-href-append')
+    $(this).removeAttr('data-href-append')
+  $.getScript request_path
   return false
 
 $('a.mark_read').live 'click', ->

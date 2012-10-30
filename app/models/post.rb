@@ -75,11 +75,15 @@ class Post < ActiveRecord::Base
     return subject
   end
   
-  def quoted_body
+  def quoted_body(start = 0, length = 0)
     author_name + " wrote:\n\n" + if body.blank?
       '>' + subject
     else
-      sigless_body.split("\n").map{ |line| '>' + line }.join("\n")
+      if length > 0
+        body[start, length]
+      else
+        sigless_body
+      end.split("\n").map{ |line| '>' + line }.join("\n")
     end + "\n\n"
   end
   

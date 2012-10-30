@@ -17,15 +17,16 @@ end
         <%= post.sticky_until.strftime(DATE_FORMAT) %>
       </div>
     <% end %>
-    <% if not @search_mode and @newsgroup.posting_allowed? %>
-      <a class="button new_draft"
-        href="#?<%= new_post_path(:newsgroup => @newsgroup.name, :number => post.number) %>">Post Reply</a>
-    <% end %>
+    
     <% if @search_mode %>
       <span class="explain" style="margin-right: -10px">To see all post actions:</span>
       <a id="view_in_newsgroup_button" class="button"
         href="#!<%= post_path(@newsgroup.name, post.number) %>">View in Newsgroup</a>
     <% else %>
+      <% if @newsgroup.posting_allowed? %>
+        <a class="button new_draft post_reply"
+          href="#?<%= new_post_path(:newsgroup => @newsgroup.name, :number => post.number) %>">Post Reply</a>
+      <% end %>
       <% if not post.authored_by?(@current_user) %>
         <a id="mark_unread_button" class="button mark_unread"
           href="#~<%= mark_read_path(:mark_unread => true, :newsgroup => @newsgroup.name, :number => @post.number) %>">Mark Unread</a>
@@ -40,6 +41,7 @@ end
         <% end %>
       <% end %>
     <% end %>
+    
     <a id="star_post_button" title="Star this post"
       class="button<%= post.starred_by_user?(@current_user) ? ' starred' : '' %>"
       href="#~<%= update_post_star_path(:newsgroup => @newsgroup.name, :number => post.number) %>">&nbsp;</a>

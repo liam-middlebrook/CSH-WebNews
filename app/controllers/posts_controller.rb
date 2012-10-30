@@ -199,7 +199,7 @@ class PostsController < ApplicationController
     @new_post = Post.new(:newsgroup => @newsgroup)
     if @post
       @new_post.subject = 'Re: ' + @post.subject.sub(/^Re: ?/, '')
-      @new_post.body = @post.quoted_body
+      @new_post.body = @post.quoted_body(params[:quote_start].to_i, params[:quote_length].to_i)
     elsif @api_access
       generic_error :bad_request, 'number_missing',
         "This method requires a post, identified by 'newsgroup' and 'number' parameters" and return
