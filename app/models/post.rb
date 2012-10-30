@@ -334,7 +334,7 @@ class Post < ActiveRecord::Base
   
   def self.import!(newsgroup, number, headers, body)
     stripped = false
-    headers.gsub!(/\n( |\t)/, ' ')
+    headers = unwrap_headers(headers)
     headers.encode!('US-ASCII', :invalid => :replace, :undef => :replace)
   
     part_headers, body = multipart_decode(headers, body)
@@ -387,32 +387,26 @@ class Post < ActiveRecord::Base
     parent_id = references[-1] || ''
     thread_id = message_id
     possible_thread_id = references[0] || ''
+    
     parent = where(:message_id => parent_id, :newsgroup => newsgroup.name).first
     
-    # Note: Doesn't try to fix replies ("Re:") that simply have no References at all
-    if parent_id != '' and not parent
-      if where(:message_id => parent_id).exists?
-        parent_id = ''
-      else
-        if possible_thread_id != '' and
-            where(:message_id => possible_thread_id, :newsgroup => newsgroup.name).exists?
-          parent_id = thread_id = possible_thread_id
-        else
-          possible_thread_parent =
-            where('subject = ? and newsgroup = ? and date < ?',
-              subject.sub(/Re: /i, ''), newsgroup.name, date).order('date DESC').first ||
-            where('subject = ? and newsgroup = ? and date < ?',
-              subject, newsgroup.name, date).order('date').first
-          
-          if possible_thread_parent
-            parent_id = thread_id = possible_thread_parent.message_id
-          else
-            parent_id = ''
-          end
-        end
-      end
-    elsif parent # Parent exists and is in the same newsgroup
+    if parent
       thread_id = parent.thread_id
+    elsif parent_id != '' and where(:message_id => parent_id).exists?
+      parent_id = ''
+    elsif possible_thread_id != '' and where(:message_id => possible_thread_id, :newsgroup => newsgroup.name).exists?
+      parent_id = thread_id = possible_thread_id
+    elsif subject =~ /Re:/i
+      possible_thread_parent = where(
+        'subject = ? and newsgroup = ? and date < ? and date > ?',
+        subject.sub(/Re: ?/i, ''), newsgroup.name, date, date - 1.year
+      ).order('date DESC').first
+      
+      if possible_thread_parent
+        parent_id = thread_id = possible_thread_parent.message_id
+      else
+        parent_id = ''
+      end
     end
     
     create!(:newsgroup => newsgroup,
@@ -471,11 +465,15 @@ class Post < ActiveRecord::Base
     if headers[/^Content-Type: multipart/i]
       boundary = Regexp.escape(headers[/^Content-Type:.*boundary ?= ?"?([^"]+?)"?(;|$)/i, 1])
       match = /.*?#{boundary}\n(.*?)\n\n(.*?)\n(--)?#{boundary}/m.match(body)
-      part_headers = match[1].gsub(/\n( |\t)/, ' ')
+      part_headers = unwrap_headers(match[1])
       part_body = match[2]
       return multipart_decode(part_headers, part_body)
     else
       return headers, body
     end
+  end
+  
+  def self.unwrap_headers(headers)
+    headers.gsub(/\n( |\t)/, ' ').gsub(/\t/, ' ')
   end
 end
