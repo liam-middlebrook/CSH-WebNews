@@ -288,7 +288,7 @@ class Post < ActiveRecord::Base
     m += "\nSubject: cmsg cancel #{message_id}"
     m += "\nNewsgroups: " + all_newsgroup_names.join(',')
     m += "\nControl: cancel #{message_id}"
-    m += "\n" + Post.common_headers(params[:api_agent], params[:posting_host])
+    m += "\n" + Post.common_headers(params)
     
     m += "\n\nThe following message was canceled by #{params[:user].real_name}:\n"
     [
@@ -309,9 +309,8 @@ class Post < ActiveRecord::Base
   end
   
   def self.build_message(params)
-    params[:subject].encode!('US-ASCII', :invalid => :replace, :undef => :replace).gsub(/[\t\r\n\f]/, '')
     m = "From: #{params[:user].real_name} <#{params[:user].email}>"
-    m += "\nSubject: #{params[:subject]}"
+    m += "\nSubject: #{sanitize_for_headers(params[:subject])}"
     m += "\nNewsgroups: #{params[:newsgroups].join(',')}"
     m += "\nFollowup-To: #{params[:newsgroups].first}" if params[:newsgroups].size > 1
     if params[:reply_post]
@@ -319,22 +318,29 @@ class Post < ActiveRecord::Base
       existing_refs ? existing_refs += ' ' : existing_refs = ''
       m += "\nReferences: #{existing_refs + params[:reply_post].message_id}"
     end
-    m += "\n" + common_headers(params[:api_agent], params[:posting_host])
+    m += "\n" + common_headers(params)
     
     m += "\n\n#{flowed_encode(params[:body].rstrip)}\n"
     return m
   end
   
-  def self.common_headers(api_agent, posting_host)
+  def self.common_headers(params)
     h = "Content-Type: text/plain; charset=utf-8; format=flowed"
-    if api_agent
-      api_agent.encode!('US-ASCII', :invalid => :replace, :undef => :replace).gsub(/[\t\r\n\f]/, '')
-      h += "\nUser-Agent: CSH-WebNews-API (#{api_agent})"
+    if params[:api_agent]
+      h += "\nUser-Agent: CSH-WebNews-API"
+      h += "\nX-WebNews-API-Agent: #{sanitize_for_headers(params[:api_agent])}"
     else
       h += "\nUser-Agent: CSH-WebNews"
     end
-    h += "\nX-WebNews-Posting-Host: #{posting_host}"
+    h += "\nX-WebNews-Posting-Host: #{params[:posting_host]}"
+    if params[:api_posting_host]
+      h += "\nX-WebNews-API-Posting-Host: #{sanitize_for_headers(params[:api_posting_host])}"
+    end
     return h
+  end
+  
+  def self.sanitize_for_headers(value)
+    value.encode('US-ASCII', :invalid => :replace, :undef => :replace).gsub(/[\t\r\n\f]/, '')
   end
   
   def self.import!(newsgroup, number, headers, body)

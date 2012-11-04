@@ -278,7 +278,8 @@ class PostsController < ApplicationController
       :body => body.to_s,
       :reply_post => reply_post,
       :api_agent => params[:api_agent],
-      :posting_host => remote_host
+      :posting_host => remote_host,
+      :api_posting_host => params[:posting_host]
     )
     
     new_message_id = nil
@@ -345,7 +346,8 @@ class PostsController < ApplicationController
           :user => @current_user,
           :reason => params[:reason],
           :api_agent => params[:api_agent],
-          :posting_host => remote_host
+          :posting_host => remote_host,
+          :api_posting_host => params[:posting_host]
         }))
       end
     rescue
