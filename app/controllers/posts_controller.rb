@@ -277,7 +277,8 @@ class PostsController < ApplicationController
       :subject => subject,
       :body => body.to_s,
       :reply_post => reply_post,
-      :api_agent => params[:api_agent]
+      :api_agent => params[:api_agent],
+      :posting_host => remote_host
     )
     
     new_message_id = nil
@@ -340,7 +341,12 @@ class PostsController < ApplicationController
     
     begin
       Net::NNTP.start(NEWS_SERVER) do |nntp|
-        nntp.post(@post.build_cancel_message(@current_user, params[:reason]))
+        nntp.post(@post.build_cancel_message({
+          :user => @current_user,
+          :reason => params[:reason],
+          :api_agent => params[:api_agent],
+          :posting_host => remote_host
+        }))
       end
     rescue
       generic_error :internal_server_error, 'nntp_post_error', 'NNTP server error: ' + $!.message and return

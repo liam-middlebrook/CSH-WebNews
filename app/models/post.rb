@@ -283,15 +283,14 @@ class Post < ActiveRecord::Base
     end
   end
   
-  def build_cancel_message(user, reason)
-    m = "From: #{user.real_name} <#{user.email}>"
+  def build_cancel_message(params)
+    m = "From: #{params[:user].real_name} <#{params[:user].email}>"
     m += "\nSubject: cmsg cancel #{message_id}"
     m += "\nNewsgroups: " + all_newsgroup_names.join(',')
     m += "\nControl: cancel #{message_id}"
-    m += "\nContent-Type: text/plain; charset=utf-8; format=flowed"
-    m += "\nUser-Agent: CSH-WebNews"
+    m += "\n" + Post.common_headers(params[:api_agent], params[:posting_host])
     
-    m += "\n\nThe following message was canceled by #{user.real_name}:\n"
+    m += "\n\nThe following message was canceled by #{params[:user].real_name}:\n"
     [
       headers[/^From: .*/i],
       headers[/^Subject: .*/i],
@@ -302,34 +301,40 @@ class Post < ActiveRecord::Base
       m += "\n  #{header}"
     end
     
-    if not reason.blank?
-      m += "\n\n" + Post.flowed_encode('The reason given was: ' + reason)
+    if params[:reason].present?
+      m += "\n\n" + Post.flowed_encode('The reason given was: ' + params[:reason])
     end
     
     return m
   end
   
-  def self.build_message(p)
-    p[:subject].encode!('US-ASCII', :invalid => :replace, :undef => :replace).gsub(/[\t\r\n\f]/, '')
-    p[:api_agent].encode!('US-ASCII', :invalid => :replace, :undef => :replace).gsub(/[\t\r\n\f]/, '') rescue nil
-    m = "From: #{p[:user].real_name} <#{p[:user].email}>"
-    m += "\nSubject: #{p[:subject]}"
-    m += "\nNewsgroups: #{p[:newsgroups].join(',')}"
-    m += "\nFollowup-To: #{p[:newsgroups].first}" if p[:newsgroups].size > 1
-    if p[:reply_post]
-      existing_refs = p[:reply_post].headers[/^References: (.*)/i, 1]
+  def self.build_message(params)
+    params[:subject].encode!('US-ASCII', :invalid => :replace, :undef => :replace).gsub(/[\t\r\n\f]/, '')
+    m = "From: #{params[:user].real_name} <#{params[:user].email}>"
+    m += "\nSubject: #{params[:subject]}"
+    m += "\nNewsgroups: #{params[:newsgroups].join(',')}"
+    m += "\nFollowup-To: #{params[:newsgroups].first}" if params[:newsgroups].size > 1
+    if params[:reply_post]
+      existing_refs = params[:reply_post].headers[/^References: (.*)/i, 1]
       existing_refs ? existing_refs += ' ' : existing_refs = ''
-      m += "\nReferences: #{existing_refs + p[:reply_post].message_id}"
+      m += "\nReferences: #{existing_refs + params[:reply_post].message_id}"
     end
-    m += "\nContent-Type: text/plain; charset=utf-8; format=flowed"
-    if p[:api_agent]
-      m += "\nUser-Agent: CSH-WebNews-API (#{p[:api_agent]})"
-    else
-      m += "\nUser-Agent: CSH-WebNews"
-    end
+    m += "\n" + common_headers(params[:api_agent], params[:posting_host])
     
-    m += "\n\n#{flowed_encode(p[:body].rstrip)}\n"
+    m += "\n\n#{flowed_encode(params[:body].rstrip)}\n"
     return m
+  end
+  
+  def self.common_headers(api_agent, posting_host)
+    h = "Content-Type: text/plain; charset=utf-8; format=flowed"
+    if api_agent
+      api_agent.encode!('US-ASCII', :invalid => :replace, :undef => :replace).gsub(/[\t\r\n\f]/, '')
+      h += "\nUser-Agent: CSH-WebNews-API (#{api_agent})"
+    else
+      h += "\nUser-Agent: CSH-WebNews"
+    end
+    h += "\nX-WebNews-Posting-Host: #{posting_host}"
+    return h
   end
   
   def self.import!(newsgroup, number, headers, body)

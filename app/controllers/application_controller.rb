@@ -1,6 +1,7 @@
 class ApplicationController < ActionController::Base
   require 'net/nntp'
   require 'shellwords'
+  require 'resolv'
   protect_from_forgery
   before_filter :check_maintenance, :authenticate, :get_or_create_user
   
@@ -235,6 +236,10 @@ class ApplicationController < ActionController::Base
       else
         {}
       end
+    end
+    
+    def remote_host
+      Resolv.getname(request.remote_ip) rescue request.remote_ip
     end
     
     def prevent_api_access
