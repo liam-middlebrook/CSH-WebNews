@@ -97,18 +97,21 @@ $ ->
   key 'v', 'main', -> click $('#view_in_newsgroup_button')
   
   # Dialog functions
-  key 'esc, alt+q', 'dialog', ->
-    if $('.dialog_cancel.clear_draft').length > 0
-      click $('.dialog_cancel.clear_draft')
-    else
-      click $('.dialog_cancel')
+  key 'alt+s', 'dialog', ->
+    click $('#dialog form input[type="submit"]')
   key 'alt+m', 'dialog', ->
     # Need this so it doesn't double-trigger... why only here?
     setTimeout (-> click $('.buttons .minimize_draft')), 1
   key 'alt+m', 'main', ->
     click $('.resume_draft')
-  key 'alt+s', 'dialog', ->
-    click $('#dialog form input[type="submit"]')
+  key 'alt+q', 'dialog', ->
+    click $('.dialog_cancel.clear_draft')
+  key 'esc', 'dialog', ->
+    if $('.buttons .minimize_draft').length > 0
+      # See above
+      setTimeout (-> click $('.buttons .minimize_draft')), 1
+    else
+      click $('.dialog_cancel')
   
   # Change keyboard focus for scrolling
   key 'alt+up', 'main', ->
