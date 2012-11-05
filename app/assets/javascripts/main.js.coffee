@@ -50,6 +50,20 @@ jQuery.ajaxScript = (method, url, success = null) ->
   if $('#post_header').length > 0
     $('#post_view .content').css('top', $('#post_header').outerHeight() + 'px');
 
+@set_reading_mode = (enable) ->
+  if enable
+    $('#post_view').css('top', $('#group_view').css('top'))
+    $('#post_view').css('margin-top', $('#group_view').css('margin-top'))
+    $('#post_view .body').css('font-size', '120%').css('max-width', '50em')
+    $('#group_view').hide()
+    $('#reading_mode_button').addClass('enabled')
+  else
+    $('#post_view').css('top', '').css('margin-top', '')
+    $('#post_view .body').css('font-size', '').css('max-width', '')
+    $('#group_view').show()
+    $('#reading_mode_button').removeClass('enabled')
+    scroll_to_selected_post()
+
 @target_external_links = ->
   $('a[href^="http"]:not([href*="' + window.location.host + '"])').attr('target', '_blank')
 
@@ -116,12 +130,13 @@ jQuery.ajaxScript = (method, url, success = null) ->
     $('#posts_list').focus()
 
 @scroll_to_selected_post = ->
-  view_height = $('#posts_list').height()
-  scroll_top = $('#posts_list').scrollTop()
-  post_top = $('#posts_list .selected').first().position().top + scroll_top
-  
-  if post_top + 20 > scroll_top + view_height or post_top < scroll_top
-    $('#posts_list').scrollTop(post_top - (view_height / 2))
+  if $('#posts_list .selected').length > 0
+    view_height = $('#posts_list').height()
+    scroll_top = $('#posts_list').scrollTop()
+    post_top = $('#posts_list .selected').first().position().top + scroll_top
+    
+    if post_top + 20 > scroll_top + view_height or post_top < scroll_top
+      $('#posts_list').scrollTop(post_top - (view_height / 2))
 
 # Calls expand_thread or collapse_thread depending on the current state
 @toggle_thread_expand = (tr, check_selected = false) ->
@@ -157,6 +172,7 @@ jQuery.ajaxScript = (method, url, success = null) ->
 
 window.onhashchange = ->
   if location.hash.substring(0, 3) == '#!/'
+    set_reading_mode(false)
     window.active_navigation.abort() if window.active_navigation
     window.active_navigation = $.getScript location.hash.replace('#!/', '')
     new_location = location.hash.split('/')[1]
@@ -177,11 +193,11 @@ window.onhashchange = ->
       if new_location == 'home'
         $('#group_view').css('bottom', '0')
         $('#group_view').css('border-bottom', '0')
-        $('#post_view').css('top', '100%')
+        $('#post_view').hide()
       else
         $('#group_view').css('bottom', '')
         $('#group_view').css('border-bottom', '')
-        $('#post_view').css('top', '')
+        $('#post_view').show()
 
 $ ->
   chunks.spinner = $('#loader .spinner').clone()
@@ -291,6 +307,9 @@ $('a.mark_unread').live 'click', ->
 $('#star_post_button').live 'click', ->
   $.ajaxScript 'PUT', @href.replace('#~/', '')
   return false
+
+$('#reading_mode_button').live 'click', ->
+  set_reading_mode(!$('#reading_mode_button').hasClass('enabled'))
 
 $('a.update_api_settings').live 'click', ->
   $('#update_api_buttons').text('Working...')

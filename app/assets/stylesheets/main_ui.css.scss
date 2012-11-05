@@ -391,7 +391,7 @@
   
   .body {
     color: $text_dark;
-    margin: 1em 0;
+    margin: 1em auto;
     
     blockquote                       { color: #077; }
     blockquote blockquote            { color: #770; }
@@ -400,6 +400,27 @@
     .showquote {
       font-family: sans-serif;
       padding: 2px 24px;
+    }
+  }
+  
+  #content_buttons {
+    position: absolute;
+    right: 30px;
+    bottom: -1px;
+    
+    .smallbutton {
+      padding-bottom: 3px;
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
+      
+      &:hover {
+        opacity: 1;
+        padding-bottom: 5px;
+      }
+    }
+    
+    #reading_mode_button.enabled {
+      background-color: #c00;
     }
   }
 }
