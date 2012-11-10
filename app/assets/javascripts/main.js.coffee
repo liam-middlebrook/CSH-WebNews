@@ -63,6 +63,9 @@ jQuery.ajaxScript = (method, url, success = null) ->
     $('#group_view').show()
     $('#reading_mode_button').removeClass('enabled')
     scroll_to_selected_post()
+  # Button width was fixed in ajaxComplete, so need to reset it
+  $('#show_quote_button').width('')
+  $('#show_quote_button').width($('#show_quote_button').width() + 1)
 
 @target_external_links = ->
   $('a[href^="http"]:not([href*="' + window.location.host + '"])').attr('target', '_blank')
@@ -392,9 +395,9 @@ $(document).ajaxComplete ->
   fix_post_header()
   target_external_links()
   for a in $('.toggle')
-    if not $(a).hasClass('width_fixed')
+    if not $(a).hasClass('init_toggled')
       $(a).width($(a).width() + 1)
-      $(a).addClass('width_fixed')
+      $(a).addClass('init_toggled')
       $($(a).attr('data-selector')).toggle()
 
 $(document).ajaxError (event, jqxhr, settings, exception) ->
