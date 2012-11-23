@@ -8,6 +8,12 @@ module ApplicationHelper
     end
   end
 
+  def gravatar_uri(email)
+    'https://secure.gravatar.com/avatar/' +
+      Digest::MD5.hexdigest(email.gsub(/\s+/, '').downcase) +
+      "?size=40&default=mm&rating=pg"
+  end
+
   def next_unread_href
     if @next_unread_post
       '#!' + post_path(@next_unread_post.newsgroup.name, @next_unread_post.number)
@@ -121,9 +127,5 @@ module ApplicationHelper
     html_body = auto_link(html_body, :link => :urls, :sanitize => false)
     
     return html_body
-  end
-
-  def gravatar_uri(email)
-    "https://secure.gravatar.com/avatar/" + Digest::MD5.hexdigest(email.gsub(/\s+/, "").downcase) + "?s=40&d=mm&r=pg"
   end
 end
