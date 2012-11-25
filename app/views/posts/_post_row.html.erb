@@ -5,7 +5,7 @@ tr_class ||= post.personal_class_for_user(@current_user) if not skip_class
 newsgroup_name = @newsgroup ? @newsgroup.name : post.newsgroup.name
 %>
 
-<tr class="<%= (post.is_sticky? ? 'sticky ' : '') + (unread ? 'unread ' : '') + tr_class.to_s %>"
+<tr class="<%= (post.sticky? ? 'sticky ' : '') + (unread ? 'unread ' : '') + tr_class.to_s %>"
   data-id="<%= post.id %>"
   data-number="<%= post.number %>"
   data-level="<%= level %>"

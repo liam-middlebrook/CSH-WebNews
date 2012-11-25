@@ -18,7 +18,7 @@ class Newsgroup < ActiveRecord::Base
     end
   end
   
-  def is_control?
+  def control?
     true if name[/^control\./]
   end
   

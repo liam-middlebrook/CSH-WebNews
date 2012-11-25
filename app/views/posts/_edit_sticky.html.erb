@@ -5,14 +5,14 @@
       :url => update_post_sticky_path(:newsgroup => @post.newsgroup.name, :number => @post.number),
       :html => { :method => 'put'}, :remote => true do |f| %>
     
-    <% if @post.is_sticky? %>
+    <% if @post.sticky? %>
       <p>This post is already sticky. You can change its expiration date, or manually unstick it by clearing the check box.</p>
     <% end %>
     
     <div class="inline_inputs">
       <%= check_box_tag :do_sticky, '1', true, :onclick => '$("#sticky_until").val("")' %>
       <%= label_tag :do_sticky, 'Sticky this post until' %>
-      <%= text_field_tag :sticky_until, @post.is_sticky? ? @post.sticky_until.strftime(DATE_FORMAT) : '' %>
+      <%= text_field_tag :sticky_until, @post.sticky? ? @post.sticky_until.strftime(DATE_FORMAT) : '' %>
     </div>
     <p class="explain">Examples: "<b>12 hours from now</b>", "<b>1 week from today at 3am</b>", "<b><%= (Time.now + 1.week).strftime('%-m/%-d/%Y') %> 9:30pm</b>"<br>If you leave out the time part, the current time will be used. Times are rounded to the nearest half-hour.</p>
     

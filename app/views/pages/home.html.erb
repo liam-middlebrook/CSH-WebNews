@@ -7,7 +7,7 @@
       <span class="real_name"><%= @current_user.real_name %></span>
       <span class="username">(<%= @current_user.username %>)</span>
     </a>
-    <% if @current_user.is_admin? %><span class="role_badge">Admin</span><% end %>
+    <% if @current_user.admin? %><span class="role_badge">Admin</span><% end %>
     <span class="buttons">
       <a id="settings_button" class="button" href="#?<%= edit_user_path %>">Settings</a>
       <a id="about_button" class="button blue" href="#?/about">?</a>

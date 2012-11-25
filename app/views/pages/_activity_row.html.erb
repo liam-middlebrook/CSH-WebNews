@@ -1,6 +1,6 @@
 <% linked_post = (unread_count > 0) ? next_unread : newest_post %>
 
-<tr<% if thread_parent.is_sticky? %> class="sticky"<% end %>>
+<tr<% if thread_parent.sticky? %> class="sticky"<% end %>>
   <td>
     <%= newest_post.date.strftime(SHORT_DATE_FORMAT) %>
   </td>

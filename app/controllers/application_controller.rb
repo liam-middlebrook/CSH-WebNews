@@ -94,7 +94,7 @@ class ApplicationController < ActionController::Base
           )
           @new_user = true
         else
-          @old_user = true if @current_user.is_inactive?
+          @old_user = true if @current_user.inactive?
           @current_user.touch
         end
       end
@@ -107,8 +107,8 @@ class ApplicationController < ActionController::Base
     def get_newsgroups_for_nav
       @newsgroups = Newsgroup.all
       @newsgroups_writable = @newsgroups.select{ |n| n.posting_allowed? }
-      @newsgroups_readonly = @newsgroups.select{ |n| not n.posting_allowed? and not n.is_control? }
-      @newsgroups_control = @newsgroups.select{ |n| n.is_control? }
+      @newsgroups_readonly = @newsgroups.select{ |n| not n.posting_allowed? and not n.control? }
+      @newsgroups_control = @newsgroups.select{ |n| n.control? }
     end
     
     def get_newsgroups_for_search

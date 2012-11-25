@@ -1,6 +1,6 @@
 <%
 other_groups = []
-if post.is_crossposted?
+if post.crossposted?
   other_groups = (post.in_all_newsgroups - [post]).map{ |other_post|
     '<a href="#!' + post_path(other_post.newsgroup.name, other_post.number) + '">' +
       other_post.newsgroup.name + '</a>'
@@ -8,9 +8,9 @@ if post.is_crossposted?
 end
 %>
 
-<div id="post_header"<% if post.is_sticky? %> class="sticky"<% end %>>
+<div id="post_header"<% if post.sticky? %> class="sticky"<% end %>>
   <div class="buttons">
-    <% if post.is_sticky? %>
+    <% if post.sticky? %>
       <div class="sticky_explain">
         Stickied by
         <%= post.sticky_user.real_name %><br>until
@@ -31,12 +31,12 @@ end
         <a id="mark_unread_button" class="button mark_unread"
           href="#~<%= mark_read_path(:mark_unread => true, :newsgroup => @newsgroup.name, :number => @post.number) %>">Mark Unread</a>
       <% end %>
-      <% if @current_user.is_admin? and post == post.thread_parent %>
+      <% if @current_user.admin? and post == post.thread_parent %>
         <a id="sticky_post_button" class="button orange"
           href="#?<%= edit_post_sticky_path(:newsgroup => @newsgroup.name, :number => post.number) %>">Sticky</a>
       <% end %>
       <% if @newsgroup.posting_allowed? and post.children.count == 0 %>
-        <% if post.authored_by?(@current_user) or @current_user.is_admin? %>
+        <% if post.authored_by?(@current_user) or @current_user.admin? %>
           <a id="cancel_post_button" class="button<%= @admin_cancel ? ' orange' : '' %>" href="#?<%= confirm_destroy_post_path(:newsgroup => @newsgroup.name, :number => post.number) %>">Cancel</a>
         <% end %>
       <% end %>
@@ -77,11 +77,11 @@ end
       Great Scott! This message is from the future! (may indicate a clock sync issue)
     </div>
   <% end %>
-  <% if post.is_reparented? and
-      not (@current_user.thread_mode == :flat and not post.is_orphaned?) %>
+  <% if post.reparented? and
+      not (@current_user.thread_mode == :flat and not post.orphaned?) %>
     <div class="notice">
       <span class="icon">!</span>
-      <% if post.is_orphaned? %>
+      <% if post.orphaned? %>
         <% if post.original_parent %>
           This message is a reply to <a href="#!<%=
             post_path(post.original_parent.newsgroup.name, post.original_parent.number)
@@ -94,11 +94,11 @@ end
       <% end %>
     </div>
   <% end %>
-  <% if post.is_crossposted? or
+  <% if post.crossposted? or
       (post.followup_newsgroup and not post.newsgroup == post.followup_newsgroup) %>
     <div class="notice">
       <span class="icon">!</span>
-      <% if not post.is_crossposted? %>
+      <% if not post.crossposted? %>
         The author specified that replies to this message should go to <%= post.followup_newsgroup.name %>.
       <% else %>
         This message was cross-posted to <%= raw other_groups.to_sentence %>.

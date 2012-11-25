@@ -74,7 +74,7 @@ class PagesController < ApplicationController
         {
           :thread_parent => thread_parent,
           :newest_post => post,
-          :cross_posted => post.is_crossposted?(true),
+          :cross_posted => post.crossposted?(true),
           :next_unread => @current_user.unread_posts.where(:thread_id => post.thread_id).order('date').first,
           :post_count => thread_parent.post_count_in_thread,
           :unread_count => unread_count,

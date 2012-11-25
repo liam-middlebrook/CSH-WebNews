@@ -176,7 +176,7 @@ class PostsController < ApplicationController
         if @post
           @post_was_unread = @post.mark_read_for_user(@current_user)
           get_next_unread_post
-          @admin_cancel = true if @current_user.is_admin? and not @post.authored_by?(@current_user)
+          @admin_cancel = true if @current_user.admin? and not @post.authored_by?(@current_user)
         else
           @not_found = true
         end
@@ -326,7 +326,7 @@ class PostsController < ApplicationController
         "Posts in read-only newsgroups cannot be canceled" and return
     end
     
-    if not @post.authored_by?(@current_user) and not @current_user.is_admin?
+    if not @post.authored_by?(@current_user) and not @current_user.admin?
       generic_error :forbidden, 'requires_admin',
         "Admin privileges are required to cancel a post that you did not author" and return
     end
@@ -422,7 +422,7 @@ class PostsController < ApplicationController
   end
   
   def update_sticky
-    if not @current_user.is_admin?
+    if not @current_user.admin?
       generic_error :forbidden, 'requires_admin',
         "Admin privileges are required to sticky or unsticky posts" and return
     end

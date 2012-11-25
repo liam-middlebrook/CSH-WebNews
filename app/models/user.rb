@@ -10,7 +10,7 @@ class User < ActiveRecord::Base
   scope :active, where('updated_at >= ?', 3.months.ago)
   scope :inactive, where('updated_at < ?', 3.months.ago)
   
-  def is_inactive?
+  def inactive?
     updated_at < 3.months.ago
   end
   
@@ -18,7 +18,7 @@ class User < ActiveRecord::Base
     @unix_groups ||= `groups #{username}`.split.reject{ |g| g == username } rescue []
   end
   
-  def is_admin?
+  def admin?
     DEVELOPMENT_MODE or unix_groups.include?('rtp') or unix_groups.include?('eboard')
   end
   

@@ -25,8 +25,8 @@ class Post < ActiveRecord::Base
           original_parent.as_json(:minimal => true) :
           parent.as_json(:minimal => true)
         json[:thread_parent] = thread_parent.as_json(:minimal => true) if not thread_parent == self
-        json[:reparented] = is_reparented? && !is_orphaned?
-        json[:orphaned] = is_orphaned? && !original_parent
+        json[:reparented] = reparented? && !orphaned?
+        json[:orphaned] = orphaned? && !original_parent
         json[:followup_to] = followup_newsgroup.name if followup_newsgroup
         json[:cross_posts] = (in_all_newsgroups - [self]).map{ |post| post.as_json(:minimal => true) }
       end
@@ -98,11 +98,11 @@ class Post < ActiveRecord::Base
     where('sticky_until is not null and sticky_until > ?', Time.now)
   end
   
-  def is_sticky?
+  def sticky?
     !sticky_until.nil? and sticky_until > Time.now
   end
   
-  def is_crossposted?(quick = false)
+  def crossposted?(quick = false)
     if quick
       all_newsgroup_names.length > 1
     else
@@ -110,12 +110,12 @@ class Post < ActiveRecord::Base
     end
   end
   
-  def is_reparented?
+  def reparented?
     parent_id != original_parent_id
   end
   
-  def is_orphaned?
-    is_reparented? and parent_id == ''
+  def orphaned?
+    reparented? and parent_id == ''
   end
   
   def followup_newsgroup
