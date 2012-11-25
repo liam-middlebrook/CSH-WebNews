@@ -271,6 +271,8 @@ class PostsController < ApplicationController
       end
     end
     
+    validate_sticky_attributes(false) or return
+    
     post_string = Post.build_message(
       :user => @current_user,
       :newsgroups => post_newsgroups.map(&:name),
@@ -295,8 +297,10 @@ class PostsController < ApplicationController
       Net::NNTP.start(NEWS_SERVER) do |nntp|
         post_newsgroups.each{ |n| Newsgroup.sync_group!(nntp, n.name, n.status) }
       end
-      @new_post = @newsgroup.posts.find_by_message_id(new_message_id)
-      if not @new_post
+      @post = @newsgroup.posts.find_by_message_id(new_message_id)
+      if @post
+        update_sticky_attributes
+      else
         @sync_error = "Your post was accepted by the news server, but it appears to have been held for moderation or silently discarded; contact the server administrators before attempting to post again"
       end
     rescue
@@ -309,7 +313,7 @@ class PostsController < ApplicationController
         if @sync_error
           json_error :internal_server_error, 'nntp_sync_error', @sync_error
         else
-          render :json => { :post => @new_post.as_json(:minimal => true) }
+          render :json => { :post => @post.as_json(:minimal => true) }
         end
       end
     end
@@ -422,44 +426,8 @@ class PostsController < ApplicationController
   end
   
   def update_sticky
-    if not @current_user.admin?
-      generic_error :forbidden, 'requires_admin',
-        "Admin privileges are required to sticky or unsticky posts" and return
-    end
-    
-    if @post.nil?
-      # API case handled by get_post
-      form_error "The post you are trying to sticky doesn't exist" and return
-    elsif @post != @post.thread_parent
-      generic_error :bad_request, 'post_not_stickable',
-        "Only the initial post in a thread can be made sticky" and return
-    end
-    
-    if params[:do_sticky] or (@api_access and not params[:unstick])
-      if params[:sticky_until].blank?
-        generic_error :bad_request, 'sticky_until_missing',
-          "An expiration date is required to make a post sticky" and return
-      end
-      t = Chronic.parse(params[:sticky_until])
-      if t.nil?
-        generic_error :bad_request, 'sticky_until_invalid',
-          "The expiration date '#{params[:sticky_until]}' could not be parsed" and return
-      end
-      sticky_until = t - t.sec - ((((t.min + 15) % 30) - 15) * 1.minute)
-      if sticky_until <= Time.now
-        generic_error :bad_request, 'sticky_until_unacceptable',
-          "The expiration date must be in the future, when rounded to the nearest half-hour" and return
-      end
-      @post.in_all_newsgroups.each do |post|
-        post.update_attributes(:sticky_user => @current_user, :sticky_until => sticky_until)
-      end
-    else
-      if not @post.sticky_until.nil?
-        @post.in_all_newsgroups.each do |post|
-          post.update_attributes(:sticky_user => @current_user, :sticky_until => Time.now - 1.second)
-        end
-      end
-    end
+    validate_sticky_attributes or return
+    update_sticky_attributes
     
     respond_to do |wants|
       wants.js {}
@@ -521,6 +489,67 @@ class PostsController < ApplicationController
         rescue
           generic_error :bad_request, 'limit_invalid',
             "The limit value '#{params[:limit]}' could not be parsed as an integer'" and return
+        end
+      end
+    end
+    
+    def validate_sticky_attributes(for_existing_post = true)
+      if for_existing_post
+        if @post.nil?
+          # API case handled by get_post
+          form_error "The post you are trying to sticky doesn't exist" and return
+        elsif @post != @post.thread_parent
+          generic_error :bad_request, 'post_not_stickable',
+            "Only the initial post in a thread can be made sticky" and return
+        end
+      end
+      
+      if params[:do_sticky] or (@api_access and not params[:unstick])
+        validate_user_can_sticky
+        if params[:sticky_until].blank?
+          generic_error :bad_request, 'sticky_until_missing',
+            "An expiration date is required to make a post sticky" and return
+        end
+        
+        @sticky_until = Chronic.parse(params[:sticky_until])
+        
+        if @sticky_until.nil?
+          generic_error :bad_request, 'sticky_until_invalid',
+            "The expiration date '#{params[:sticky_until]}' could not be parsed" and return
+        elsif @sticky_until <= Time.now
+          # Hack to make e.g. '1/13' work when it's December, see https://github.com/mojombo/chronic/issues/154
+          if not params[:sticky_until].include?(Time.now.year.to_s) and @sticky_until + 1.year > Time.now
+            @sticky_until += 1.year
+          else
+            generic_error :bad_request, 'sticky_until_unacceptable',
+              "The parsed expiration date '#{@sticky_until.strftime(DATE_FORMAT)}' is in the past" and return
+          end
+        end
+      else
+        validate_user_can_sticky if for_existing_post
+        @sticky_until = nil
+      end
+      
+      return true
+    end
+    
+    def validate_user_can_sticky
+      if not @current_user.admin?
+        generic_error :forbidden, 'requires_admin',
+          "Admin privileges are required to sticky or unsticky posts" and return
+      end
+    end
+    
+    def update_sticky_attributes
+      if @sticky_until
+        @post.in_all_newsgroups.each do |post|
+          post.update_attributes(:sticky_user => @current_user, :sticky_until => @sticky_until)
+        end
+      else
+        if not @post.sticky_until.nil?
+          @post.in_all_newsgroups.each do |post|
+            post.update_attributes(:sticky_user => @current_user, :sticky_until => Time.now - 1.second)
+          end
         end
       end
     end

@@ -1,0 +1,12 @@
+<% if post.sticky? %>
+  <p>This post is already sticky. You can change its expiration date, or manually unstick it by clearing the check box.</p>
+<% end %>
+
+<p class="inline_inputs">
+  <%= check_box_tag :do_sticky, '1', post.persisted? %>
+  <%= label_tag :do_sticky, 'Sticky this post until' %>
+  <%= text_field_tag :sticky_until,
+    post.sticky? ? post.sticky_until.strftime(DATE_FORMAT) : '',
+    :disabled => !post.persisted? %>
+  <span class="explain">e.g. "<%= (Time.now + 2.weeks).strftime('%-m/%-d %-I%p').downcase %>" or "2 weeks from now"</span>
+</p>

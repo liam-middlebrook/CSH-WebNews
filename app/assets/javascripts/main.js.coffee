@@ -319,6 +319,12 @@ $('a.update_api_settings').live 'click', ->
   $.ajaxScript 'PUT', @href.replace('#~/', '')
   return false
 
+$('#do_sticky').live 'click', ->
+  if $(this).is(':checked')
+    $('#sticky_until').attr('disabled', false).focus()
+  else
+    $('#sticky_until').val('').attr('disabled', true)
+
 $('#crosspost_toggle').live 'click', ->
   $('#crosspost_to').val('')
   $('.crosspost_options input').val([])
