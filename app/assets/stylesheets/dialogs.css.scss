@@ -52,14 +52,15 @@
     margin-bottom: 1em;
   }
   
+  .explain_button {
+    padding: 0 0.25em;
+    font-size: 80%;
+  }
+  
   p.explain {
     margin-top: 0.5em;
     margin-bottom: 1em;
-    
-    .smallbutton {
-      padding: 0 0.25em;
-      font-size: 90%;
-    }
+    .explain_button { font-size: 100%; }
   }
   
   p.explain.close {
@@ -90,20 +91,19 @@
     legend { color: $text_light; }
   }
   
+  input[type=checkbox], input[type=radio] {
+    padding: 0;
+    vertical-align: baseline;
+  }
+  
   input[type=checkbox] {
     margin-left: 3px;
     margin-right: 3px;
   }
   
   input[type=radio] {
-    margin-left: 2em;
-    margin-right: 3px;
-    &:first-child { margin-left: 3px; }
-  }
-  
-  input[type=checkbox], input[type=radio] {
-    padding: 0;
-    vertical-align: baseline;
+    margin-left: 1.5em;
+    &:first-of-type { margin-left: 0; }
   }
   
   .user_radio_block {
@@ -150,11 +150,16 @@
   }
   
   .aligned_field {
-    label:first-child { width: 90px; display: inline-block; }
+    label:first-child, .fake_label { width: 90px; display: inline-block; }
     input[type=text] { width: 350px; }
     input[type=checkbox] { margin-left: 20px; }
     input.date { width: auto; }
+    select { vertical-align: baseline; }
     p { clear: both; margin-left: 90px; margin-top: 0.25em; }
+  }
+  
+  form.edit_user .aligned_field {
+    label:first-child, .fake_label { width: 140px; }
   }
 }
 

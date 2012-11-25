@@ -5,15 +5,34 @@
     
     <%= f.fields_for :preferences do |p| %>
       <fieldset>
-        <legend>Newsgroup view</legend>
-        <div class="form_element">
+        <legend>My profile</legend>
+        <%= gravatar_image @current_user.email, 50 %>
+        <p class="user_info">
+          <span class="real_name"><%= @current_user.real_name %></span>
+          <span class="email">(<%= @current_user.email %>)</span>
+          <br>&raquo; <%= link_to 'Change image on Gravatar', 'https://www.gravatar.com/emails' %>
+          <br>&raquo; <%= link_to 'Change display name on Profiles', PROFILES_URL + @current_user.username %>
+        </p>
+      </fieldset>
+      
+      <fieldset>
+        <legend>Display options</legend>
+        <div class="form_element aligned_field">
+          <span class="fake_label">Newsgroup view:</span>
           <%= p.radio_button :thread_mode, 'normal', :checked => @current_user.thread_mode == :normal %>
           <%= p.label :thread_mode, 'Threaded', :value => 'normal' %>
           <%= p.radio_button :thread_mode, 'flat', :checked => @current_user.thread_mode == :flat %>
           <%= p.label :thread_mode, 'Flat', :value => 'flat' %>
           <%= p.radio_button :thread_mode, 'hybrid', :checked => @current_user.thread_mode == :hybrid %>
           <%= p.label :thread_mode, 'Hybrid', :value => 'hybrid' %>
-          <p class="explain">Hybrid view flattens replies like Flat, but keeps them grouped under the original post like Threaded</p>
+          <a href="#" class="smallbutton explain_button toggle" title="What's this?" data-selector="#hybrid_view_explain">?</a>
+          <span id="hybrid_view_explain" class="explain">flattens replies, but keeps them grouped under the first post</span>
+        </div>
+        <div class="form_element aligned_field">
+          <%= p.label :time_zone, 'Time zone preference:' %>
+          <%= p.time_zone_select :time_zone,
+            ActiveSupport::TimeZone.us_zones, :default => @current_user.time_zone %>
+        </div>
       </fieldset>
       
       <fieldset>
@@ -46,15 +65,7 @@
           <%= render 'api_settings' %>
         </div>
       </fieldset>
-      
-      <div class="form_element">
-        <%= p.label :time_zone, 'Display all times in this time zone:' %>
-        <%= p.time_zone_select :time_zone,
-          ActiveSupport::TimeZone.us_zones, :default => @current_user.time_zone %>
-      </div>
     <% end %>
-    
-    <p>Your &quot;real name&quot; is taken from the Common Name (CN) field in the CSH LDAP database. You can change this field using <a href="<%= PROFILES_URL + @current_user.username %>">Member Profiles</a>. This may also change your displayed &quot;real name&quot; on other CSH services.</p>
     
     <div class="buttons">
       <%= f.submit 'Save', :class => 'button green' %>

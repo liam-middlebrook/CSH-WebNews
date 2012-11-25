@@ -14,19 +14,14 @@
     display: inline;
   }
   
-  #user_info {
+  .user_info {
     float: right;
     
-    .real_name {
-      font-weight: bold;
-    }
-    
-    .username {
-      color: $text_light;
+    .gravatar {
+      margin-top: -1px;
     }
     
     a {
-      margin-right: 8px;
       &:hover { opacity: 0.7; }
     }
   }
@@ -356,13 +351,6 @@
           background-color: $link_hover;
         }
       }
-    }
-    
-    .gravatar {
-      float:left;
-      padding-right: 5px;
-      width: 40px;
-      height: 40px;
     }
     
     .notice {

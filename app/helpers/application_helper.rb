@@ -8,10 +8,11 @@ module ApplicationHelper
     end
   end
 
-  def gravatar_uri(email)
-    'https://secure.gravatar.com/avatar/' +
+  def gravatar_image(email, size)
+    image_tag 'https://secure.gravatar.com/avatar/' +
       Digest::MD5.hexdigest(email.gsub(/\s+/, '').downcase) +
-      "?size=40&default=mm&rating=pg"
+      "?size=#{size}&default=mm&rating=pg",
+      :alt => '', :size => "#{size}x#{size}", :class => 'gravatar'
   end
 
   def next_unread_href
