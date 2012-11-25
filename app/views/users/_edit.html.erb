@@ -18,7 +18,7 @@
       <fieldset>
         <legend>Display options</legend>
         <div class="form_element aligned_field">
-          <span class="fake_label">Newsgroup view:</span>
+          <span class="label">Newsgroup view:</span>
           <%= p.radio_button :thread_mode, 'normal', :checked => @current_user.thread_mode == :normal %>
           <%= p.label :thread_mode, 'Threaded', :value => 'normal' %>
           <%= p.radio_button :thread_mode, 'flat', :checked => @current_user.thread_mode == :flat %>

@@ -150,16 +150,16 @@
   }
   
   .aligned_field {
-    label:first-child, .fake_label { width: 90px; display: inline-block; }
+    label:first-child, .label { width: 95px; display: inline-block; }
     input[type=text] { width: 350px; }
     input[type=checkbox] { margin-left: 20px; }
     input.date { width: auto; }
     select { vertical-align: baseline; }
-    p { clear: both; margin-left: 90px; margin-top: 0.25em; }
+    p { clear: both; margin-left: 95px; margin-top: 0.25em; }
   }
   
   form.edit_user .aligned_field {
-    label:first-child, .fake_label { width: 140px; }
+    label:first-child, .label { width: 140px; }
   }
 }
 
