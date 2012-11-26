@@ -156,6 +156,10 @@ class Post < ActiveRecord::Base
     message_id == thread_id ? self : all_in_thread.order('date').first
   end
   
+  def self.thread_parents
+    where('message_id = thread_id')
+  end
+  
   def all_in_thread
     Post.where(:thread_id => thread_id, :newsgroup => newsgroup.name).order('date')
   end

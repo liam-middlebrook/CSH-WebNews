@@ -134,6 +134,7 @@ class PostsController < ApplicationController
     
     scope = Post.scoped
     scope = scope.sticky if params[:sticky]
+    scope = scope.thread_parents if params[:original]
     scope = scope.starred_by_user(@current_user) if params[:starred]
     scope = scope.unread_for_user(@current_user) if params[:unread]
     scope = scope.where(:newsgroup => @newsgroup.name) if @newsgroup

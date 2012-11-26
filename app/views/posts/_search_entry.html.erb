@@ -32,12 +32,14 @@
     
     <div class="form_element inline_inputs aligned_field">
       <span class="label">Limit search to:</span>
+      <%= check_box_tag :original, 'true', params[:original] %>
+      <%= label_tag :original, 'original posts' %>
       <%= check_box_tag :starred, 'true', params[:starred] %>
-      <%= label_tag :starred, 'my starred posts' %>
+      <%= label_tag :starred, 'my starred' %>
       <%= check_box_tag :unread, 'true', params[:unread] %>
-      <%= label_tag :unread, 'my unread posts' %>
+      <%= label_tag :unread, 'my unread' %>
       <%= check_box_tag :sticky, 'true', params[:sticky] %>
-      <%= label_tag :sticky, 'sticky posts' %>
+      <%= label_tag :sticky, 'stickies' %>
     </div>
     
     <%= hidden_field_tag :validate, true %>
