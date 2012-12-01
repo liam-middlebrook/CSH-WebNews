@@ -50,6 +50,23 @@ jQuery.ajaxScript = (method, url, success = null) ->
   if $('#post_header').length > 0
     $('#post_view .content').css('top', $('#post_header').outerHeight() + 'px');
 
+@fix_dialog_height = ->
+  dialog = $('#dialog')
+  shrinkable = $('.shrinkable')
+  if dialog.length > 0 and shrinkable.length > 0
+    if not dialog.attr('data-original-height')
+      shrinkable.height(shrinkable.height() + 1)
+      dialog.attr('data-original-height', dialog.height())
+      shrinkable.attr('data-original-height', shrinkable.height())
+    dialog_original_height = parseInt(dialog.attr('data-original-height'))
+    shrinkable_original_height = parseInt(shrinkable.attr('data-original-height'))
+    if dialog.outerHeight() > $(window).height()
+      shrinkable.height(shrinkable.height() - (dialog.outerHeight() - $(window).height()))
+    else if dialog.outerHeight() < $(window).height() and dialog.height() < dialog_original_height
+      shrinkable.height(shrinkable.height() + ($(window).height() - dialog.outerHeight()))
+    if dialog.height() > dialog_original_height
+      shrinkable.height(shrinkable_original_height)
+
 @set_reading_mode = (enable) ->
   if enable
     $('#post_view').css('top', $('#group_view').css('top'))
@@ -123,6 +140,8 @@ jQuery.ajaxScript = (method, url, success = null) ->
 @open_dialog = (content) ->
   $('#overlay').append(content)
   key.setScope('dialog')
+  # Must be delayed, otherwise outerHeight returns nonsensical values
+  setTimeout (-> fix_dialog_height()), 1
 
 @close_dialog = ->
   $('#overlay').remove()
@@ -396,6 +415,7 @@ $('a, input, select, textarea, button').live 'focus', ->
 
 $(window).resize ->
   fix_post_header()
+  fix_dialog_height()
 
 $(document).ajaxComplete ->
   fix_post_header()
