@@ -67,6 +67,12 @@ jQuery.ajaxScript = (method, url, success = null) ->
     if dialog.height() > dialog_original_height
       shrinkable.height(shrinkable_original_height)
 
+@adjust_dialog_original_height = (adjustment) ->
+  dialog = $('#dialog')
+  dialog_original_height = parseInt(dialog.attr('data-original-height'))
+  dialog.attr('data-original-height', dialog_original_height + adjustment)
+  fix_dialog_height()
+
 @set_reading_mode = (enable) ->
   if enable
     $('#post_view').css('top', $('#group_view').css('top'))
@@ -246,12 +252,19 @@ $('a[href="#"]').live 'click', ->
 
 $('.toggle').live 'click', ->
   # Fixing the width is handled in ajaxComplete
-  a = $(this)
-  $(a.attr('data-selector')).toggle()
-  new_text = a.attr('data-text')
+  link = $(this)
+  $(link.attr('data-selector')).toggle()
+  new_text = link.attr('data-text')
   if new_text
-    a.attr('data-text', a.text())
-    a.text(new_text)
+    link.attr('data-text', link.text())
+    link.text(new_text)
+
+$('#crosspost_toggle, #markup_explain_toggle').live 'click', ->
+  toggled = $($(this).attr('data-selector'))
+  if toggled.is(':visible')
+    adjust_dialog_original_height(toggled.height())
+  else
+    adjust_dialog_original_height(0 - toggled.height())
 
 $('a.new_draft').live 'click', (e) ->
   if localStorage['draft_form'] and not confirm('Really abandon your saved draft and start a new post?')

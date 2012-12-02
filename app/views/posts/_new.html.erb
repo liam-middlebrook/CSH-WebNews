@@ -52,7 +52,12 @@
     <div class="form_element">
       <%= f.text_area :body, :rows => 25, :class => 'shrinkable' %>
     </div>
-    <p class="explain close">Drafts are saved automatically in your browser's local storage. Saved drafts will not be available if you switch browsers or devices.<br>Need to reference a bunch of long URLs? WebNews auto-links &quot;footnote&quot; style URL references. <a href="#" class="smallbutton explain_button toggle" title="Show me how!" data-selector="#link_markup_explain">?</a></p>
+    <p class="explain close">
+      Drafts are saved automatically in your browser's local storage. Saved drafts will not be available if you switch browsers or devices.
+      <br>Need to reference long URLs? WebNews auto-links &quot;footnote&quot; style URL references.
+      <a href="#" title="Show me how!" id="markup_explain_toggle"
+        class="smallbutton explain_button toggle" data-selector="#link_markup_explain">?</a>
+    </p>
     
     <% if @post %>
       <%= hidden_field_tag :reply_newsgroup, @post.newsgroup.name %>
