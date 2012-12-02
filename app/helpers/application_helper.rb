@@ -57,6 +57,33 @@ module ApplicationHelper
     return unread_line
   end
   
+  def activity_breakout(activity)
+    now = Time.now
+    Hash[
+      {
+        'Stickies' => ->(item) { item[:thread_parent].sticky? },
+        'Today' => ->(item) { item[:newest_post].date > now.beginning_of_day },
+        'Yesterday' => ->(item) { item[:newest_post].date > (now - 1.day).beginning_of_day },
+        'This Week' => ->(item) { item[:newest_post].date > now.beginning_of_week },
+        'Last Week' => ->(item) { item[:newest_post].date > (now - 1.week).beginning_of_week },
+        'This Month' => ->(item) { item[:newest_post].date > now.beginning_of_month },
+        'Last Month' => ->(item) { true }
+      }.map{ |heading, proc|
+        if activity.empty?
+          nil
+        else
+          items = activity.select(&proc)
+          activity -= items
+          if activity.empty?
+            ['Earlier', items]
+          else
+            [heading, items]
+          end
+        end
+      }
+    ].reject{ |_, items| items.empty? }
+  end
+  
   def post_html_body(post, quote_collapse = true)
     pre_body = post.body.dup
     parent = post.parent

@@ -1,17 +1,26 @@
-<% if @activity.any? %>
-  <table class="activity">
-    <% @activity.each do |item| %>
-      <%= render :partial => 'activity_row', :locals => {
-        :newest_post => item[:newest_post],
-        :thread_parent => item[:thread_parent],
-        :next_unread => item[:next_unread],
-        :post_count => item[:post_count],
-        :unread_count => item[:unread_count],
-        :personal_class => item[:personal_class],
-        :cross_posted => item[:cross_posted]
-      } %>
+<table class="activity">
+  <% if not @activity.nil? %>
+    <% if @activity.any? %>
+      <% activity_breakout(@activity).each do |header, items| %>
+        <tr class="header">
+          <th colspan="5"><%= header %></th>
+        </tr>
+        <% items.each do |item| %>
+          <%= render :partial => 'activity_row', :locals => {
+            :newest_post => item[:newest_post],
+            :thread_parent => item[:thread_parent],
+            :next_unread => item[:next_unread],
+            :post_count => item[:post_count],
+            :unread_count => item[:unread_count],
+            :personal_class => item[:personal_class],
+            :cross_posted => item[:cross_posted]
+          } %>
+        <% end %>
+      <% end %>
+    <% else %>
+      <tr class="header"><th>No recent activity to display</th></tr>
     <% end %>
-  </table>
-<% else %>
-  <p>There is no recent activity to display.</p>
-<% end %>
+  <% else %>
+    <tr class="header"><th>Loading recent activity...</th></tr>
+  <% end %>
+</table>

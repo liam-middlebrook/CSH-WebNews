@@ -2,13 +2,8 @@
   <h2>Home</h2>
 
   <p id="unread_line"><%= raw home_unread_line %></p>
-  
-  <h3>Recent Activity</h3>
+
   <div id="activity_feed">
-    <% if @activity.present? %>
-      <%= render 'activity' %>
-    <% else %>
-      <p>Loading activity feed...</p>
-    <% end %>
+    <%= render 'activity' %>
   </div>
 </div>
