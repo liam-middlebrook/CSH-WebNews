@@ -321,9 +321,8 @@ $('a.mark_read').live 'click', ->
     if window.loaded_location == 'home'
       document.title = 'CSH WebNews'
       $('#unread_line').text('You have no unread posts.')
-      $('#activity_feed').text('Reloading activity feed...')
-      $('#group_view').append(chunks.spinner.clone())
-      after_func = -> window.onhashchange()
+      $('.activity a').removeClass('unread')
+      $('.activity .counter.unread').remove()
     else
       abort_active_scroll()
       $('#posts_list tbody tr').removeClass('unread')
