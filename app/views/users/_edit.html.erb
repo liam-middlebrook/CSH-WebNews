@@ -18,6 +18,14 @@
       <fieldset>
         <legend>Display options</legend>
         <div class="form_element aligned_field">
+          <span class="label">Color scheme:</span>
+          <% AVAILABLE_THEMES.each do |theme| %>
+            <%= p.radio_button :theme, theme, :checked => @current_user.theme == theme,
+              :class => 'change_theme', :data => { :path => asset_path(theme_stylesheet(theme)) } %>
+            <%= p.label :theme, theme.to_s.capitalize, :value => theme %>
+          <% end %>
+        </div>
+        <div class="form_element aligned_field">
           <span class="label">Newsgroup view:</span>
           <%= p.radio_button :thread_mode, 'normal', :checked => @current_user.thread_mode == :normal %>
           <%= p.label :thread_mode, 'Threaded', :value => 'normal' %>
@@ -69,7 +77,8 @@
     
     <div class="buttons">
       <%= f.submit 'Save', :class => 'button green' %>
-      <a href="#" class="button red dialog_cancel">Cancel</a>
+      <a href="#" class="button red dialog_cancel change_theme"
+        data-path="<%= asset_path(current_user_stylesheet) %>">Cancel</a>
     </div>
   <% end %>
   

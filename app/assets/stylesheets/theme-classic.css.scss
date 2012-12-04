@@ -1,0 +1,28 @@
+$white:           #fff;
+$bg_light:        #f5f5f5;
+$bg_toolbar:      #ddd;
+
+$dimmer_opacity:  0.3;
+
+$bg_row_selected: #dddfff;
+$bg_row_hover:    #eeefff;
+$bg_expand_hover: #ddd;
+$bg_sticky:       #ffc;
+
+$border_light:    #ddd;
+$border_button:   #bbb;
+$border_pane:     #444;
+
+$text_dark:       #111;
+$text_normal:     #444;
+$text_light:      #999;
+
+$text_mine:       #1b1;
+$text_reply:      #d1d;
+$text_in_thread:  #11f;
+
+$text_quote_1:    #077;
+$text_quote_2:    #770;
+$text_quote_3:    #707;
+
+@import 'application';

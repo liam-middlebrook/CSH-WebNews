@@ -2,7 +2,7 @@
 <html>
 <head>
   <title><%= home_page_title %></title>
-  <%= stylesheet_link_tag    "application" %>
+  <%= stylesheet_link_tag current_user_stylesheet %>
   <%= javascript_include_tag "application" if not @no_script %>
   <%= csrf_meta_tags %>
 </head>

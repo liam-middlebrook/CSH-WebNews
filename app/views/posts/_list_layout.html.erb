@@ -45,7 +45,7 @@
       </tr>
       <% if @more_newer %>
         <tr id="posts_load_newer" style="margin-top: -1px">
-          <th colspan="<%= cols %>" class="spinner">Loading newer posts...</th>
+          <th colspan="<%= cols %>" class="loading">Loading newer posts...</th>
         </tr>
       <% end %>
     </thead>
@@ -55,7 +55,7 @@
     <tfoot>
       <% if @more_older %>
         <tr id="posts_load_older">
-          <th colspan="<%= cols %>" class="spinner">Loading older posts...</th>
+          <th colspan="<%= cols %>" class="loading">Loading older posts...</th>
         </tr>
       <% end %>
     </tfoot>

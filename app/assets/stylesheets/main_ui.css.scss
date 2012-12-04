@@ -1,5 +1,3 @@
-@import "defs";
-
 #toolbar {
   height: 32px;
   line-height: 24px;
@@ -8,7 +6,7 @@
   border-bottom: 2px solid $border_button;
   
   h1 {
-    color: #bbb;
+    color: $border_button;
     font-size: 160%;
     vertical-align: middle;
     display: inline;
@@ -38,8 +36,8 @@
   line-height: 40px;
   padding: 0 10px;
   font-weight: bold;
-  background-color: #ffc;
-  border-bottom: 2px solid #ee9;
+  background-color: $bg_sticky;
+  border-bottom: 2px solid $border_warning;
 }
 
 #groups_list {
@@ -90,8 +88,8 @@
     white-space: normal;
     padding: 5px;
     margin-bottom: 0.5em;
-    border: 1px solid #ee9;
-    background-color: #ffc;
+    border: 1px solid $border_warning;
+    background-color: $bg_sticky;
   }
 }
 
@@ -151,6 +149,15 @@
         line-height: 1;
         padding: 5px;
         background-color: $bg_light;
+      }
+      
+      th.loading {
+        padding-left: 22px;
+        
+        .spinner {
+          top: 5px;
+          left: -11px;
+        }
       }
       
       td {
@@ -217,8 +224,6 @@
     position: absolute;
     top: 50%;
     left: 50%;
-    margin-top: -12px;
-    margin-left: -12px;
   }
   
   #group_header {
@@ -231,11 +236,11 @@
     margin-right: 20px;
     
     .new_posts {
-      color: #cc0;
+      color: $text_new_posts;
       font-weight: bold;
       text-decoration: underline;
       margin-right: 14px;
-      &:hover { color: #dd0; }
+      &:hover { opacity: 0.7; }
     }
   }
   
@@ -277,12 +282,14 @@
         }
       }
       
-      th.spinner {
+      th.loading {
         padding-left: 22px;
         border-top: 1px solid $border_light;
-        background-repeat: no-repeat;
-        background-position: left center;
-        background-image: url('spinner-sm.gif');
+        
+        .spinner {
+          top: 10px;
+          left: -11px;
+        }
       }
       
       .indent {
@@ -297,7 +304,7 @@
         background-position: left center;
         &.expandable { background-image: url('expander-closed.png'); }
         &.expanded { background-image: url('expander-open.png'); }
-        &.expandable:hover, &.expanded:hover { background-color: $bg_toolbar; }
+        &.expandable:hover, &.expanded:hover { background-color: $bg_expand_hover; }
       }
       
       tr[data-level]:not([data-level="1"]) {
@@ -365,7 +372,7 @@
     
     .notice {
       font-weight: bold;
-      color: #b70;
+      color: $text_post_notice;
       
       a {
         text-decoration: underline;
@@ -374,7 +381,7 @@
       
       .icon {
         color: $white;
-        background-color: #b70;
+        background-color: $text_post_notice;
         padding: 0 0.5em;
         border-radius: 2px;
       }
@@ -398,9 +405,9 @@
     color: $text_dark;
     margin: 1em auto;
     
-    blockquote                       { color: #077; }
-    blockquote blockquote            { color: #770; }
-    blockquote blockquote blockquote { color: #707; }
+    blockquote                       { color: $text_quote_1; }
+    blockquote blockquote            { color: $text_quote_2; }
+    blockquote blockquote blockquote { color: $text_quote_3; }
     
     .showquote {
       font-family: sans-serif;
@@ -425,7 +432,7 @@
     }
     
     #reading_mode_button.enabled {
-      background-color: #c00;
+      background-color: $button_red;
     }
   }
 }

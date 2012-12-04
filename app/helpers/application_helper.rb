@@ -1,5 +1,17 @@
 module ApplicationHelper
 
+  def current_user_stylesheet
+    if @current_user.present?
+      theme_stylesheet(@current_user.theme)
+    else
+      theme_stylesheet(:classic)
+    end
+  end
+  
+  def theme_stylesheet(name)
+    "theme-#{name}.css"
+  end
+
   def maybe_you(name, capitalize = false)
     if name == @current_user.real_name
       capitalize ? 'You' : 'you'

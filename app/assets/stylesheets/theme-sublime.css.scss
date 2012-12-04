@@ -1,0 +1,28 @@
+$white:           #111;
+$bg_light:        #222;
+$bg_toolbar:      #333;
+
+$dimmer_opacity:  0.5;
+
+$bg_row_selected: #122334;
+$bg_row_hover:    #233445;
+$bg_expand_hover: #344556;
+$bg_sticky:       #330;
+
+$border_light:    #333;
+$border_button:   #777;
+$border_pane:     #777;
+
+$text_dark:       #bbb;
+$text_normal:     #bbb;
+$text_light:      #777;
+
+$text_mine:       #2b2;
+$text_reply:      #c3c;
+$text_in_thread:  #66d;
+
+$text_quote_1:    #177;
+$text_quote_2:    #771;
+$text_quote_3:    #828;
+
+@import 'application';

@@ -3,6 +3,23 @@
 @check_new_retry_interval = 5000
 @draft_save_interval = 2000
 @delay_click_time = 300
+@spinner_large = {
+  lines: 17,
+  length: 0,
+  width: 4,
+  radius: 12,
+  corners: 1,
+  hwaccel: true
+}
+@spinner_small = {
+  lines: 17,
+  length: 0,
+  width: 2,
+  radius: 5,
+  corners: 0,
+  hwaccel: true
+}
+
 window.loaded_location = false
 window.first_load = true
 window.active_navigation = false
@@ -213,9 +230,9 @@ window.onhashchange = ->
       $('#groups_list .selected').removeClass('selected')
       $('#groups_list [data-name="' + new_location + '"]').addClass('selected')
       if new_location == 'home' and window.first_load == true
-        $('#group_view').append(chunks.spinner.clone())
+        $('#group_view .loading').spin(spinner_small)
       else
-        $('#group_view').empty().append(chunks.spinner.clone())
+        $('#group_view').empty().spin(spinner_large)
       window.first_load = false
       
       if new_location == 'home'
@@ -228,7 +245,6 @@ window.onhashchange = ->
         $('#post_view').show()
 
 $ ->
-  chunks.spinner = $('#loader .spinner').clone()
   chunks.overlay = $('#loader #overlay').clone()
   chunks.ajax_error = $('#loader #ajax_error').clone()
   $('#loader').remove()
@@ -349,6 +365,9 @@ $('a.update_api_settings').live 'click', ->
   $('#update_api_buttons').text('Working...')
   $.ajaxScript 'PUT', @href.replace('#~/', '')
   return false
+
+$('.change_theme').live 'click', ->
+  $('link[rel="stylesheet"]').first().attr('href', $(this).attr('data-path'))
 
 $('#do_sticky').live 'click', ->
   if $(this).is(':checked')

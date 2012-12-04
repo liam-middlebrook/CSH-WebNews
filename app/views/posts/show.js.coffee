@@ -30,7 +30,7 @@ document.title = '<%= @newsgroup.name %> \u00bb <%= raw j(@post.subject) %>'
 <% end %>
 
 if $('#posts_list tr[data-id="<%= @post.id %>"]').length == 0
-  $('#group_view').empty().append(chunks.spinner.clone())
+  $('#group_view').empty().spin(spinner_large)
   $.getScript '<%= posts_path(@newsgroup.name) %>?from_number=<%= @post.number %>', -> select_post(true)
   $('#post_view .content').focus()
 else

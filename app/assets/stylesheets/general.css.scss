@@ -1,6 +1,7 @@
-@import "defs";
-
-body { overflow: hidden; }
+body {
+  overflow: hidden;
+  background-color: $white;
+}
 
 body, select, input, button, textarea { color: $text_normal; }
 
@@ -42,10 +43,10 @@ b { font-weight: bold; }
 i { font-style: italic; }
 
 .unread { color: $text_normal !important; font-weight: bold; }
-.mine { color: #1b1 !important; }
-.mine_reply { color: #d1d !important; }
-.mine_in_thread { color: #11f !important; }
-.sticky { background-color: #ffc; }
+.mine { color: $text_mine !important; }
+.mine_reply { color: $text_reply !important; }
+.mine_in_thread { color: $text_in_thread !important; }
+.sticky { background-color: $bg_sticky; }
 
 .button { margin-right: 8px; }
 [type="submit"] { margin-right: 0; }
@@ -76,28 +77,28 @@ i { font-style: italic; }
   }
   
   &.green {
-    border-color: #0b0;
-    &:hover { background-color: #0b0; }
+    border-color: $button_green;
+    &:hover { background-color: $button_green; }
   }
   
   &.red {
-    border-color: #c00;
-    &:hover { background-color: #c00; }
+    border-color: $button_red;
+    &:hover { background-color: $button_red; }
   }
   
   &.blue {
-    border-color: #77f;
-    &:hover { background-color: #77f; }
+    border-color: $button_blue;
+    &:hover { background-color: $button_blue; }
   }
   
   &.yellow {
-    border-color: #cc0;
-    &:hover { background-color: #cc0; }
+    border-color: $button_yellow;
+    &:hover { background-color: $button_yellow; }
   }
   
   &.orange {
-    border-color: #c90;
-    &:hover { background-color: #c90; }
+    border-color: $button_orange;
+    &:hover { background-color: $button_orange; }
   }
   
   &#next_unread[href="#"] {
@@ -123,12 +124,12 @@ i { font-style: italic; }
     &:hover {
       color: $text_normal;
       background-color: $bg_light;
-      border-color: #0b0;
+      border-color: $button_green;
     }
     &.starred, &.starred:hover {
       color: $bg_light;
-      border-color: #0b0;
-      background-color: #0b0;
+      border-color: $button_green;
+      background-color: $button_green;
       background-image: url('star-light.png');
     }
   }
@@ -175,7 +176,7 @@ i { font-style: italic; }
   line-height: normal;
   vertical-align: 10%;
   font-style: normal;
-  background-color: #c90;
+  background-color: $button_orange;
 }
 
 .user_info {

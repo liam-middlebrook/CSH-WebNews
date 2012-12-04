@@ -30,6 +30,10 @@ class User < ActiveRecord::Base
     username + LOCAL_EMAIL_DOMAIN
   end
   
+  def theme
+    preferences[:theme].andand.to_sym || :classic
+  end
+  
   def time_zone
     preferences[:time_zone] || 'Eastern Time (US & Canada)'
   end

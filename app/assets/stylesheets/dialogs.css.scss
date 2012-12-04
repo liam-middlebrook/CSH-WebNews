@@ -1,5 +1,3 @@
-@import "defs";
-
 #overlay_dimmer {
   z-index: 10;
   position: absolute;
@@ -8,7 +6,7 @@
   top: 0;
   bottom: 0;
   background-color: black;
-  opacity: 0.3;
+  opacity: $dimmer_opacity;
 }
 
 #dialog {
@@ -36,8 +34,8 @@
     margin-right: 8px;
   }
   
-  .loading { color: #0b0; }
-  .errors { color: #d00; }
+  .loading { color: $text_dialog_working; }
+  .errors { color: $text_dialog_error; }
   
   .with_links {
     @include links;

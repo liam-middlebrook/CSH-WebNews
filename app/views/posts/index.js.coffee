@@ -29,6 +29,8 @@ if <%= @posts_selected ? 'true' : 'false' %> or <%= @search_mode ? 'true' : 'fal
   for unread in $('#posts_list tbody .unread[data-level!="1"]')
     expand_thread $($(unread).prevAll('[data-level="1"]')[0])
   
+  $('#posts_list .loading').spin(spinner_small)
+  
   $('#posts_list').scroll ->
     if not window.active_scroll_load
       view_height = $(this).height()
