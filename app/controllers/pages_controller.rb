@@ -78,11 +78,8 @@ class PagesController < ApplicationController
           :next_unread => @current_user.unread_posts.where(:thread_id => post.thread_id).order('date').first,
           :post_count => thread_parent.post_count_in_thread,
           :unread_count => unread_count,
-          :personal_class => if unread_count > 0
-            thread_parent.unread_personal_class_for_user(@current_user)
-          else
-            thread_parent.personal_class_for_user(@current_user)
-          end
+          :personal_class => thread_parent.personal_class_for_user(@current_user),
+          :unread_class => (unread_count > 0 ? thread_parent.unread_personal_class_for_user(@current_user) : nil)
         }
       end
     end

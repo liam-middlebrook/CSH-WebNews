@@ -1,9 +1,16 @@
 <table class="activity">
   <% if not @activity.nil? %>
     <% if @activity.any? %>
+      <tr>
+        <td colspan="5">&nbsp;</td>
+        <td>
+          <a href="#" id="mark_read_toggle" class="smallbutton toggle"
+            data-text="Done" data-selector=".activity a.mark_read">Mark Read...</a>
+        </td>
+      </tr>
       <% activity_breakout(@activity).each do |header, items| %>
         <tr class="header">
-          <th colspan="5"><%= header %></th>
+          <th colspan="6"><%= header %></th>
         </tr>
         <% items.each do |item| %>
           <%= render :partial => 'activity_row', :locals => {
@@ -13,14 +20,17 @@
             :post_count => item[:post_count],
             :unread_count => item[:unread_count],
             :personal_class => item[:personal_class],
+            :unread_class => item[:unread_class],
             :cross_posted => item[:cross_posted]
           } %>
         <% end %>
       <% end %>
     <% else %>
+      <tr><td>&nbsp;</td></tr>
       <tr class="header"><th>No recent activity to display</th></tr>
     <% end %>
   <% else %>
+    <tr><td>&nbsp;</td></tr>
     <tr class="header"><th class="loading">Loading recent activity...</th></tr>
   <% end %>
 </table>

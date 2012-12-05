@@ -18,11 +18,13 @@ $('#next_unread').attr('href', '<%= next_unread_href %>')
 <% if @dashboard_active %>
 if window.loaded_location == 'home'
   was_focused = $('#dashboard').is(':focus')
+  mark_read_toggled = $('.activity a.mark_read').is(':visible')
   document.title = '<%= j home_page_title %>'
   scroll = $('#dashboard').scrollTop()
   $('#group_view').html '<%= j render('dashboard') %>'
   $('#dashboard').scrollTop(scroll)
   $('#dashboard').focus() if was_focused
+  init_toggle($('#mark_read_toggle'), false) if mark_read_toggled
 <% end %>
 
 $('#sync_warning').remove()

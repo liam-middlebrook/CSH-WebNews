@@ -17,11 +17,12 @@
   </td>
   <td class="unread_count">
     <% if unread_count > 0 %>
-      <span class="counter unread <%= personal_class %>"><%= unread_count %></span>
+      <span class="counter unread <%= unread_class %>"><%= unread_count %></span>
     <% end %>
   </td>
   <td class="subject">
-    <a class="<%= personal_class %><%= unread_count > 0 ? ' unread' : '' %>"
+    <a class="<%= unread_count > 0 ? "unread #{unread_class}" : personal_class %>"
+      data-personal-class="<%= personal_class %>"
       href="#!<%= post_path(linked_post.newsgroup.name, linked_post.number) %>"><%= thread_parent.subject %></a>
     <span class="byline">
       <% if newest_post != thread_parent %>
@@ -34,5 +35,12 @@
         <%= thread_parent.newsgroup.name %>
       <% end %>
     </span>
+  </td>
+  <td class="mark_read">
+    <% if unread_count > 0 %>
+      <a href="#" class="smallbutton mark_read" data-scope="thread"
+        data-newsgroup="<%= thread_parent.newsgroup.name %>"
+        data-number="<%= thread_parent.number %>">Mark Read</a>
+    <% end %>
   </td>
 </tr>

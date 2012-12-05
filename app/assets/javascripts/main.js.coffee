@@ -110,6 +110,26 @@ jQuery.ajaxScript = (method, url, success = null) ->
 @target_external_links = ->
   $('a[href^="http"]:not([href*="' + window.location.host + '"])').attr('target', '_blank')
 
+@init_toggle = (elem, pretoggle = true) ->
+  elem = $(elem)
+  if not elem.hasClass('init_toggled')
+    elem.width(elem.width() + 1)
+    elem.addClass('init_toggled')
+    if pretoggle
+      toggle_content(elem)
+    else
+      exchange_toggle_text(elem)
+
+@toggle_content = (elem) ->
+  $($(elem).attr('data-selector')).toggle()
+
+@exchange_toggle_text = (elem) ->
+  elem = $(elem)
+  new_text = elem.attr('data-text')
+  if new_text
+    elem.attr('data-text', elem.text())
+    elem.text(new_text)
+
 @set_loaded_location = ->
   window.loaded_location = location.hash.split('/')[1]
 
@@ -267,13 +287,8 @@ $('a[href="#"]').live 'click', ->
   return false
 
 $('.toggle').live 'click', ->
-  # Fixing the width is handled in ajaxComplete
-  link = $(this)
-  $(link.attr('data-selector')).toggle()
-  new_text = link.attr('data-text')
-  if new_text
-    link.attr('data-text', link.text())
-    link.text(new_text)
+  toggle_content(this)
+  exchange_toggle_text(this)
 
 $('#crosspost_toggle, #markup_explain_toggle').live 'click', ->
   toggled = $($(this).attr('data-selector'))
@@ -310,19 +325,28 @@ $('a.mark_read').live 'click', ->
   path = 'mark_read'
   after_func = null
   scope = $(this).attr('data-scope')
-  newsgroup = $('#groups_list .selected').attr('data-name')
-  number = $('#posts_list .selected').attr('data-number')
+  newsgroup = $('#groups_list .selected').attr('data-name') || $(this).attr('data-newsgroup')
+  number = $('#posts_list .selected').attr('data-number') || $(this).attr('data-number')
   thread_id = $('#posts_list .selected').attr('data-thread')
   
-  if thread_id and scope == 'thread'
+  if scope == 'thread'
     path += '?in_thread=true'
     path += '&newsgroup=' + encodeURIComponent(newsgroup) + '&number=' + number
-    abort_active_scroll()
-    after_func = ->
-      reset_check_timeout(0)
-      $('#posts_list').scroll()
-    $('#posts_list tr[data-thread="' + thread_id + '"]').removeClass('unread')
-  else if newsgroup and scope == 'newsgroup'
+    if window.loaded_location == 'home'
+      row = $(this).parents('tr')
+      row.find('.counter.unread').remove()
+      link = row.find('.subject a')
+      link.removeClass('unread mine_reply mine_in_thread').addClass(link.attr('data-personal-class'))
+      $(this).remove()
+      after_func = ->
+        reset_check_timeout(1500)
+    else
+      abort_active_scroll()
+      after_func = ->
+        reset_check_timeout(0)
+        $('#posts_list').scroll()
+      $('#posts_list tr[data-thread="' + thread_id + '"]').removeClass('unread')
+  else if scope == 'newsgroup'
     path += '?newsgroup=' + encodeURIComponent(newsgroup)
     group_item = $('#groups_list [data-name="' + newsgroup + '"]')
     group_item.removeClass('unread mine_reply mine_in_thread').find('.unread_count').remove()
@@ -451,11 +475,8 @@ $(window).resize ->
 $(document).ajaxComplete ->
   fix_post_header()
   target_external_links()
-  for a in $('.toggle')
-    if not $(a).hasClass('init_toggled')
-      $(a).width($(a).width() + 1)
-      $(a).addClass('init_toggled')
-      $($(a).attr('data-selector')).toggle()
+  for link in $('.toggle')
+    init_toggle(link)
 
 $(document).ajaxError (event, jqxhr, settings, exception) ->
   if jqxhr.readyState != 0
