@@ -103,7 +103,7 @@ module ApplicationHelper
       end
     end
     
-    { 'Stickies' => stickies }.merge(breakout.reject{ |_, items| items.empty? })
+    { 'Stickies' => stickies }.merge(breakout).reject{ |_, items| items.empty? }
   end
   
   def post_html_body(post, quote_collapse = true)
