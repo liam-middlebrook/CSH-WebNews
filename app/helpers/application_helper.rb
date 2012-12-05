@@ -21,6 +21,7 @@ module ApplicationHelper
   end
 
   def gravatar_image(email, size)
+    email ||= 'nobody@example.com'
     image_tag 'https://secure.gravatar.com/avatar/' +
       Digest::MD5.hexdigest(email.gsub(/\s+/, '').downcase) +
       "?size=#{size}&default=mm&rating=pg",

@@ -46,12 +46,16 @@ class Post < ActiveRecord::Base
   end
   
   def author_name
-    author[/(.*)<.*>/, 1].andand.gsub(/(\A|[^\\])"/, '\\1').andand.gsub('\\"', '"').andand.rstrip ||
+    candidate = author[/(.*)<.*>/, 1]
+    if candidate
+      candidate.gsub(/(\A|[^\\])"/, '\\1').gsub('\\"', '"').rstrip
+    else
       author[/.* \((.*)\)/, 1] || author
+    end
   end
   
   def author_email
-    author[/.*<(.*)>/, 1] || author[/(.*) \(.*\)/, 1] || nil
+    author[/.*<(.*)>/, 1] || author[/(.*) \(.*\)/, 1] || author[/\S+@\S+\.\S+/]
   end
   
   def author_username

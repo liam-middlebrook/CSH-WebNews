@@ -12,7 +12,11 @@ xml.rss :version => '2.0' do
       xml.item do
         xml.category post.newsgroup.name
         xml.title post.subject
-        xml.author (post.author_email ? "#{post.author_email} (#{post.author_name})" : post.author_name)
+        xml.author(if post.author_name == post.author_email
+          post.author_name
+        else
+          "#{post.author_email} (#{post.author_name})"
+        end)
         xml.description { xml.cdata! simple_format(post.body) }
         xml.pubDate post.date.to_s(:rfc822)
         xml.link root_url + '#!' + post_path(post.newsgroup.name, post.number)
