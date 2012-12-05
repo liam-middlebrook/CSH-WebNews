@@ -147,11 +147,6 @@
       
       th.loading {
         padding-left: 22px;
-        
-        .spinner {
-          top: 5px;
-          left: -11px;
-        }
       }
       
       td {
@@ -218,12 +213,6 @@
   border-left: 2px solid $border_pane;
   border-bottom: 2px solid $border_pane;
   
-  &>.spinner {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-  }
-  
   #group_header {
     padding: 10px 0 0 10px;
   }
@@ -283,11 +272,6 @@
       th.loading {
         padding-left: 22px;
         border-top: 1px solid $border_light;
-        
-        .spinner {
-          top: 10px;
-          left: -11px;
-        }
       }
       
       .indent {

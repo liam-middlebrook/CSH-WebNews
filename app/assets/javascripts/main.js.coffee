@@ -4,20 +4,19 @@
 @draft_save_interval = 2000
 @delay_click_time = 300
 @spinner_large = {
-  lines: 17,
+  segments: 17,
   length: 0,
-  width: 4,
-  radius: 12,
-  corners: 1,
-  hwaccel: true
+  width: 6,
+  space: 6,
+  padding: 0
 }
 @spinner_small = {
-  lines: 17,
+  segments: 17,
   length: 0,
   width: 2,
-  radius: 5,
-  corners: 0,
-  hwaccel: true
+  space: 2,
+  padding: 4,
+  align: 'left'
 }
 
 window.loaded_location = false
@@ -249,11 +248,6 @@ window.onhashchange = ->
       $('#post_view').empty()
       $('#groups_list .selected').removeClass('selected')
       $('#groups_list [data-name="' + new_location + '"]').addClass('selected')
-      if new_location == 'home' and window.first_load == true
-        $('#group_view .loading').spin(spinner_small)
-      else
-        $('#group_view').empty().spin(spinner_large)
-      window.first_load = false
       
       if new_location == 'home'
         $('#group_view').css('bottom', '0')
@@ -263,6 +257,12 @@ window.onhashchange = ->
         $('#group_view').css('bottom', '')
         $('#group_view').css('border-bottom', '')
         $('#post_view').show()
+      
+      if new_location == 'home' and window.first_load == true
+        $('#group_view .loading').activity(spinner_small)
+      else
+        $('#group_view').empty().activity(spinner_large)
+      window.first_load = false
 
 $ ->
   chunks.overlay = $('#loader #overlay').clone()
