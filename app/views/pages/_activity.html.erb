@@ -4,7 +4,8 @@
       <tr>
         <td colspan="5">&nbsp;</td>
         <td>
-          <a href="#" id="mark_read_toggle" class="smallbutton toggle"
+          <a href="#" id="mark_read_toggle"
+            class="smallbutton toggle <%= @activity.any?{ |item| item[:unread_count] > 0 } ? '' : 'invisible' %>"
             data-text="Done" data-selector=".activity a.mark_read">Mark Read...</a>
         </td>
       </tr>

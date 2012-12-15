@@ -363,6 +363,7 @@ $('a.mark_read').live 'click', ->
       $('#unread_line').text('You have no unread posts.')
       $('.activity a').removeClass('unread')
       $('.activity .counter.unread').remove()
+      $('#mark_read_toggle').addClass('invisible')
     else
       abort_active_scroll()
       $('#posts_list tbody tr').removeClass('unread')
