@@ -1,4 +1,12 @@
-<% linked_post = (unread_count > 0) ? next_unread : newest_post %>
+<%
+linked_post = if unread_count > 0
+  next_unread
+elsif thread_parent.sticky?
+  thread_parent
+else
+  newest_post
+end
+%>
 
 <tr<% if thread_parent.sticky? %> class="sticky"<% end %>>
   <td>
