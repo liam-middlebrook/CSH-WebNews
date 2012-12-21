@@ -518,13 +518,8 @@ class PostsController < ApplicationController
           generic_error :bad_request, 'sticky_until_invalid',
             "The expiration date '#{params[:sticky_until]}' could not be parsed" and return
         elsif @sticky_until <= Time.now
-          # Hack to make e.g. '1/13' work when it's December, see https://github.com/mojombo/chronic/issues/154
-          if not params[:sticky_until].include?(Time.now.year.to_s) and @sticky_until + 1.year > Time.now
-            @sticky_until += 1.year
-          else
-            generic_error :bad_request, 'sticky_until_unacceptable',
-              "The parsed expiration date '#{@sticky_until.strftime(DATE_FORMAT)}' is in the past" and return
-          end
+          generic_error :bad_request, 'sticky_until_unacceptable',
+            "The parsed expiration date '#{@sticky_until.strftime(DATE_FORMAT)}' is in the past" and return
         end
       else
         validate_user_can_sticky if for_existing_post
