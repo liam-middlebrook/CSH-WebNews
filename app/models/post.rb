@@ -81,19 +81,21 @@ class Post < ActiveRecord::Base
   
   def quoted_body(start = 0, length = 0)
     author_name + " wrote:\n\n" + if body.blank?
-      '>' + subject
+      subject
     else
       if length > 0
         body[start, length]
+      elsif sigless_body.blank?
+        subject
       else
         sigless_body
-      end.split("\n").map{ |line| '>' + line }.join("\n")
-    end + "\n\n"
+      end
+    end.split("\n").map{ |line| '>' + line }.join("\n") + "\n\n"
   end
   
   def sigless_body
     return body.                               # Things to strip:
-      sub(/(.*)\n-- \n.*/m, '\\1').            # '-- ' on its own line and all following text ("standard" sig)
+      sub(/(.*)\n-- ?\n.*/m, '\\1').           # The line '--' or '-- ' and all following text ("standard" sig)
       sub(/\n\n[-~].*[[:alpha:]].*\n*\z/, ''). # Non-blank final lines starting with [-~] and containing a letter
       rstrip
   end
