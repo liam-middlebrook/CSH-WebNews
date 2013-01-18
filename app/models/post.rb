@@ -428,6 +428,8 @@ class Post < ActiveRecord::Base
       else
         parent_id = ''
       end
+    else
+      parent_id = ''
     end
     
     create!(:newsgroup => newsgroup,
