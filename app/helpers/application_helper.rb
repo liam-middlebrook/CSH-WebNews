@@ -152,11 +152,11 @@ module ApplicationHelper
           html_body.gsub!("#{MARK_STRING}1\n", '<div class="quoted_text">')
         else
           html_body.gsub!("#{MARK_STRING}1\n",
-            '<a href="#"
+            '<span id="added_post_text"><a href="#"
               id="show_quote_button" class="smallbutton showquote toggle"
               data-selector="#post_view .fullquote"
               data-text="Hide quoted text">Show quoted text</a>' +
-              "\n" + '<div class="fullquote">'
+              "\n" + '</span><div class="fullquote">'
           )
         end
         html_body.gsub!(/#{MARK_STRING}2(\n|\z)/, '</div>')

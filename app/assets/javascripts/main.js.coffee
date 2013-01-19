@@ -303,10 +303,12 @@ $('a.new_draft').live 'click', (e) ->
     return false
 
 $('a.post_reply').live 'click', (e) ->
+  added_text = $('#added_post_text').detach()
   selected_text = window.getSelection().toString().replace(/\r\n/g, "\n").replace(/\r/g, "\n")
   selected_index = $('.content .body').text().indexOf(selected_text)
   if selected_index >= 0 and selected_text.length > 0
     $(this).attr('data-href-append', '&quote_start=' + selected_index + '&quote_length=' + selected_text.length)
+  added_text.insertBefore('.fullquote')
 
 $('a[href^="#?/"]').live 'click', ->
   key.setScope('intermediate')
