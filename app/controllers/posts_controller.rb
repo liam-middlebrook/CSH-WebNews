@@ -505,8 +505,8 @@ class PostsController < ApplicationController
         end
       end
       
-      if params[:do_sticky] or (@api_access and not params[:unstick])
-        validate_user_can_sticky
+      if params[:do_sticky] or (@api_access and params[:sticky_until] and not params[:unstick])
+        validate_user_can_sticky or return
         if params[:sticky_until].blank?
           generic_error :bad_request, 'sticky_until_missing',
             "An expiration date is required to make a post sticky" and return
@@ -522,7 +522,9 @@ class PostsController < ApplicationController
             "The parsed expiration date '#{@sticky_until.strftime(DATE_FORMAT)}' is in the past" and return
         end
       else
-        validate_user_can_sticky if for_existing_post
+        if for_existing_post
+          validate_user_can_sticky or return
+        end
         @sticky_until = nil
       end
       
@@ -532,7 +534,10 @@ class PostsController < ApplicationController
     def validate_user_can_sticky
       if not @current_user.admin?
         generic_error :forbidden, 'requires_admin',
-          "Admin privileges are required to sticky or unsticky posts" and return
+          "Admin privileges are required to sticky or unsticky posts"
+        return false
+      else
+        return true
       end
     end
     
