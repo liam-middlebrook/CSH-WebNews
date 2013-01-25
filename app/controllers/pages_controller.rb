@@ -63,10 +63,11 @@ class PagesController < ApplicationController
     
     def get_activity_feed
       included_newsgroups = Newsgroup.pluck(:name).reject{ |name| name =~ ACTIVITY_EXCLUDE }
-      newest_in_stickies = Post.sticky.order('date DESC').map{ |post| post.all_in_thread.order('date').last }
+      newest_in_stickies = Post.sticky.order('date DESC').
+        map{ |post| post.all_in_thread.order('date').last }.uniq_by(&:thread_id)
       newest_in_threads = Post.where(:newsgroup => included_newsgroups).
         where('date > ?', 1.month.ago).order('date DESC').uniq_by(&:thread_id)[0...20]
-      activity_posts = newest_in_stickies | newest_in_threads
+      activity_posts = (newest_in_stickies | newest_in_threads).uniq_by(&:thread_id)
       
       @activity = activity_posts.map do |post|
         thread_parent = post.thread_parent
