@@ -71,7 +71,7 @@ else
 $('#posts_list tbody').append '<%=
   j render(:partial => "posts_list", :locals => { :posts => @posts_older }) %>'
 from_tr = $('#posts_list tr[data-date="<%= @from_older %>"]').nextAll('[data-level="1"]').first()
-from_tr.nextAll().andSelf().find('.expanded').removeClass('expanded').addClass('expandable')
+from_tr.nextAll().addBack().find('.expanded').removeClass('expanded').addClass('expandable')
 from_tr.nextAll('[data-level!="1"]').hide()
 for unread in from_tr.nextAll('.unread[data-level!="1"]')
   expand_thread $($(unread).prevAll('[data-level="1"]')[0])
@@ -82,7 +82,7 @@ $('#posts_list tbody').prepend '<%=
   j render(:partial => "posts_list", :locals => { :posts => @posts_newer }) %>'
 from_tr = $('#posts_list tr[data-date="<%= @from_newer %>"]').prevAll('[data-level="1"]').first()
 tr_height = from_tr.height()
-from_tr.prevAll().andSelf().find('.expanded').removeClass('expanded').addClass('expandable')
+from_tr.prevAll().addBack().find('.expanded').removeClass('expanded').addClass('expandable')
 from_tr.prevAll('[data-level!="1"]').hide()
 from_tr.nextUntil('[data-level="1"]').hide()
 extra_rows = 0

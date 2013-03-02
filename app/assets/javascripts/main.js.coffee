@@ -283,26 +283,26 @@ $ ->
   
   set_check_timeout()
 
-$('a[href="#"]').live 'click', ->
+$(document).on 'click', 'a[href="#"]', ->
   return false
 
-$('.toggle').live 'click', ->
+$(document).on 'click', '.toggle', ->
   toggle_content(this)
   exchange_toggle_text(this)
 
-$('#crosspost_toggle, #markup_explain_toggle').live 'click', ->
+$(document).on 'click', '#crosspost_toggle, #markup_explain_toggle', ->
   toggled = $($(this).attr('data-selector'))
   if toggled.is(':visible')
     adjust_dialog_original_height(toggled.height())
   else
     adjust_dialog_original_height(0 - toggled.height())
 
-$('a.new_draft').live 'click', (e) ->
+$(document).on 'click', 'a.new_draft', (e) ->
   if localStorage['draft_form'] and not confirm('Really abandon your saved draft and start a new post?')
     e.stopImmediatePropagation()
     return false
 
-$('a.post_reply').live 'click', (e) ->
+$(document).on 'click', 'a.post_reply', (e) ->
   added_text = $('#added_post_text').detach()
   selected_text = window.getSelection().toString().replace(/\r\n/g, "\n").replace(/\r/g, "\n")
   selected_index = $('.content .body').text().indexOf(selected_text)
@@ -310,7 +310,7 @@ $('a.post_reply').live 'click', (e) ->
     $(this).attr('data-href-append', '&quote_start=' + selected_index + '&quote_length=' + selected_text.length)
   added_text.insertBefore('.fullquote')
 
-$('a[href^="#?/"]').live 'click', ->
+$(document).on 'click', 'a[href^="#?/"]', ->
   key.setScope('intermediate')
   init_dialog()
   request_path = @href.replace('#?/', '')
@@ -320,7 +320,7 @@ $('a[href^="#?/"]').live 'click', ->
   $.getScript request_path
   return false
 
-$('a.mark_read').live 'click', ->
+$(document).on 'click', 'a.mark_read', ->
   reset_check_timeout()
   $('#next_unread').attr('href', '#')
   
@@ -374,51 +374,51 @@ $('a.mark_read').live 'click', ->
   $.ajaxScript 'PUT', path, after_func
   return false
 
-$('a.mark_unread').live 'click', ->
+$(document).on 'click', 'a.mark_unread', ->
   clear_check_timeout()
   abort_active_check()
   $('#posts_list .selected').addClass('unread')
   $.ajaxScript 'PUT', @href.replace('#~/', ''), -> set_check_timeout(0)
   return false
 
-$('#star_post_button').live 'click', ->
+$(document).on 'click', '#star_post_button', ->
   $.ajaxScript 'PUT', @href.replace('#~/', '')
   return false
 
-$('#reading_mode_button').live 'click', ->
+$(document).on 'click', '#reading_mode_button', ->
   set_reading_mode(!$('#reading_mode_button').hasClass('enabled'))
 
-$('a.update_api_settings').live 'click', ->
+$(document).on 'click', 'a.update_api_settings', ->
   $('#update_api_buttons').text('Working...')
   $.ajaxScript 'PUT', @href.replace('#~/', '')
   return false
 
-$('.change_theme').live 'click', ->
+$(document).on 'click', '.change_theme', ->
   $('link[rel="stylesheet"]').first().attr('href', $(this).attr('data-path'))
 
-$('#do_sticky').live 'click', ->
+$(document).on 'click', '#do_sticky', ->
   if $(this).is(':checked')
-    $('#sticky_until').attr('disabled', false).focus()
+    $('#sticky_until').prop('disabled', false).focus()
   else
-    $('#sticky_until').val('').attr('disabled', true)
+    $('#sticky_until').val('').prop('disabled', true)
 
-$('#crosspost_toggle').live 'click', ->
+$(document).on 'click', '#crosspost_toggle', ->
   $('#crosspost_to').val('')
   $('.crosspost_options input').val([])
 
-$('a.minimize_draft').live 'click', ->
+$(document).on 'click', 'a.minimize_draft', ->
   save_draft()
 
-$('a.dialog_cancel').live 'click', ->
+$(document).on 'click', 'a.dialog_cancel', ->
   clear_draft_interval()
   close_dialog()
 
-$('a.clear_draft').live 'click', ->
+$(document).on 'click', 'a.clear_draft', ->
   localStorage.removeItem('draft_html')
   localStorage.removeItem('draft_form')
   $('a.resume_draft').hide()
 
-$('a.resume_draft').live 'click', ->
+$(document).on 'click', 'a.resume_draft', ->
   init_dialog()
   open_dialog(localStorage['draft_html'])
   for elem in JSON.parse(localStorage['draft_form'])
@@ -426,25 +426,25 @@ $('a.resume_draft').live 'click', ->
   $('#post_body').putCursorAtEnd() if $('#post_body').val() != ''
   set_draft_interval()
 
-$('#new_post [type="submit"]').live 'click', (e) ->
+$(document).on 'click', '#new_post [type="submit"]', (e) ->
   body = $('#new_post #post_body').first().val()
   if $.trim(body).length == 0 and not confirm('Really submit this post with no content?')
     e.stopImmediatePropagation()
     return false
 
-$('[type="submit"]').live 'click', ->
+$(document).on 'click', '[type="submit"]', ->
   $('#dialog .buttons').hide()
   $('#dialog .loading').text('Working...')
   $('#dialog .errors').text('')
 
-$('a.refresh').live 'click', ->
+$(document).on 'click', 'a.refresh', ->
   refresh_loaded_location()
 
-$('#posts_list .expander').live 'click', (e) ->
+$(document).on 'click', '#posts_list .expander', (e) ->
   toggle_thread_expand($(this).closest('tr'))
   e.stopImmediatePropagation()
 
-$('#posts_list tbody tr').live 'click', (e, do_toggle = true) ->
+$(document).on 'click', '#posts_list tbody tr', (e, do_toggle = true) ->
   tr = $(this)
   
   href = tr.find('a').attr('href')
@@ -459,13 +459,13 @@ $('#posts_list tbody tr').live 'click', (e, do_toggle = true) ->
   tr.addClass('selected')
   return false
 
-$('a, input').live 'mousedown', -> this.style.outlineStyle = 'none'
-$('a, input').live 'blur', -> this.style.outlineStyle = ''
+$(document).on 'mousedown', 'a, input', -> this.style.outlineStyle = 'none'
+$(document).on 'blur', 'a, input', -> this.style.outlineStyle = ''
 
-$('a, input, select, textarea, button').live 'focus', ->
+$(document).on 'focus', 'a, input, select, textarea, button', ->
   if $('#dialog').length > 0 and $(this).parents('#dialog').length == 0
     $('#dialog').find('a[href], input, select, textarea, button').
-      filter(':not([disabled])').filter(':visible').first().focus()
+      filter(':visible').not(':disabled').first().focus()
     return false
   else if $('#overlay').length > 0 and $('#dialog').length == 0
     $('#overlay').focus()
