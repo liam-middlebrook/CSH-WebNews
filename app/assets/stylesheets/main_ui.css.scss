@@ -344,11 +344,16 @@
       color: $text_light;
       
       .author {
+        white-space: nowrap;
         color: $text_normal;
         
         .smallbutton {
           background-color: $link_hover;
         }
+      }
+      
+      .date {
+        white-space: nowrap;
       }
     }
     

@@ -84,10 +84,17 @@ jQuery.ajaxScript = (method, url, success = null) ->
       shrinkable.height(shrinkable_original_height)
 
 @adjust_dialog_original_height = (adjustment) ->
-  dialog = $('#dialog')
-  dialog_original_height = parseInt(dialog.attr('data-original-height'))
-  dialog.attr('data-original-height', dialog_original_height + adjustment)
+  adjust_original_height($('#dialog'), adjustment)
   fix_dialog_height()
+
+@adjust_shrinkable_original_height = (adjustment) ->
+  adjust_dialog_original_height(adjustment)
+  adjust_original_height($('.shrinkable'), adjustment)
+  fix_dialog_height()
+
+@adjust_original_height = (element, adjustment) ->
+  original_height = parseInt(element.attr('data-original-height'))
+  element.attr('data-original-height', original_height + adjustment)
 
 @set_reading_mode = (enable) ->
   if enable
@@ -361,7 +368,7 @@ $(document).on 'click', 'a.mark_read', ->
     $('#groups_list li').removeClass('unread mine_reply mine_in_thread').find('.unread_count').remove()
     $('#next_unread').attr('href', '#')
     if window.loaded_location == 'home'
-      document.title = 'CSH WebNews'
+      document.title = 'WebNews'
       $('#unread_line').text('You have no unread posts.')
       $('.activity a').removeClass('unread')
       $('.activity .counter.unread').remove()
