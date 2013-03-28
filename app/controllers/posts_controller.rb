@@ -42,12 +42,12 @@ class PostsController < ApplicationController
     if @from_newer
       date_condition = (params[:newer_inclusive] ? 'date >= ?' : 'date > ?')
       if @flat_mode
-        @posts_newer = @newsgroup.posts.where(date_condition, @from_newer).order('date').limit(@limit).reverse
+        @posts_newer = @newsgroup.posts.where(date_condition, @from_newer).order('date').limit(@limit)
       else
         @from_newer = @newsgroup.posts.where(:date => @from_newer).first.thread_parent.date
         @posts_newer = @newsgroup.posts.
           where("parent_id = ? and #{date_condition}", '', @from_newer).
-          order('date').limit(@limit).reverse
+          order('date').limit(@limit)
       end
     end
     
@@ -58,6 +58,7 @@ class PostsController < ApplicationController
     if @posts_newer
       @more_newer = @posts_newer.length > 0 && !@posts_newer[@limit - 1].nil?
       @posts_newer.delete_at(-1) if @posts_newer.length == @limit
+      @posts_newer.reverse!
     end
     
     if not @flat_mode
