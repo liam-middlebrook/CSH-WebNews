@@ -2,7 +2,7 @@
   <div class="user_info">
     <%= gravatar_image @current_user.email, 28 %>
     <a title="Show all my posts" href="#!<%=
-      search_path(:authors => [@current_user.real_name, @current_user.email].join(','))
+      search_path(:authors => [@current_user.real_name, "<#{@current_user.email}>"].join(','))
     %>">
       <span class="real_name"><%= @current_user.real_name %></span>
       <span class="username">(<%= @current_user.username %>)</span>

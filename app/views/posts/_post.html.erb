@@ -60,7 +60,7 @@ end
         <% end %>
       <% end %>
       <a class="smallbutton"
-        href="#!<%= search_path(:authors => [post.author_name, post.author_email].compact.join(',')) %>"
+        href="#!<%= search_path(:authors => [post.author_name, "<#{post.author_email}>"].join(',')) %>"
         title="Search for posts by this user">Posts</a>
       <% if post.author_is_local? %>
         <a class="smallbutton" href="<%= PROFILES_URL + post.author_username %>"
