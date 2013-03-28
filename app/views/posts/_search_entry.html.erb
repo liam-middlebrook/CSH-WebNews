@@ -7,7 +7,7 @@
       <%= label_tag :newsgroup, 'Newsgroup:' %><%= select_tag :newsgroup,
         options_for_select(
           @newsgroups.map{ |n| [n.name, n.name] }, @newsgroup ? @newsgroup.name : nil
-        ), :prompt => '(all newsgroups)' %>
+        ), :prompt => '(all regular newsgroups)' %>
     </div>
     
     <div class="form_element inline_inputs aligned_field">

@@ -105,8 +105,8 @@ class PostsController < ApplicationController
       values << @from_older
     end
     if not @newsgroup
-      conditions << 'newsgroup not like ?'
-      values << 'control%'
+      conditions << 'newsgroup in (?)'
+      values << Newsgroup.pluck(:name).reject{ |name| name =~ DEFAULT_NEWSGROUP_FILTER }
     end
     if params[:unread] and params[:personal_class]
       min_level = PERSONAL_CODES[params[:personal_class].to_sym]
