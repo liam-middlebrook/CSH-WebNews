@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120901192447) do
+ActiveRecord::Schema.define(:version => 20130512230751) do
 
   create_table "newsgroups", :force => true do |t|
     t.string "name"
@@ -47,6 +47,19 @@ ActiveRecord::Schema.define(:version => 20120901192447) do
   end
 
   add_index "starred_post_entries", ["user_id", "post_id"], :name => "index_starred_post_entries_on_user_id_and_post_id", :unique => true
+
+  create_table "subscriptions", :force => true do |t|
+    t.integer  "user_id"
+    t.string   "newsgroup_name"
+    t.integer  "unread_level"
+    t.integer  "email_level"
+    t.string   "email_type"
+    t.datetime "created_at",     :null => false
+    t.datetime "updated_at",     :null => false
+  end
+
+  add_index "subscriptions", ["newsgroup_name"], :name => "index_subscriptions_on_newsgroup_name"
+  add_index "subscriptions", ["user_id"], :name => "index_subscriptions_on_user_id"
 
   create_table "unread_post_entries", :force => true do |t|
     t.integer "user_id"

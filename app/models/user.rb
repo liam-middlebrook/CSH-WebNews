@@ -1,8 +1,17 @@
 class User < ActiveRecord::Base
-  has_many :unread_post_entries
-  has_many :starred_post_entries
+  has_many :unread_post_entries, :dependent => :destroy
+  has_many :starred_post_entries, :dependent => :destroy
   has_many :unread_posts, :through => :unread_post_entries, :source => :post
   has_many :starred_posts, :through => :starred_post_entries, :source => :post
+  has_one :default_subscription, :class_name => Subscription,
+    :conditions => 'newsgroup_name IS NULL', :autosave => true, :dependent => :destroy
+  has_many :subscriptions,
+    :conditions => 'newsgroup_name IS NOT NULL', :autosave => true, :dependent => :destroy
+  
+  accepts_nested_attributes_for :default_subscription
+  accepts_nested_attributes_for :subscriptions, :allow_destroy => true, :reject_if => :all_blank
+  
+  before_save :ensure_subscriptions
   
   serialize :preferences, Hash
   serialize :api_data, Hash
@@ -27,7 +36,7 @@ class User < ActiveRecord::Base
   end
   
   def email
-    username + LOCAL_EMAIL_DOMAIN
+    "#{username}@#{LOCAL_EMAIL_DOMAIN}"
   end
   
   def theme
@@ -42,28 +51,13 @@ class User < ActiveRecord::Base
     preferences[:thread_mode].andand.to_sym || :normal
   end
   
-  def unread_level
-    preferences[:unread_level].andand.to_i || 0
-  end
-  
-  def unread_in_test?
-    (preferences[:unread_in_test] == '1') || false
-  end
-  
-  def unread_in_control?
-    (preferences[:unread_in_control] == '1') || false
-  end
-  
-  def unread_in_lists?
-    (preferences[:unread_in_lists] == '1') || false
-  end
-  
-  def unread_in_group?(newsgroup)
-    return false if
-      (newsgroup.name == 'csh.test' and not unread_in_test?) or
-      (newsgroup.name[/^control/] and not unread_in_control?) or
-      (newsgroup.name[/^csh.lists/] and not unread_in_lists?)
-    return true
+  def ensure_subscriptions
+    if !default_subscription.present?
+      subscriptions.destroy_all
+      NEW_USER_SUBSCRIPTIONS.each do |attrs|
+        subscriptions << Subscription.new(attrs)
+      end
+    end
   end
   
   def unread_count

@@ -1,0 +1,41 @@
+<% @posts.sort_by(&:date).group_by(&:newsgroup).each do |newsgroup, newsgroup_posts| %>
+  <h2><%= newsgroup.name %></h2>
+  <% newsgroup_posts.group_by(&:thread_parent).each do |thread_parent, thread_posts| %>
+    <ul style="list-style-type: none; margin-left: 0; padding-left: 0">
+      <li>
+        <% thread_parent_alone = (thread_posts.count == 1 and thread_posts.first == thread_parent) %>
+        <% new_thread = thread_parent_alone || thread_posts.include?(thread_parent) %>
+        
+        <b>
+          <% if new_thread %>
+            <% if thread_parent_alone %>
+              (new thread)
+            <% else %>
+              (new thread + <%= pluralize(thread_posts.count - 1, 'reply') %>)
+            <% end %>
+          <% else %>
+            (<%= pluralize(thread_posts.count, 'new reply') %>)
+          <% end %>
+        </b>
+        
+        [<%= thread_parent.date.strftime(SHORT_DATE_FORMAT) %>]
+        <%= thread_parent.author_name %>:
+        <% if new_thread %><b><% end %>
+          <%= link_to thread_parent.subject, post_hash_url(thread_parent) %>
+        <% if new_thread %></b><% end %>
+        
+        <% if !thread_parent_alone %>
+          <ul style="list-style-type: none; margin-left: 0; padding-left: 0">
+            <% (thread_posts - [thread_parent]).each do |post| %>
+              <li>
+                [<%= post.date.strftime(SHORT_DATE_FORMAT) %>]
+                <%= post.author_name %>:
+                <%= link_to truncate(post.first_line, :length => 80), post_hash_url(post) %>
+              </li>
+            <% end %>
+          </ul>
+        <% end %>
+      </li>
+    </ul>
+  <% end %>
+<% end %>

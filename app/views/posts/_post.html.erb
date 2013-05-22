@@ -51,14 +51,7 @@ end
   <h3><%= post.subject %></h3>
   <div class="byline">
     <span class="author">
-      <%= post.author_name %>
-      <% if post.author_email != post.author_name %>
-        <% if post.author_is_local? %>
-          <%= ' (' + post.author_username + ')' %>
-        <% else %>
-          <%= ' <' + post.author_email + '>' if post.author_email %>
-        <% end %>
-      <% end %>
+      <%= author_line(post) %>
       <a class="smallbutton"
         href="#!<%= search_path(:authors => [post.author_name, "<#{post.author_email}>"].join(',')) %>"
         title="Search for posts by this user">Posts</a>

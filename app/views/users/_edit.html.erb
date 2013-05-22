@@ -1,21 +1,21 @@
 <div id="dialog">
   <h2>Settings</h2>
-  <%= form_for @current_user, :remote => true,
+  <%= nested_form_for @current_user, :remote => true,
       :url => update_user_path, :html => { :method => 'put'} do |f| %>
     
     <div class="shrinkable">
-      <%= f.fields_for :preferences do |p| %>
-        <fieldset>
-          <legend>My profile</legend>
-          <%= gravatar_image @current_user.email, 50 %>
-          <p class="user_info">
-            <span class="real_name"><%= @current_user.real_name %></span>
-            <span class="email">(<%= @current_user.email %>)</span>
-            <br>&raquo; <%= link_to 'Change image on Gravatar', 'https://www.gravatar.com/emails' %>
-            <br>&raquo; <%= link_to 'Change display name on Profiles', PROFILES_URL + @current_user.username %>
-          </p>
-        </fieldset>
+      <fieldset>
+        <legend>My profile</legend>
+        <%= gravatar_image @current_user.email, 50 %>
+        <p class="user_info">
+          <span class="real_name"><%= @current_user.real_name %></span>
+          <span class="email">(<%= @current_user.email %>)</span>
+          <br>&raquo; <%= link_to 'Change image on Gravatar', 'https://www.gravatar.com/emails' %>
+          <br>&raquo; <%= link_to 'Change display name on Profiles', PROFILES_URL + @current_user.username %>
+        </p>
+      </fieldset>
         
+      <%= f.fields_for :preferences do |p| %>
         <fieldset>
           <legend>Display options</legend>
           <div class="form_element aligned_field">
@@ -43,38 +43,54 @@
               ActiveSupport::TimeZone.us_zones, :default => @current_user.time_zone %>
           </div>
         </fieldset>
-        
-        <fieldset>
-          <legend>Show unread posts</legend>
-          <div class="user_check_block">
-            <%= p.check_box :unread_in_test, :checked => @current_user.unread_in_test? %>
-            <%= p.label :unread_in_test, 'in csh.test' %><br>
-            <%= p.check_box :unread_in_control, :checked => @current_user.unread_in_control? %>
-            <%= p.label :unread_in_control, 'in control groups (e.g. control.cancel)' %><br>
-            <%= p.check_box :unread_in_lists, :checked => @current_user.unread_in_lists? %>
-            <%= p.label :unread_in_lists, 'in mailing list groups (e.g. csh.lists.alumni)' %>
-          </div>
-          <div class="form_element">
-            <div class="user_radio_block">
-              <%= p.radio_button :unread_level, 0, :checked => @current_user.unread_level == 0 %>
-              <%= p.label :unread_level, 'Always', :value => 0 %><br>
-              <%= p.radio_button :unread_level, 1, :checked => @current_user.unread_level == 1 %>
-              <%= p.label :unread_level, 'Only in threads I\'ve posted in', :value => 1 %><br>
-              <%= p.radio_button :unread_level, 2, :checked => @current_user.unread_level == 2 %>
-              <%= p.label :unread_level, 'Only direct replies to my posts', :value => 2 %><br>
-              <%= p.radio_button :unread_level, 3, :checked => @current_user.unread_level == 3 %>
-              <%= p.label :unread_level, 'Never', :value => 3 %>
-            </div>
-          </div>
-        </fieldset>
-        
-        <fieldset>
-          <legend>WebNews API</legend>
-          <div id="api_settings">
-            <%= render 'api_settings' %>
-          </div>
-        </fieldset>
       <% end %>
+        
+      <fieldset>
+        <legend>Newsgroup settings</legend>
+        <table id="user_subscriptions">
+          <thead>
+            <tr>
+              <th>&nbsp;</th>
+              <th>Mark unread</th>
+              <th>Send email</th>
+              <th>Email type</th>
+              <th>&nbsp;</th>
+            </tr>
+          </thead>
+          <tbody id="subscription_rows">
+            <%= f.fields_for :default_subscription do |sub| %>
+              <tr class="fields">
+                <td>(default settings)</td>
+                <td><%= sub.select :unread_level, options_for_select(PERSONAL_CODES_DESCRIPTIONS, sub.object.unread_level) %></td>
+                <td><%= sub.select :email_level, options_for_select(PERSONAL_CODES_DESCRIPTIONS, sub.object.email_level) %></td>
+                <td><%= sub.select :email_type, options_for_select(Subscription::EMAIL_TYPES.map{ |t| [t.humanize, t] }, sub.object.email_type) %></td>
+                <td>&nbsp;</td>
+              </tr>
+            <% end %>
+            <%= f.fields_for :subscriptions, :wrapper => false do |sub| %>
+              <tr class="fields">
+                <td><%= sub.select :newsgroup_name, options_for_select(@newsgroups.map{ |n| [n.name, n.name] }, sub.object.newsgroup_name), :prompt => '' %></td>
+                <td><%= sub.select :unread_level, options_for_select(PERSONAL_CODES_DESCRIPTIONS, sub.object.unread_level), :include_blank => '(use default)' %></td>
+                <td><%= sub.select :email_level, options_for_select(PERSONAL_CODES_DESCRIPTIONS, sub.object.email_level), :include_blank => '(use default)' %></td>
+                <td><%= sub.select :email_type, options_for_select(Subscription::EMAIL_TYPES.map{ |t| [t.humanize, t] }, sub.object.email_type), :include_blank => '(use default)' %></td>
+                <td><%= sub.link_to_remove '&times;'.html_safe, :class => 'smallbutton' %></td>
+              </tr>
+            <% end %>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="5"><%= f.link_to_add '+ Add newsgroup', :subscriptions, :class => 'smallbutton', 'data-target' => '#subscription_rows' %>
+            </tr>
+          </tfoot>
+        </table>
+      </fieldset>
+      
+      <fieldset>
+        <legend>WebNews API</legend>
+        <div id="api_settings">
+          <%= render 'api_settings' %>
+        </div>
+      </fieldset>
     </div>
     
     <div class="buttons">

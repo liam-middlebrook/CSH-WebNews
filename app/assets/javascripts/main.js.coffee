@@ -304,6 +304,12 @@ $(document).on 'click', '#crosspost_toggle, #markup_explain_toggle', ->
   else
     adjust_dialog_original_height(0 - toggled.height())
 
+$(document).on 'click', '.add_nested_fields[data-association="subscriptions"]', ->
+  adjust_shrinkable_original_height($('#subscription_rows tr').first().height())
+
+$(document).on 'click', '.remove_nested_fields[data-association="subscriptions"]', ->
+  adjust_shrinkable_original_height(0 - $('#subscription_rows tr').first().height())
+
 $(document).on 'click', 'a.new_draft', (e) ->
   if localStorage['draft_form'] and not confirm('Really abandon your saved draft and start a new post?')
     e.stopImmediatePropagation()

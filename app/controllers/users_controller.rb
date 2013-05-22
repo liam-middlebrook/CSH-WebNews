@@ -1,5 +1,6 @@
 class UsersController < ApplicationController
   before_filter :prevent_api_access, :only => [:edit, :update, :update_api]
+  before_filter :get_newsgroups_for_search, :only => :edit
   
   def show
     render :json => {
@@ -13,16 +14,9 @@ class UsersController < ApplicationController
   end
   
   def update
-    @current_user.update_attributes(params[:user].except(:username, :real_name))
-    Newsgroup.find_each do |newsgroup|
-      if not @current_user.unread_in_group?(newsgroup)
-        UnreadPostEntry.where(:user_id => @current_user.id, :newsgroup_id => newsgroup.id).delete_all
-      end
+    if not @current_user.update_attributes(params[:user].except(:username, :real_name))
+      form_error(@current_user.errors.full_messages.join(', '))
     end
-    UnreadPostEntry.where(
-      'user_id = ? and personal_level < ?',
-      @current_user.id, @current_user.unread_level
-    ).delete_all
   end
   
   def update_api

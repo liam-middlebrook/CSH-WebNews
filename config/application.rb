@@ -38,5 +38,12 @@ module Webnews
 
     # Enable the asset pipeline
     config.assets.enabled = true
+    
+    # Set up the mailer
+    config.after_initialize do
+      Webnews::Application.config.action_mailer.default_url_options = { :host => SERVER_NAME, :protocol => 'https' }
+      Webnews::Application.config.action_mailer.delivery_method = :sendmail
+      ActionMailer::Base.default from: %Q("WebNews" <webnews@#{LOCAL_EMAIL_DOMAIN}>)
+    end
   end
 end

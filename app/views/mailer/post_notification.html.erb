@@ -1,0 +1,22 @@
+<div style="display: none; display: none !important"><%= @post.first_line %></div>
+
+<table>
+  <tr>
+    <td>
+      <%= gravatar_image @post.author_email, 40 %>
+    </td>
+    <td>
+      <span style="font-size: 24px">
+        <%= link_to @post.subject, post_hash_url(@post) %>
+      </span>
+      <br>
+      <span style="font-size: 14px">
+        <b><%= author_line(@post) %></b> &mdash; <%= @post.date.strftime(DATE_FORMAT) %>
+      </span>
+    </td>
+  </tr>
+</table>
+
+<br><br>
+
+<div style="white-space: pre-wrap; word-wrap: break-word; font-family: monospace"><%= @post.body %></div>

@@ -5,6 +5,7 @@ class Post < ActiveRecord::Base
   has_many :starred_post_entries, :dependent => :destroy
   has_many :unread_users, :through => :unread_post_entries, :source => :user
   has_many :starred_users, :through => :starred_post_entries, :source => :user
+  
   before_destroy :kill_parent_id
   
   def as_json(options = {})
@@ -63,7 +64,7 @@ class Post < ActiveRecord::Base
   end
   
   def author_is_local?
-    !author_email[LOCAL_EMAIL_DOMAIN].nil? if author_email
+    !author_email['@' + LOCAL_EMAIL_DOMAIN].nil? if author_email
   end
   
   def first_line

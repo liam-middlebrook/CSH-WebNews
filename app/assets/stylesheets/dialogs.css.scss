@@ -111,13 +111,24 @@
     }
   }
   
-  .user_check_block {
-    float: right;
-    width: 50%;
-    input {
-      margin-top: 0.5em;
-      margin-left: 1em;
-      &:first-child { margin-top: 0; }
+  #user_subscriptions {
+    width: 100%;
+    
+    th {
+      text-align: left;
+      font-weight: bold;
+    }
+    
+    td {
+      padding: 4px;
+    }
+    
+    tr {
+      border-bottom: 1px solid $border_light;
+    }
+    
+    tfoot tr {
+      border-bottom: none;
     }
   }
   

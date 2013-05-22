@@ -1,6 +1,7 @@
 class Newsgroup < ActiveRecord::Base
   has_many :unread_post_entries, :dependent => :destroy
   has_many :posts, :foreign_key => :newsgroup, :primary_key => :name, :dependent => :destroy
+  has_many :subscriptions, :dependent => :destroy
   
   default_scope :order => 'name'
   scope :where_posting_allowed, where(:status => 'y')
@@ -87,9 +88,20 @@ class Newsgroup < ActiveRecord::Base
       post = Post.import!(newsgroup, number, head, body)
       if not full_reload
         User.active.each do |user|
-          level = PERSONAL_CODES[post.personal_class_for_user(user)]
-          if not post.authored_by?(user) and user.unread_in_group?(newsgroup) and level >= user.unread_level
-            UnreadPostEntry.create!(:user => user, :newsgroup => newsgroup, :post => post, :personal_level => level)
+          if not post.authored_by?(user)
+            personal_level = PERSONAL_CODES[post.personal_class_for_user(user)]
+            subscription = user.subscriptions.for(newsgroup) || user.default_subscription
+            unread_level = subscription.unread_level || user.default_subscription.unread_level
+            email_level = subscription.email_level || user.default_subscription.email_level
+            email_type = subscription.email_type.presence || user.default_subscription.email_type
+            
+            if personal_level >= unread_level
+              UnreadPostEntry.create!(:user => user, :newsgroup => newsgroup, :post => post, :personal_level => personal_level)
+            end
+            
+            if personal_level >= email_level and email_type == 'immediate'
+              Mailer.post_notification(post, user).deliver
+            end
           end
         end
       end

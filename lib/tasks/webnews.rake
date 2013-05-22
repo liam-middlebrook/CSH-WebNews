@@ -16,4 +16,9 @@ namespace :webnews do
   task :clean_unread => :environment do
     User.clean_unread!
   end
+  
+  desc "Email post digests for users with digest subscriptions"
+  task :send_digests => :environment do
+    Subscription.send_digests!
+  end
 end

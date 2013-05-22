@@ -10,6 +10,7 @@ gem 'rails_autolink'
 gem 'chronic'
 gem 'andand'
 gem 'whenever'
+gem 'nested_form'
 
 # ExecJS engine
 gem 'therubyracer', '0.11.0beta8', :platform => :ruby

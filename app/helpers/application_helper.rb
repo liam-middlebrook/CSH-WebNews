@@ -1,5 +1,4 @@
 module ApplicationHelper
-
   def current_user_stylesheet
     if @current_user.present?
       theme_stylesheet(@current_user.theme)
@@ -17,6 +16,22 @@ module ApplicationHelper
       capitalize ? 'You' : 'you'
     else
       name
+    end
+  end
+  
+  def post_hash_url(post)
+    root_url + '#!' + post_path(post.newsgroup.name, post.number)
+  end
+  
+  def author_line(post)
+    post.author_name + if post.author_email != post.author_name
+      if post.author_is_local?
+        ' (' + post.author_username + ')'
+      else
+        ' <' + post.author_email + '>' if post.author_email
+      end
+    else
+      ''
     end
   end
 
