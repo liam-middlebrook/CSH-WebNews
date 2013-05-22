@@ -1,5 +1,5 @@
 class Post < ActiveRecord::Base
-  belongs_to :newsgroup, :foreign_key => :newsgroup, :primary_key => :name
+  belongs_to :newsgroup, :foreign_key => :newsgroup_name, :primary_key => :name
   belongs_to :sticky_user, :class_name => 'User'
   has_many :unread_post_entries, :dependent => :destroy
   has_many :starred_post_entries, :dependent => :destroy
@@ -33,7 +33,7 @@ class Post < ActiveRecord::Base
       end
     end
     
-    json[:newsgroup] = newsgroup.name
+    json[:newsgroup] = newsgroup_name
     
     if options[:with_user]
       json.merge!(
@@ -152,11 +152,11 @@ class Post < ActiveRecord::Base
   end
   
   def parent
-    parent_id == '' ? nil : Post.where(:message_id => parent_id, :newsgroup => newsgroup.name).first
+    parent_id == '' ? nil : Post.where(:message_id => parent_id, :newsgroup_name => newsgroup_name).first
   end
   
   def children
-    Post.where(:parent_id => message_id, :newsgroup => newsgroup.name)
+    Post.where(:parent_id => message_id, :newsgroup_name => newsgroup_name)
   end
   
   def thread_parent
@@ -168,7 +168,7 @@ class Post < ActiveRecord::Base
   end
   
   def all_in_thread
-    Post.where(:thread_id => thread_id, :newsgroup => newsgroup.name).order('date')
+    Post.where(:thread_id => thread_id, :newsgroup_name => newsgroup_name).order('date')
   end
   
   def post_count_in_thread
@@ -410,17 +410,17 @@ class Post < ActiveRecord::Base
     thread_id = message_id
     possible_thread_id = references[0] || ''
     
-    parent = where(:message_id => parent_id, :newsgroup => newsgroup.name).first
+    parent = where(:message_id => parent_id, :newsgroup_name => newsgroup.name).first
     
     if parent
       thread_id = parent.thread_id
     elsif parent_id != '' and where(:message_id => parent_id).exists?
       parent_id = ''
-    elsif possible_thread_id != '' and where(:message_id => possible_thread_id, :newsgroup => newsgroup.name).exists?
+    elsif possible_thread_id != '' and where(:message_id => possible_thread_id, :newsgroup_name => newsgroup.name).exists?
       parent_id = thread_id = possible_thread_id
     elsif subject =~ /Re:/i
       possible_thread_parent = where(
-        '(subject = ? or subject = ?) and newsgroup = ? and date < ? and date > ?',
+        '(subject = ? or subject = ?) and newsgroup_name = ? and date < ? and date > ?',
         subject, subject.sub(/Re: ?/i, ''), newsgroup.name, date, date - 3.months
       ).order('date').first
       

@@ -20,7 +20,7 @@ module ApplicationHelper
   end
   
   def post_hash_url(post)
-    root_url + '#!' + post_path(post.newsgroup.name, post.number)
+    root_url + '#!' + post_path(post.newsgroup_name, post.number)
   end
   
   def author_line(post)
@@ -45,7 +45,7 @@ module ApplicationHelper
 
   def next_unread_href
     if @next_unread_post
-      '#!' + post_path(@next_unread_post.newsgroup.name, @next_unread_post.number)
+      '#!' + post_path(@next_unread_post.newsgroup_name, @next_unread_post.number)
     else
       '#'
     end

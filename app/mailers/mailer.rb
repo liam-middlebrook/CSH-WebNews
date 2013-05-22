@@ -12,7 +12,7 @@ class Mailer < ActionMailer::Base
       "posted in thread \"#{post.thread_parent.subject}\""
     end
     
-    mail(:to => user.email, :subject => "[#{post.newsgroup.name}] #{post.author_name} #{author_action}")
+    mail(:to => user.email, :subject => "[#{post.newsgroup_name}] #{post.author_name} #{author_action}")
   end
   
   def posts_digest(user, start_at, end_at, target_email_type)

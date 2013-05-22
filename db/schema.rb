@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130512230751) do
+ActiveRecord::Schema.define(:version => 20130522004513) do
 
   create_table "newsgroups", :force => true do |t|
     t.string "name"
@@ -19,7 +19,7 @@ ActiveRecord::Schema.define(:version => 20130512230751) do
   end
 
   create_table "posts", :force => true do |t|
-    t.string   "newsgroup"
+    t.string   "newsgroup_name"
     t.integer  "number"
     t.string   "subject"
     t.string   "author"
@@ -36,7 +36,7 @@ ActiveRecord::Schema.define(:version => 20130512230751) do
 
   add_index "posts", ["date"], :name => "index_posts_on_date"
   add_index "posts", ["message_id"], :name => "index_posts_on_message_id"
-  add_index "posts", ["newsgroup", "number"], :name => "index_posts_on_newsgroup_and_number", :unique => true
+  add_index "posts", ["newsgroup_name", "number"], :name => "index_posts_on_newsgroup_name_and_number", :unique => true
   add_index "posts", ["parent_id"], :name => "index_posts_on_parent_id"
   add_index "posts", ["sticky_until"], :name => "index_posts_on_sticky_until"
   add_index "posts", ["thread_id"], :name => "index_posts_on_thread_id"

@@ -1,18 +1,16 @@
 <div id="dialog">
   <h2>Really cancel this post?</h2>
   <%= form_for @post,
-      :url => destroy_post_path(@post.newsgroup.name, @post.number),
+      :url => destroy_post_path(@post.newsgroup_name, @post.number),
       :html => { :method => 'delete'}, :remote => true do |f| %>
     
     <%= hidden_field_tag :confirm_cancel, 'y' %>
     
     <p>Canceling this post will remove it from WebNews and the news server.</p>
 
-    <p><b>However,</b> if anyone using a different news client has already downloaded this post, it may remain cached in their client indefinitely, allowing them to read and reply to it.</p>
+    <p><b>However,</b> the post may remain cached elsewhere in the form of WebNews email notifications, mailing list messages, or copies downloaded by other news clients. Canceling it will not prevent users from reading or replying to these copies.</p>
     
-    <p><b>Additionally,</b> most newsgroups are synchronized with a mailing list. List subscribers have probably already received this post, and canceling it will not prevent them from reading or replying to the copy in their mailbox.</p>
-    
-    <p>Canceling will create a corresponding message in the <i>control.cancel</i> newsgroup, containing some information about the canceled post (author, date, subject line). You may optionally specify a <b>reason for canceling</b> that will be included in the cancel message.</p>
+    <p>Canceling will create a corresponding message in the <i>control.cancel</i> newsgroup, containing some information about the canceled post (author, date, subject line) and optionally a <b>reason for canceling</b> that you specify.</p>
     
     <div class="form_element">
       <%= text_field_tag :reason, nil, :placeholder => 'Reason for canceling (optional)' %>

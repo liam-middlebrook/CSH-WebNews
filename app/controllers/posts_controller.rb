@@ -105,7 +105,7 @@ class PostsController < ApplicationController
       values << @from_older
     end
     if not @newsgroup
-      conditions << 'newsgroup in (?)'
+      conditions << 'newsgroup_name in (?)'
       values << Newsgroup.pluck(:name).reject{ |name| name =~ DEFAULT_NEWSGROUP_FILTER }
     end
     if params[:unread] and params[:personal_class]
@@ -138,7 +138,7 @@ class PostsController < ApplicationController
     scope = scope.thread_parents if params[:original]
     scope = scope.starred_by_user(@current_user) if params[:starred]
     scope = scope.unread_for_user(@current_user) if params[:unread]
-    scope = scope.where(:newsgroup => @newsgroup.name) if @newsgroup
+    scope = scope.where(:newsgroup_name => @newsgroup.name) if @newsgroup
     @posts_older = scope.where(conditions.join(' and '), *values).order('date DESC').limit(@limit)
     if not @api_rss
       @more_older = @posts_older.length > 0 && !@posts_older[@limit - 1].nil?
@@ -267,7 +267,7 @@ class PostsController < ApplicationController
     reply_newsgroup = reply_post = nil
     if params[:reply_newsgroup]
       reply_newsgroup = Newsgroup.find_by_name(params[:reply_newsgroup])
-      reply_post = Post.where(:newsgroup => params[:reply_newsgroup], :number => params[:reply_number]).first
+      reply_post = Post.where(:newsgroup_name => params[:reply_newsgroup], :number => params[:reply_number]).first
       if reply_post.nil?
         generic_error :not_found, 'post_not_found', "Can't reply to nonexistent post number '#{params[:reply_number]}' in newsgroup '#{params[:reply_newsgroup]}'" and return
       end

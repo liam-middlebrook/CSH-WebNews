@@ -7,7 +7,7 @@
     <% if @post %>
       <div class="form_element with_links">
         Replying to <a class="dialog_cancel minimize_draft"
-          href="#!<%= post_path(@post.newsgroup.name, @post.number) %>"><%= @post.subject %></a>
+          href="#!<%= post_path(@post.newsgroup_name, @post.number) %>"><%= @post.subject %></a>
       </div>
     <% end %>
     
@@ -60,7 +60,7 @@
     </p>
     
     <% if @post %>
-      <%= hidden_field_tag :reply_newsgroup, @post.newsgroup.name %>
+      <%= hidden_field_tag :reply_newsgroup, @post.newsgroup_name %>
       <%= hidden_field_tag :reply_number, @post.number %>
     <% end %>
     

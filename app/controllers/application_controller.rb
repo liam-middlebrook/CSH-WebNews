@@ -132,7 +132,7 @@ class ApplicationController < ActionController::Base
     def get_post
       number = params[:number] || params[:from_number]
       if not params[:newsgroup].blank? and not number.blank?
-        @post = Post.where(:number => number, :newsgroup => params[:newsgroup]).first
+        @post = Post.where(:number => number, :newsgroup_name => params[:newsgroup]).first
         if @api_access and not @post
           generic_error :not_found, 'post_not_found',
             "Post number '#{number}' in newsgroup '#{params[:newsgroup]}' does not exist"
@@ -145,21 +145,21 @@ class ApplicationController < ActionController::Base
     
     def get_next_unread_post
       unread_order = "CASE unread_post_entries.user_created WHEN #{Post.sanitize(true)} THEN 2 ELSE 1 END"
-      standard_order = 'newsgroup, date'
+      standard_order = 'newsgroup_name, date'
       
       if @post and @current_user.thread_mode == :normal
         order = "#{unread_order},
-        CASE newsgroup WHEN #{Post.sanitize(@post.newsgroup.name)} THEN 1 ELSE 2 END,
+        CASE newsgroup_name WHEN #{Post.sanitize(@post.newsgroup_name)} THEN 1 ELSE 2 END,
         CASE thread_id WHEN #{Post.sanitize(@post.thread_id)} THEN 1 ELSE 2 END,
         CASE parent_id WHEN #{Post.sanitize(@post.message_id)} THEN 1 ELSE 2 END,
         CASE parent_id WHEN #{Post.sanitize(@post.parent_id)} THEN 1 ELSE 2 END, #{standard_order}"
       elsif @post and @current_user.thread_mode == :hybrid
         order = "#{unread_order},
-        CASE newsgroup WHEN #{Post.sanitize(@post.newsgroup.name)} THEN 1 ELSE 2 END,
+        CASE newsgroup_name WHEN #{Post.sanitize(@post.newsgroup_name)} THEN 1 ELSE 2 END,
         CASE thread_id WHEN #{Post.sanitize(@post.thread_id)} THEN 1 ELSE 2 END, #{standard_order}"
       elsif @newsgroup
         order = "#{unread_order},
-          CASE newsgroup WHEN #{Post.sanitize(@newsgroup.name)} THEN 1 ELSE 2 END, #{standard_order}"
+          CASE newsgroup_name WHEN #{Post.sanitize(@newsgroup_name)} THEN 1 ELSE 2 END, #{standard_order}"
       else
         order = "#{unread_order}, #{standard_order}"
       end

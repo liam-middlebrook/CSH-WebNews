@@ -2,7 +2,7 @@
 expanded ||= false
 unread ||= post.unread_for_user?(@current_user)
 tr_class ||= post.personal_class_for_user(@current_user) if not skip_class
-newsgroup_name = @newsgroup ? @newsgroup.name : post.newsgroup.name
+newsgroup_name = @newsgroup ? @newsgroup.name : post.newsgroup_name
 %>
 
 <tr class="<%= (post.sticky? ? 'sticky ' : '') + (unread ? 'unread ' : '') + tr_class.to_s %>"

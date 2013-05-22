@@ -1,6 +1,6 @@
 class Newsgroup < ActiveRecord::Base
   has_many :unread_post_entries, :dependent => :destroy
-  has_many :posts, :foreign_key => :newsgroup, :primary_key => :name, :dependent => :destroy
+  has_many :posts, :foreign_key => :newsgroup_name, :primary_key => :name, :dependent => :destroy
   has_many :subscriptions, :dependent => :destroy
   
   default_scope :order => 'name'
@@ -42,7 +42,7 @@ class Newsgroup < ActiveRecord::Base
     begin
       head = body = nil
       Net::NNTP.start(NEWS_SERVER) do |nntp|
-        nntp.group(post.newsgroup.name)
+        nntp.group(post.newsgroup_name)
         head = nntp.head(post.number)[1].join("\n")
         body = nntp.body(post.number)[1].join("\n")
       end
@@ -71,14 +71,14 @@ class Newsgroup < ActiveRecord::Base
     end
     
     puts nntp.group(newsgroup.name)[1] if $in_rake
-    my_posts = Post.where(:newsgroup => newsgroup.name).select(:number).map(&:number)
+    my_posts = Post.where(:newsgroup_name => newsgroup.name).select(:number).map(&:number)
     news_posts = nntp.listgroup(newsgroup.name)[1].map(&:to_i)
     to_delete = my_posts - news_posts
     to_import = news_posts - my_posts
     
     puts "Deleting #{to_delete.size} posts." if $in_rake
     to_delete.each do |number|
-      Post.where(:newsgroup => newsgroup.name, :number => number).first.destroy
+      Post.where(:newsgroup_name => newsgroup.name, :number => number).first.destroy
     end
     
     puts "Importing #{to_import.size} posts." if $in_rake
