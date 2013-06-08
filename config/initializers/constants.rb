@@ -6,6 +6,12 @@ PERSONAL_CODES_DESCRIPTIONS = {
   'Replies to me' => 2,
   'Never' => 3
 }
+DIGEST_TYPES_DESCRIPTIONS = {
+  'No digest' => 'none',
+  'Daily digest' => 'daily',
+  'Weekly digest' => 'weekly',
+  'Monthly digest' => 'monthly'
+}
 
 # Randomly generate a short string unlikely to be found in post content
 MARK_STRING = (1..12).map{ ('A'..'Z').to_a[rand(26)] }.join.gsub(/[AEIOU]/, 'x')

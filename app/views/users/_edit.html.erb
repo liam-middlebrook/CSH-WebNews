@@ -52,8 +52,8 @@
             <tr>
               <th>&nbsp;</th>
               <th>Mark unread</th>
-              <th>Send email</th>
-              <th>Email type</th>
+              <th>Email notification</th>
+              <th>Include in digest</th>
               <th>&nbsp;</th>
             </tr>
           </thead>
@@ -63,7 +63,7 @@
                 <td>(default settings)</td>
                 <td><%= sub.select :unread_level, options_for_select(PERSONAL_CODES_DESCRIPTIONS, sub.object.unread_level) %></td>
                 <td><%= sub.select :email_level, options_for_select(PERSONAL_CODES_DESCRIPTIONS, sub.object.email_level) %></td>
-                <td><%= sub.select :email_type, options_for_select(Subscription::EMAIL_TYPES.map{ |t| [t.humanize, t] }, sub.object.email_type) %></td>
+                <td><%= sub.select :digest_type, options_for_select(DIGEST_TYPES_DESCRIPTIONS, sub.object.digest_type) %></td>
                 <td>&nbsp;</td>
               </tr>
             <% end %>
@@ -72,14 +72,16 @@
                 <td><%= sub.select :newsgroup_name, options_for_select(@newsgroups.map{ |n| [n.name, n.name] }, sub.object.newsgroup_name), :prompt => '' %></td>
                 <td><%= sub.select :unread_level, options_for_select(PERSONAL_CODES_DESCRIPTIONS, sub.object.unread_level), :include_blank => '(use default)' %></td>
                 <td><%= sub.select :email_level, options_for_select(PERSONAL_CODES_DESCRIPTIONS, sub.object.email_level), :include_blank => '(use default)' %></td>
-                <td><%= sub.select :email_type, options_for_select(Subscription::EMAIL_TYPES.map{ |t| [t.humanize, t] }, sub.object.email_type), :include_blank => '(use default)' %></td>
+                <td><%= sub.select :digest_type, options_for_select(DIGEST_TYPES_DESCRIPTIONS, sub.object.digest_type), :include_blank => '(use default)' %></td>
                 <td><%= sub.link_to_remove '&times;'.html_safe, :class => 'smallbutton' %></td>
               </tr>
             <% end %>
           </tbody>
           <tfoot>
             <tr>
-              <td colspan="5"><%= f.link_to_add '+ Add newsgroup', :subscriptions, :class => 'smallbutton', 'data-target' => '#subscription_rows' %>
+              <td colspan="5">
+                <%= f.link_to_add '+ Add newsgroup', :subscriptions, :class => 'smallbutton', 'data-target' => '#subscription_rows' %>
+              </td>
             </tr>
           </tfoot>
         </table>

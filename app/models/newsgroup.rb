@@ -93,13 +93,12 @@ class Newsgroup < ActiveRecord::Base
             subscription = user.subscriptions.for(newsgroup) || user.default_subscription
             unread_level = subscription.unread_level || user.default_subscription.unread_level
             email_level = subscription.email_level || user.default_subscription.email_level
-            email_type = subscription.email_type.presence || user.default_subscription.email_type
-            
+
             if personal_level >= unread_level
               UnreadPostEntry.create!(:user => user, :newsgroup => newsgroup, :post => post, :personal_level => personal_level)
             end
             
-            if personal_level >= email_level and email_type == 'immediate'
+            if personal_level >= email_level
               Mailer.post_notification(post, user).deliver
             end
           end

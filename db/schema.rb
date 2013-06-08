@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130522004513) do
+ActiveRecord::Schema.define(:version => 20130608141604) do
 
   create_table "newsgroups", :force => true do |t|
     t.string "name"
@@ -26,12 +26,12 @@ ActiveRecord::Schema.define(:version => 20130522004513) do
     t.datetime "date"
     t.string   "message_id"
     t.string   "parent_id"
+    t.text     "headers"
+    t.text     "body"
     t.string   "thread_id"
     t.boolean  "stripped"
     t.integer  "sticky_user_id"
     t.datetime "sticky_until"
-    t.text     "headers"
-    t.text     "body"
   end
 
   add_index "posts", ["date"], :name => "index_posts_on_date"
@@ -53,7 +53,7 @@ ActiveRecord::Schema.define(:version => 20130522004513) do
     t.string   "newsgroup_name"
     t.integer  "unread_level"
     t.integer  "email_level"
-    t.string   "email_type"
+    t.string   "digest_type"
     t.datetime "created_at",     :null => false
     t.datetime "updated_at",     :null => false
   end

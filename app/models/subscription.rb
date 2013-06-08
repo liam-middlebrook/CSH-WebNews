@@ -1,5 +1,5 @@
 class Subscription < ActiveRecord::Base
-  EMAIL_TYPES = %w(immediate daily_digest weekly_digest monthly_digest)
+  DIGEST_TYPES = %w(none daily weekly monthly)
   
   belongs_to :user
   belongs_to :newsgroup, :foreign_key => :newsgroup_name, :primary_key => :name
@@ -9,7 +9,7 @@ class Subscription < ActiveRecord::Base
   validates :unread_level, :email_level, :numericality => {
     :greater_than_or_equal_to => 0, :less_than => PERSONAL_CODES.length, :allow_nil => true
   }
-  validates :email_type, :inclusion => { :in => EMAIL_TYPES, :allow_blank => true }
+  validates :digest_type, :inclusion => { :in => DIGEST_TYPES, :allow_blank => true }
   
   def self.for(newsgroup)
     find_by_newsgroup_name(newsgroup.name)
