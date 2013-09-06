@@ -292,7 +292,8 @@ class PostsController < ApplicationController
         new_message_id = nntp.post(post_string)[1][/<.*?>/]
       end
     rescue
-      generic_error :internal_server_error, 'nntp_post_error', 'NNTP server error: ' + $!.message and return
+      generic_error :internal_server_error, 'nntp_post_error', 'NNTP server error: ' + $!.message
+      log_exception($!) and return
     end
     
     begin
@@ -307,6 +308,7 @@ class PostsController < ApplicationController
       end
     rescue
       @sync_error = "Your post was accepted by the news server and does not need to be resubmitted, but an error occurred while resyncing the newsgroups: #{$!.message}"
+      log_exception($!)
     end
     
     respond_to do |wants|
@@ -357,7 +359,8 @@ class PostsController < ApplicationController
         }))
       end
     rescue
-      generic_error :internal_server_error, 'nntp_post_error', 'NNTP server error: ' + $!.message and return
+      generic_error :internal_server_error, 'nntp_post_error', 'NNTP server error: ' + $!.message
+      log_exception($!) and return
     end
     
     begin
@@ -367,6 +370,7 @@ class PostsController < ApplicationController
       end
     rescue
       @sync_error = "Your cancel was accepted by the news server and does not need to be resubmitted, but an error occurred while resyncing the newsgroups: #{$!.message}"
+      log_exception($!)
     end
     
     respond_to do |wants|

@@ -238,6 +238,11 @@ class ApplicationController < ActionController::Base
       end
     end
     
+    def log_exception(exception)
+      logger.error(exception.message)
+      logger.error(exception.backtrace.join("\n"))
+    end
+    
     def remote_host
       Resolv.getname(request.remote_ip) rescue request.remote_ip
     end
