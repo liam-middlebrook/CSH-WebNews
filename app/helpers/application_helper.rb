@@ -20,7 +20,9 @@ module ApplicationHelper
   end
   
   def post_hash_url(post)
-    root_url + '#!' + post_path(post.newsgroup_name, post.number)
+    # Used from mailer templates, so we must manually specify the site URL
+    root_url(Webnews::Application.config.action_mailer.default_url_options) +
+      '#!' + post_path(post.newsgroup_name, post.number)
   end
   
   def author_line(post)
