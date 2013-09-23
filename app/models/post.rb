@@ -138,7 +138,11 @@ class Post < ActiveRecord::Base
   end
   
   def all_newsgroup_names
-    headers[/^Newsgroups: (.*)/i, 1].split(',').map(&:strip)
+    if headers =~ /^Control: cancel/
+      ['control.cancel']
+    else
+      headers[/^Newsgroups: (.*)/i, 1].split(',').map(&:strip)
+    end
   end
   
   def in_newsgroup(newsgroup)
