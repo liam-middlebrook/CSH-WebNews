@@ -43,6 +43,7 @@ reset_check_timeout()
 <% @post.all_newsgroups.each do |group| %>
 group_li = $('#groups_list li[data-name="<%= group.name %>"]')
 selected = group_li.hasClass('selected')
+read_only = group_li.hasClass('read_only')
 group_li.removeClass()
 unread = <%= raw group.unread_for_user(@current_user).to_json %>
 
@@ -53,6 +54,7 @@ else
   group_li.find('.unread_count').remove()
 
 group_li.addClass('selected') if selected
+group_li.addClass('read_only') if read_only
 <% end %>
 <% end %>
 
