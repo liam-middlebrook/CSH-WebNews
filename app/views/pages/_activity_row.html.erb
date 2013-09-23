@@ -13,7 +13,7 @@ end
     <%= newest_post.date.strftime(SHORT_DATE_FORMAT) %>
   </td>
   <td>
-    <%= maybe_you(newest_post.author_name, true) %>
+    <%= truncate(maybe_you(newest_post.author_name, true)) %>
     <% if newest_post == thread_parent %>
       posted
     <% else %>
@@ -34,7 +34,7 @@ end
       href="#!<%= post_path(linked_post.newsgroup_name, linked_post.number) %>"><%= thread_parent.subject %></a>
     <span class="byline">
       <% if newest_post != thread_parent %>
-        by <%= maybe_you(thread_parent.author_name) %>
+        by <%= truncate(maybe_you(thread_parent.author_name)) %>
       <% end %>
       in
       <% if cross_posted %>
