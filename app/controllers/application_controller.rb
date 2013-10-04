@@ -95,10 +95,11 @@ class ApplicationController < ActionController::Base
           @new_user = true
         else
           @old_user = true if @current_user.inactive?
-          @current_user.touch
         end
       end
+      
       if @current_user
+        @current_user.touch
         Time.zone = @current_user.time_zone
         Chronic.time_class = Time.zone
       end
