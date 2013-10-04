@@ -5,6 +5,7 @@ class UsersController < ApplicationController
   def show
     render :json => {
       :user => @current_user.as_json(:only => [:username, :real_name, :created_at]).
+        merge(:is_admin => @current_user.admin?).
         merge(:preferences => @current_user.preferences.slice(:thread_mode, :time_zone))
     }
   end
