@@ -11,12 +11,14 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130608141604) do
+ActiveRecord::Schema.define(:version => 20131009224837) do
 
   create_table "newsgroups", :force => true do |t|
     t.string "name"
     t.string "status"
   end
+
+  add_index "newsgroups", ["name"], :name => "index_newsgroups_on_name"
 
   create_table "posts", :force => true do |t|
     t.string   "newsgroup_name"
@@ -37,6 +39,7 @@ ActiveRecord::Schema.define(:version => 20130608141604) do
   add_index "posts", ["date"], :name => "index_posts_on_date"
   add_index "posts", ["message_id"], :name => "index_posts_on_message_id"
   add_index "posts", ["newsgroup_name", "number"], :name => "index_posts_on_newsgroup_name_and_number", :unique => true
+  add_index "posts", ["newsgroup_name"], :name => "index_posts_on_newsgroup_name"
   add_index "posts", ["parent_id"], :name => "index_posts_on_parent_id"
   add_index "posts", ["sticky_until"], :name => "index_posts_on_sticky_until"
   add_index "posts", ["thread_id"], :name => "index_posts_on_thread_id"
@@ -46,7 +49,9 @@ ActiveRecord::Schema.define(:version => 20130608141604) do
     t.integer "post_id"
   end
 
+  add_index "starred_post_entries", ["post_id"], :name => "index_starred_post_entries_on_post_id"
   add_index "starred_post_entries", ["user_id", "post_id"], :name => "index_starred_post_entries_on_user_id_and_post_id", :unique => true
+  add_index "starred_post_entries", ["user_id"], :name => "index_starred_post_entries_on_user_id"
 
   create_table "subscriptions", :force => true do |t|
     t.integer  "user_id"
@@ -69,7 +74,10 @@ ActiveRecord::Schema.define(:version => 20130608141604) do
     t.boolean "user_created"
   end
 
+  add_index "unread_post_entries", ["newsgroup_id"], :name => "index_unread_post_entries_on_newsgroup_id"
+  add_index "unread_post_entries", ["post_id"], :name => "index_unread_post_entries_on_post_id"
   add_index "unread_post_entries", ["user_id", "post_id"], :name => "index_unread_post_entries_on_user_id_and_post_id", :unique => true
+  add_index "unread_post_entries", ["user_id"], :name => "index_unread_post_entries_on_user_id"
 
   create_table "users", :force => true do |t|
     t.string   "username"
@@ -82,5 +90,6 @@ ActiveRecord::Schema.define(:version => 20130608141604) do
   end
 
   add_index "users", ["api_key"], :name => "index_users_on_api_key"
+  add_index "users", ["username"], :name => "index_users_on_username"
 
 end
