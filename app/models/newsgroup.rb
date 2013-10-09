@@ -63,52 +63,56 @@ class Newsgroup < ActiveRecord::Base
       FileUtils.touch('tmp/syncing.txt')
     end
     
-    if Newsgroup.where(:name => name).exists?
-      newsgroup = Newsgroup.where(:name => name).first
-      newsgroup.update_attributes(:status => status)
-    else
-      newsgroup = Newsgroup.create!(:name => name, :status => status)
-    end
-    
-    puts nntp.group(newsgroup.name)[1] if $in_rake
-    my_posts = Post.where(:newsgroup_name => newsgroup.name).select(:number).map(&:number)
-    news_posts = nntp.listgroup(newsgroup.name)[1].map(&:to_i)
-    to_delete = my_posts - news_posts
-    to_import = news_posts - my_posts
-    
-    puts "Deleting #{to_delete.size} posts." if $in_rake
-    to_delete.each do |number|
-      Post.where(:newsgroup_name => newsgroup.name, :number => number).first.destroy
-    end
-    
-    puts "Importing #{to_import.size} posts." if $in_rake
-    to_import.each do |number|
-      head = nntp.head(number)[1].join("\n")
-      body = nntp.body(number)[1].join("\n")
-      post = Post.import!(newsgroup, number, head, body)
-      if not full_reload
-        User.active.each do |user|
-          if not post.authored_by?(user)
-            personal_level = PERSONAL_CODES[post.personal_class_for_user(user)]
-            subscription = user.subscriptions.for(newsgroup) || user.default_subscription
-            unread_level = subscription.unread_level || user.default_subscription.unread_level
-            email_level = subscription.email_level || user.default_subscription.email_level
+    begin
+      if Newsgroup.where(:name => name).exists?
+        newsgroup = Newsgroup.where(:name => name).first
+        newsgroup.update_attributes(:status => status)
+      else
+        newsgroup = Newsgroup.create!(:name => name, :status => status)
+      end
+      
+      puts nntp.group(newsgroup.name)[1] if $in_rake
+      my_posts = Post.where(:newsgroup_name => newsgroup.name).pluck(:number)
+      news_posts = nntp.listgroup(newsgroup.name)[1].map(&:to_i)
+      to_delete = my_posts - news_posts
+      to_import = news_posts - my_posts
+      
+      puts "Deleting #{to_delete.size} posts." if $in_rake
+      to_delete.each do |number|
+        Post.where(:newsgroup_name => newsgroup.name, :number => number).first.destroy
+      end
+      
+      puts "Importing #{to_import.size} posts." if $in_rake
+      to_import.each do |number|
+        head = nntp.head(number)[1].join("\n")
+        body = nntp.body(number)[1].join("\n")
+        post = Post.import!(newsgroup, number, head, body)
+        if not full_reload
+          User.active.each do |user|
+            if not post.authored_by?(user)
+              personal_level = PERSONAL_CODES[post.personal_class_for_user(user)]
+              subscription = user.subscriptions.for(newsgroup) || user.default_subscription
+              unread_level = subscription.unread_level || user.default_subscription.unread_level
+              email_level = subscription.email_level || user.default_subscription.email_level
 
-            if personal_level >= unread_level
-              UnreadPostEntry.create!(:user => user, :newsgroup => newsgroup, :post => post, :personal_level => personal_level)
-            end
-            
-            if personal_level >= email_level
-              Mailer.post_notification(post, user).deliver
+              if personal_level >= unread_level
+                UnreadPostEntry.create!(:user => user, :newsgroup => newsgroup, :post => post, :personal_level => personal_level)
+              end
+              
+              if personal_level >= email_level
+                Mailer.post_notification(post, user).deliver
+              end
             end
           end
         end
+        print '.' if $in_rake
       end
-      print '.' if $in_rake
+      puts if $in_rake
+    ensure
+      if standalone
+        FileUtils.rm('tmp/syncing.txt')
+      end
     end
-    puts if $in_rake
-  ensure
-    FileUtils.rm('tmp/syncing.txt') if standalone
   end
   
   def self.sync_all!(full_reload = false)
@@ -151,19 +155,17 @@ class Newsgroup < ActiveRecord::Base
   end
   
   def self.wait_for_sync_or_timeout
-    return if not File.exists?('tmp/syncing.txt')
-    print "Waiting for another active sync to complete... " if $in_rake
-    seconds = 0
-    loop do
-      sleep 1
-      seconds += 1
-      if not File.exists?('tmp/syncing.txt')
-        puts "OK\n\n"
-        return
-      elsif seconds >= 15
-        puts "timed out!\n\n"
-        raise 'Timed out waiting for another active sync to complete'
+    if File.exists?('tmp/syncing.txt')
+      print "Waiting for another active sync to complete... " if $in_rake
+      15.times do
+        sleep 1
+        if not File.exists?('tmp/syncing.txt')
+          puts "OK\n\n" if $in_rake
+          return
+        end
       end
+      puts "timed out!\n\n" if $in_rake
+      raise 'Timed out waiting for another active sync to complete'
     end
   end
 end
