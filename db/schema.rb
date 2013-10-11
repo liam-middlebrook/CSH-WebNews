@@ -28,12 +28,12 @@ ActiveRecord::Schema.define(:version => 20131009224837) do
     t.datetime "date"
     t.string   "message_id"
     t.string   "parent_id"
-    t.text     "headers"
-    t.text     "body"
     t.string   "thread_id"
     t.boolean  "stripped"
     t.integer  "sticky_user_id"
     t.datetime "sticky_until"
+    t.text     "headers"
+    t.text     "body"
   end
 
   add_index "posts", ["date"], :name => "index_posts_on_date"
