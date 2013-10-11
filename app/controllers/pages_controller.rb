@@ -15,7 +15,6 @@ class PagesController < ApplicationController
           @current_user.real_name = request.env[ENV_REALNAME]
           @current_user.save!
         end
-        cronless_sync_all
         get_last_sync_time
         get_next_unread_post
       end
@@ -33,6 +32,15 @@ class PagesController < ApplicationController
     end
   end
   
+  def check_new
+    get_last_sync_time
+    get_next_unread_post
+    if params[:location] == '#!/home'
+      @dashboard_active = true
+      get_activity_feed
+    end
+  end
+  
   def about
     render 'shared/dialog'
   end
@@ -47,16 +55,6 @@ class PagesController < ApplicationController
   
   def rss_caution
     render 'shared/dialog'
-  end
-  
-  def check_new
-    cronless_sync_all
-    get_last_sync_time
-    get_next_unread_post
-    if params[:location] == '#!/home'
-      @dashboard_active = true
-      get_activity_feed
-    end
   end
   
   private

@@ -39,9 +39,5 @@ NEW_USER_SUBSCRIPTIONS = [
   { :newsgroup_name => 'csh.test', :unread_level => 3, :email_level => 3, :digest_type => 'none' }
 ]
 
-# Set true to enable 'lazy' news syncing without having to install the cron jobs
-# (Note: Does not enable cronless versions of the other cron jobs, see config/schedule.rb)
-CRONLESS_SYNC = false
-
 # Set true to disable authentication and auto-login as a test user with admin privileges
 DEVELOPMENT_MODE = false

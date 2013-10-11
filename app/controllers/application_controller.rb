@@ -180,20 +180,6 @@ class ApplicationController < ActionController::Base
       end
     end
     
-    def cronless_sync_all
-      if CRONLESS_SYNC and not File.exists?('tmp/syncing.txt') and (
-        not File.exists?('tmp/lastsync.txt') or File.mtime('tmp/lastsync.txt') < 1.minute.ago
-      )
-        begin
-          Newsgroup.sync_all!
-        rescue
-          logger.error "\n\n### SYNC ERROR ###"
-          logger.error $!.message
-          logger.error "##################\n\n"
-        end
-      end
-    end
-    
     def form_error(details)
       @error_details = details
       render 'shared/form_error'
