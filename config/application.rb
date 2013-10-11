@@ -6,6 +6,9 @@ require 'rails/all'
 # you've limited to :test, :development, or :production.
 Bundler.require(:default, Rails.env) if defined?(Bundler)
 
+# Load WebNews configuration constants
+require File.expand_path('../webnews', __FILE__)
+
 module Webnews
   class Application < Rails::Application
     # Settings in config/environments/* take precedence over those specified here.
@@ -40,10 +43,8 @@ module Webnews
     config.assets.enabled = true
     
     # Set up the mailer
-    config.after_initialize do
-      Webnews::Application.config.action_mailer.default_url_options = { :host => SERVER_NAME, :protocol => 'https' }
-      Webnews::Application.config.action_mailer.delivery_method = :sendmail
-      ActionMailer::Base.default from: %Q("WebNews" <webnews@#{LOCAL_EMAIL_DOMAIN}>)
-    end
+    config.action_mailer.default_url_options = { :host => SERVER_NAME, :protocol => 'https' }
+    config.action_mailer.delivery_method = :sendmail
+    ActionMailer::Base.default from: %Q("WebNews" <webnews@#{LOCAL_EMAIL_DOMAIN}>)
   end
 end
