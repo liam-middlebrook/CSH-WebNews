@@ -1,0 +1,14 @@
+document.addEventListener('DOMContentLoaded', function(event) {
+  var event = document.createEvent('Event')
+  event.initEvent('webnewsReady', true, true)
+
+  var frame = document.createElement('iframe')
+  frame.src = 'https://<%= SERVER_NAME %>/webauth/iframe.html'
+  frame.style.display = 'none'
+  frame.onload = function(){
+    document.dispatchEvent(event)
+    document.body.removeChild(frame)
+  }
+
+  document.body.appendChild(frame)
+})

@@ -1,5 +1,6 @@
 class UsersController < ApplicationController
   before_filter :prevent_api_access, :only => [:edit, :update, :update_api]
+  before_filter :allow_cross_origin_access, :only => [:show, :unread_counts]
   before_filter :get_newsgroups_for_search, :only => :edit
   
   def show

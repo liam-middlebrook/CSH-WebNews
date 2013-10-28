@@ -4,8 +4,9 @@ SERVER_NAME = "webnews#{'-dev' unless Rails.env.production?}.csh.rit.edu"
 # The news server name, or 'localhost' if using SSH tunneling
 NEWS_SERVER = 'news.csh.rit.edu'
 
-# Users at this domain get the Posts/Profile/Wiki link treatment
-LOCAL_EMAIL_DOMAIN = 'csh.rit.edu'
+# The local top-level domain for users of this installation
+# Cross-origin requests without API authentication will be allowed from this domain
+LOCAL_DOMAIN = 'csh.rit.edu'
 
 # URL prefixes for the Profile and Wiki links
 PROFILES_URL = 'https://members.csh.rit.edu/profiles/members/'

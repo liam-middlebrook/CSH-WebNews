@@ -3,11 +3,12 @@ class ApplicationController < ActionController::Base
   require 'shellwords'
   require 'resolv'
   protect_from_forgery
-  before_filter :check_maintenance, :authenticate, :get_or_create_user
+  before_filter :set_frame_options, :set_request_format
+  before_filter :check_maintenance, :check_auth, :get_or_create_user
   
   private
   
-    def authenticate
+    def check_auth
       if not Newsgroup.select(true).first
         @no_script = true
         render 'shared/no_groups'
@@ -21,8 +22,8 @@ class ApplicationController < ActionController::Base
           end
         elsif not DEVELOPMENT_MODE and not params[:api_key]
           respond_to do |wants|
-            wants.html { render :file => "#{Rails.root}/public/auth.html", :layout => false }
-            wants.js { render 'shared/needs_auth' }
+            wants.html { render 'shared/authenticate', :layout => false }
+            wants.js { render 'shared/unauthenticated' }
             wants.any { generic_error :unauthorized, 'api_key_missing',
               "API access requires a key to be provided in the 'api_key' parameter" }
           end
@@ -236,5 +237,25 @@ class ApplicationController < ActionController::Base
     
     def prevent_api_access
       head :forbidden if @api_access
+    end
+
+    def allow_cross_origin_access
+      request_origin = request.headers['Origin']
+      if request_origin =~ /\Ahttps.*#{LOCAL_DOMAIN}\Z/
+        headers['Access-Control-Allow-Origin'] = request_origin
+        headers['Access-Control-Allow-Methods'] = 'GET'
+        headers['Access-Control-Allow-Credentials'] = 'true'
+      end
+    end
+
+    def set_frame_options
+      headers['X-Frame-Options'] = 'DENY'
+    end
+
+    def set_request_format
+      # JSON request detection doesn't seem to work if Accept contains multiple content types
+      if request.headers['Accept'].present? && request.headers['Accept'] =~ /application\/json/
+        request.format = :json
+      end
     end
 end

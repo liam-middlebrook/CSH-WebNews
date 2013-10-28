@@ -36,7 +36,7 @@ class User < ActiveRecord::Base
   end
   
   def email
-    "#{username}@#{LOCAL_EMAIL_DOMAIN}"
+    "#{username}@#{LOCAL_DOMAIN}"
   end
   
   def theme

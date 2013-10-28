@@ -64,7 +64,7 @@ class Post < ActiveRecord::Base
   end
   
   def author_is_local?
-    !author_email['@' + LOCAL_EMAIL_DOMAIN].nil? if author_email
+    !author_email['@' + LOCAL_DOMAIN].nil? if author_email
   end
   
   def first_line

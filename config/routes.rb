@@ -1,5 +1,6 @@
 Webnews::Application.routes.draw do
   root :to => 'pages#home'
+  get '/authenticate', :to => 'pages#authenticate'
   
   get '/home',      :to => 'pages#home'
   get '/activity',  :to => 'pages#home'
