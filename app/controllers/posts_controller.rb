@@ -44,7 +44,8 @@ class PostsController < ApplicationController
       if @flat_mode
         @posts_newer = @newsgroup.posts.where(date_condition, @from_newer).order('date').limit(@limit)
       else
-        @from_newer = @newsgroup.posts.where(:date => @from_newer).first.thread_parent.date
+        from_newer_post = @newsgroup.posts.where(:date => @from_newer).first
+        @from_newer = from_newer_post.thread_parent.date if from_newer_post
         @posts_newer = @newsgroup.posts.
           where("parent_id = ? and #{date_condition}", '', @from_newer).
           order('date').limit(@limit)
