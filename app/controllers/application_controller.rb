@@ -256,6 +256,7 @@ class ApplicationController < ActionController::Base
       # JSON request detection doesn't seem to work if Accept contains multiple content types
       if request.headers['Accept'].present? && request.headers['Accept'] =~ /application\/json/
         request.format = :json
+        @api_access = true
       end
     end
 end
