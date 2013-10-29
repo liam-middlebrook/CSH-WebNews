@@ -88,14 +88,25 @@ class ApplicationController < ActionController::Base
       else # Non-API access, may create the user
         @current_user = DEVELOPMENT_MODE ? User.first :
           User.find_by_username(request.env[ENV_USERNAME])
+
         if @current_user.nil?
-          @current_user = User.create!(
-            :username => request.env[ENV_USERNAME],
-            :real_name => request.env[ENV_REALNAME]
-          )
-          @new_user = true
-        else
-          @old_user = true if @current_user.inactive?
+          if request.format.html?
+            @current_user = User.create!(
+              :username => request.env[ENV_USERNAME],
+              :real_name => request.env[ENV_REALNAME]
+            )
+            @new_user = true
+          else
+            generic_error :forbidden, 'user_not_created',
+              'This user has no account and must visit the main WebNews site to create one'
+          end
+        elsif @current_user.inactive?
+          if request.format.html?
+            @old_user = true
+          else
+            generic_error :forbidden, 'user_inactive',
+              'This account has been marked inactive and must be reactivated through the main WebNews site'
+          end
         end
       end
       
@@ -192,6 +203,7 @@ class ApplicationController < ActionController::Base
     end
     
     def json_error(status, id, details)
+      allow_cross_origin_access
       render :status => status, :json => json_error_object(id, details)
     end
     
