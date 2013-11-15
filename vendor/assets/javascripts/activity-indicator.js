@@ -10,6 +10,7 @@
  
 /**
  * Plugin that renders a customisable activity indicator (spinner) using SVG or VML.
+ * Patched for latest Chrome compatibility as per https://github.com/neteye/jquery-plugins/pull/59
  */
 (function($) {
 
@@ -140,6 +141,7 @@
 				if (!animations[steps]) {
 					var name = 'spin' + steps;
 					var rule = '@-webkit-keyframes '+ name +' {';
+					var style = document.createElement('style');
 					for (var i=0; i < steps; i++) {
 						var p1 = Math.round(100000 / steps * i) / 1000;
 						var p2 = Math.round(100000 / steps * (i+1) - 1) / 1000;
@@ -147,7 +149,13 @@
 						rule += p1 + value + p2 + value; 
 					}
 					rule += '100% { -webkit-transform:rotate(100deg); }\n}';
-					document.styleSheets[0].insertRule(rule);
+					style.type = 'text/css';
+					if (style.styleSheet) {
+						style.styleSheet.cssText = rule;
+					} else {
+						style.appendChild(document.createTextNode(rule));
+					}
+					document.getElementsByTagName('head')[0].appendChild(style);
 					animations[steps] = name;
 				}
 				el.css('-webkit-animation', animations[steps] + ' ' + duration +'s linear infinite');
