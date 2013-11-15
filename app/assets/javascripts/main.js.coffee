@@ -501,4 +501,4 @@ $(document).ajaxError (event, jqxhr, settings, exception) ->
       window.active_check_new = false
       set_check_timeout(check_new_retry_interval)
     else
-      alert("An error occurred requesting #{settings.url}\n\nThis might be due to a connection issue on your end, or it might indicate a bug in WebNews. Check your connection and refresh the page. If this error persists, please file a bug report with the steps needed to reproduce it.")
+      alert("\"#{exception}\" occurred while requesting #{settings.url}\n\nThis error could indicate a network issue or a bug in WebNews. Check your connection and refresh the page. If the error persists, please file a bug report with the steps needed to reproduce it and the full text of the error message above.")
