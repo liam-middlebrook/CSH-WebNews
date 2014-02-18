@@ -18,4 +18,4 @@ MARK_STRING = (1..12).map{ ('A'..'Z').to_a[rand(26)] }.join.gsub(/[AEIOU]/, 'x')
 
 AVAILABLE_THEMES =
   Dir.glob("#{Rails.root}/app/assets/stylesheets/theme-*").
-  map{ |path| /theme-(.*)\.css/.match(path)[1] }.map(&:to_sym)
+  map{ |path| /theme-(.*)\.css/.match(path)[1] }.map(&:to_sym).sort
