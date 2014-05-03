@@ -274,7 +274,7 @@ $(document).on 'click', '.toggle', ->
   toggle_content(this)
   exchange_toggle_text(this)
 
-$(document).on 'click', '#crosspost_toggle, #markup_explain_toggle', ->
+$(document).on 'click', '#crosspost_toggle', ->
   toggled = $($(this).attr('data-selector'))
   if toggled.is(':visible')
     adjust_dialog_original_height(toggled.height())
