@@ -1,0 +1,93 @@
+#group_view {
+  overflow: hidden;
+  position: absolute;
+  top: 40px;
+  left: 250px;
+  right: 0;
+  bottom: 50%;
+  margin-top: 2px;
+  border-left: 2px solid $border_pane;
+  border-bottom: 2px solid $border_pane;
+
+  #group_header {
+    padding: 10px 0 0 10px;
+  }
+
+  .buttons {
+    float: right;
+    margin-top: 14px;
+    margin-right: 20px;
+
+    .new_posts {
+      color: $text_new_posts;
+      font-weight: bold;
+      text-decoration: underline;
+      margin-right: 14px;
+      &:hover { opacity: 0.7; }
+    }
+  }
+
+  #posts_list {
+    position: absolute;
+    top: 52px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow-x: hidden;
+    overflow-y: scroll;
+    border-top: 1px solid $border_light;
+
+    table {
+      width: 100%;
+      line-height: 20px;
+      table-layout: fixed;
+
+      tbody tr {
+        @include highlights;
+      }
+
+      th, td {
+        padding: 0 5px;
+        @include ellipsis;
+      }
+
+      th {
+        width: 175px;
+        text-align: left;
+        background-color: $bg_light;
+        border: 1px solid $border_light;
+        border-top: 0;
+        border-right: 0;
+
+        &:first-child {
+          width: auto;
+          border-left: 0;
+        }
+      }
+
+      th.loading {
+        padding-left: 22px;
+        border-top: 1px solid $border_light;
+      }
+
+      .indent {
+        @include ellipsis;
+        padding-left: 20px;
+      }
+
+      .expander {
+        width: 16px;
+        display: inline-block;
+        background-repeat: no-repeat;
+        background-position: left center;
+        &.expandable { background-image: url('expander-closed.png'); }
+        &.expanded { background-image: url('expander-open.png'); }
+        &.expandable:hover, &.expanded:hover { background-color: $bg_expand_hover; }
+      }
+
+      tr[data-level]:not([data-level="1"]) {
+        color: $text_light;
+      }
+    }
+  }
+}

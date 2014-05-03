@@ -62,50 +62,50 @@ i { font-style: italic; }
   border-radius: 2px;
   background-color: $bg_light;
   font-weight: bold;
-  
+
   &:first-of-type {
     margin-left: 8px;
   }
-  
+
   &:hover {
     color: $bg_light;
     background-color: $border_button;
   }
-  
+
   &:active {
     opacity: 0.7;
   }
-  
+
   &.green {
     border-color: $button_green;
     &:hover { background-color: $button_green; }
   }
-  
+
   &.red {
     border-color: $button_red;
     &:hover { background-color: $button_red; }
   }
-  
+
   &.blue {
     border-color: $button_blue;
     &:hover { background-color: $button_blue; }
   }
-  
+
   &.yellow {
     border-color: $button_yellow;
     &:hover { background-color: $button_yellow; }
   }
-  
+
   &.orange {
     border-color: $button_orange;
     &:hover { background-color: $button_orange; }
   }
-  
+
   &#next_unread[href="#"] {
     color: $border_button;
     &:hover { background-color: $bg_light; }
   }
-  
+
   &#rss_feed_button {
     width: 18px;
     background-repeat: no-repeat;
@@ -115,7 +115,7 @@ i { font-style: italic; }
       background-image: url('rss-light.png');
     }
   }
-  
+
   &#star_post_button {
     width: 18px;
     background-repeat: no-repeat;
@@ -141,7 +141,7 @@ i { font-style: italic; }
     padding: 0 6px;
     font-size: 100%;
   }
-  
+
   .sticky_explain {
     display: inline-block;
     font-size: 80%;
@@ -184,7 +184,7 @@ i { font-style: italic; }
   .real_name {
     font-weight: bold;
   }
-  
+
   .username, .email {
     color: $text_light;
   }
@@ -194,4 +194,19 @@ img.gravatar {
   float: left;
   margin-right: 5px;
   border-radius: 2px;
+}
+
+#ajax_error {
+  position: absolute;
+  z-index: 15;
+  opacity: 0.9;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 40px;
+  line-height: 40px;
+  padding: 0 10px;
+  font-weight: bold;
+  background-color: $bg_sticky;
+  border-bottom: 2px solid $border_warning;
 }

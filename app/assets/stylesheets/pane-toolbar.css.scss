@@ -1,0 +1,26 @@
+#toolbar {
+  height: 32px;
+  line-height: 24px;
+  padding: 8px 0 0 10px;
+  background-color: $bg_toolbar;
+  border-bottom: 2px solid $border_button;
+
+  h1 {
+    color: $border_button;
+    font-size: 160%;
+    vertical-align: middle;
+    display: inline;
+  }
+
+  .user_info {
+    float: right;
+
+    .gravatar {
+      margin-top: -1px;
+    }
+
+    a {
+      &:hover { opacity: 0.7; }
+    }
+  }
+}

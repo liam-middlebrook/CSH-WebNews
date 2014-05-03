@@ -1,0 +1,19 @@
+#external_links {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 250px;
+  height: 40px;
+  margin-right: 2px;
+  color: $text_light;
+  background-color: $bg_toolbar;
+  border-top: 1px solid $border_button;
+  text-align: center;
+  line-height: 19px;
+
+  a {
+    color: $text_normal;
+    text-decoration: none;
+    &:hover { color: $link_hover }
+  }
+}

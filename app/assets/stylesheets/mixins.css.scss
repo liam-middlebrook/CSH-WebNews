@@ -1,0 +1,18 @@
+@mixin links {
+  a {
+    color: $text_dark;
+    text-decoration: underline;
+    &:hover { color: $link_hover; }
+  }
+}
+
+@mixin highlights {
+  &.selected { background-color: $bg_row_selected !important; }
+  &:hover { background-color: $bg_row_hover; cursor: pointer; }
+}
+
+@mixin ellipsis {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}

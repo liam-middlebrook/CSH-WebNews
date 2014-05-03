@@ -1,0 +1,88 @@
+#dashboard {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding: 10px;
+
+  table.activity {
+    line-height: 1.5;
+    margin-bottom: 2em;
+
+    a {
+      color: $text_normal;
+      &:hover { opacity: 0.7; }
+    }
+
+    tr {
+      border-bottom: 1px solid $border_light;
+
+      th {
+        text-align: left;
+        text-transform: uppercase;
+        font-weight: bold;
+        font-size: 80%;
+        line-height: 1;
+        padding: 5px;
+        background-color: $bg_light;
+      }
+
+      th.loading {
+        padding-left: 22px;
+      }
+
+      td {
+        color: $text_light;
+        white-space: nowrap;
+        padding: 5px;
+        padding-right: 10px;
+
+        &.subject {
+          white-space: normal;
+          text-indent: -16px;
+          padding-left: 16px;
+        }
+
+        .counter {
+          border: 1px solid $border_button;
+          border-radius: 2px;
+          padding: 0 3px;
+        }
+
+        &.post_count {
+          text-align: right;
+          padding-right: 0;
+
+          .counter {
+            padding-right: 4px;
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+          }
+        }
+
+        &.unread_count {
+          padding-left: 0;
+          padding-right: 5px;
+
+          .counter {
+            padding-left: 4px;
+            border-left: none;
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+          }
+        }
+
+        .byline {
+          white-space: nowrap;
+        }
+
+        &.mark_read {
+          text-align: center;
+        }
+      }
+    }
+  }
+}
