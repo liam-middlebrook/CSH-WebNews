@@ -24,7 +24,13 @@ Webnews::Application.configure do
 
   # Do not compress assets
   config.assets.compress = false
-  
+
+  # Disable the asset cache
+  config.assets.cache_store = :null_store
+
+  # Disable the SASS compiler cache
+  config.sass.cache = false
+
   # Raise exception on mass assignment protection for Active Record models
   config.active_record.mass_assignment_sanitizer = :strict
 
