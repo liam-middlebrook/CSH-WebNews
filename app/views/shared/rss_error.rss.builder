@@ -8,5 +8,5 @@ xml.rss :version => '2.0' do
       xml.title "Error: #{@error_id}"
       xml.description @error_details
     end
-  end 
-end 
+  end
+end

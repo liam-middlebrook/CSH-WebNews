@@ -6,7 +6,7 @@ module ApplicationHelper
       theme_stylesheet(:classic)
     end
   end
-  
+
   def theme_stylesheet(name)
     "theme-#{name}.css"
   end
@@ -18,13 +18,13 @@ module ApplicationHelper
       name
     end
   end
-  
+
   def post_hash_url(post)
     # Used from mailer templates, so we must manually specify the site URL
     root_url(Webnews::Application.config.action_mailer.default_url_options) +
       '#!' + post_path(post.newsgroup_name, post.number)
   end
-  
+
   def author_line(post)
     post.author_name + if post.author_email != post.author_name
       if post.author_is_local?
@@ -52,7 +52,7 @@ module ApplicationHelper
       '#'
     end
   end
-  
+
   def home_page_title
     if @current_user and @current_user.unread_count > 0
       "(#{@current_user.unread_count}) WebNews"
@@ -60,12 +60,12 @@ module ApplicationHelper
       'WebNews'
     end
   end
-  
+
   def home_unread_line
     unread = @current_user.unread_count
     unread_thread = @current_user.unread_count_in_thread
     unread_reply = @current_user.unread_count_in_reply
-    
+
     if unread == 0
       unread_line = 'You have no unread posts.'
     else
@@ -83,18 +83,18 @@ module ApplicationHelper
       end
       unread_line += '.'
     end
-    
+
     return unread_line
   end
-  
+
   def activity_breakout(activity)
     now = Time.now
-    
+
     stickies = activity.select{ |item| item[:thread_parent].sticky? }
     activity -= stickies
-    
+
     breakout = {}
-    
+
     {
       'Today' => ->(item) { item[:newest_post].date > now.beginning_of_day },
       'Yesterday' => ->(item) { item[:newest_post].date > (now - 1.day).beginning_of_day },
@@ -104,10 +104,10 @@ module ApplicationHelper
       'Last Month' => ->(item) { true }
     }.each do |heading, proc|
       break if activity.empty?
-      
+
       items = activity.select(&proc)
       activity -= items
-      
+
       if items.any?
         if activity.any?
           breakout.merge!({ heading => items })
@@ -120,18 +120,18 @@ module ApplicationHelper
         end
       end
     end
-    
+
     { 'Stickies' => stickies }.merge(breakout).reject{ |_, items| items.empty? }
   end
-  
+
   def post_html_body(post, quote_collapse = true)
     pre_body = post.body.dup
     parent = post.parent
     html_body = ''
     quote_collapse &&= parent
-    
+
     # Warning: Even I barely understand this, and I wrote it. --grantovich
-    
+
     if quote_collapse and @current_user.thread_mode == :normal
       [parent.body, parent.sigless_body].each do |parent_body|
         regex = '[> ]*' +
@@ -145,20 +145,20 @@ module ApplicationHelper
         break if pre_body != post.body
       end
     end
-    
+
     (1..3).each do |depth|
       more_quotes = ' ?>' * (depth - 1)
       pre_body.gsub!(/(\A|\n)((>#{more_quotes}.*(\n|\z))+)/,
         '\\1' + "#{MARK_STRING}3\n" + '\\2' + "#{MARK_STRING}4\n")
     end
-    
+
     # This structure tends to cause problems when the replacements are done
     if pre_body[/#{MARK_STRING}3.*#{MARK_STRING}1.*#{MARK_STRING}4/m]
       return post_html_body(post, false)
     end
-    
+
     html_body = html_escape(pre_body)
-    
+
     if quote_collapse
       quoted = html_body[/#{MARK_STRING}1\n.*#{MARK_STRING}2/m].andand.gsub(/#{MARK_STRING}\d\n/, '')
       # If the text that would be collapsed is trivially short, forget it
@@ -181,19 +181,19 @@ module ApplicationHelper
     end
     html_body.gsub!("#{MARK_STRING}3\n", "<blockquote>")
     html_body.gsub!("#{MARK_STRING}4\n", "</blockquote>")
-    
+
     # Definitely shouldn't have any leftover MARK_STRING at this point
     if quote_collapse and html_body[MARK_STRING]
       return post_html_body(post, false)
     end
-    
+
     # gsub doesn't work with this regex, unfortunately
     {} while html_body.sub!(
       /(\[\d+\])(?!<\/a>)(.*\n {0,3}\1[^\n]*?(https?:[^\s]+).*?(\n|\z))/m,
       '<a href="\\3">\\1</a>\\2'
     )
     html_body = auto_link(html_body, :link => :urls, :sanitize => false)
-    
+
     return html_body
   end
 end

@@ -776,7 +776,7 @@ module Net  #:nodoc:
         stat = check_response(get_response('AUTHINFO SASL CRAM-MD5'), true)
         challenge = stat.split(/ /)[1].unpack('m')[0]
         secret = Digest::MD5.digest(secret) if secret.size > 64
-    
+
         isecret = secret + "\0" * (64 - secret.size)
         osecret = isecret.dup
         0.upto(63) do |i|
@@ -785,7 +785,7 @@ module Net  #:nodoc:
         end
         tmp = Digest::MD5.digest(isecret + challenge)
         tmp = Digest::MD5.hexdigest(osecret + tmp)
-    
+
         stat = get_response(base64_encode(user + ' ' + tmp))
       }
       raise NNTPAuthenticationError, stat unless /\A2../ === stat

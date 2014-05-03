@@ -9,25 +9,25 @@ class PostsController < ApplicationController
   def index
     @not_found = true if params[:not_found]
     @flat_mode = true if @current_user.thread_mode == :flat
-    
+
     if @post
       thread_selected = @post
       thread_selected = @post.thread_parent if not @flat_mode
       @from_older = (params[:include_older] or not @api_access) ? thread_selected.date : nil
       @from_newer = (params[:include_newer] or not @api_access) ? thread_selected.date : nil
     end
-    
+
     if not @limit
       @limit = (@from_older and @from_newer) ? INDEX_DEF_LIMIT_2 : INDEX_DEF_LIMIT_1
       @limit *= 2 if @flat_mode
     end
-    
+
     @limit += 1
-    
+
     if not (@from_older or @from_newer or thread_selected)
       @from_older = Post.order('date').last.date + 1.second
     end
-    
+
     if @from_older
       date_condition = (params[:older_inclusive] ? 'date <= ?' : 'date < ?')
       if @flat_mode
@@ -38,7 +38,7 @@ class PostsController < ApplicationController
           order('date DESC').limit(@limit)
       end
     end
-    
+
     if @from_newer
       date_condition = (params[:newer_inclusive] ? 'date >= ?' : 'date > ?')
       if @flat_mode
@@ -51,7 +51,7 @@ class PostsController < ApplicationController
           order('date').limit(@limit)
       end
     end
-    
+
     if @posts_older
       @more_older = @posts_older.length > 0 && !@posts_older[@limit - 1].nil?
       @posts_older.delete_at(-1) if @posts_older.length == @limit
@@ -61,7 +61,7 @@ class PostsController < ApplicationController
       @posts_newer.delete_at(-1) if @posts_newer.length == @limit
       @posts_newer.reverse!
     end
-    
+
     if not @flat_mode
       flatten = (@current_user.thread_mode == :hybrid)
       @posts_selected = thread_selected.thread_tree_for_user(@current_user, flatten, @api_access) if thread_selected
@@ -74,9 +74,9 @@ class PostsController < ApplicationController
         posts.map!{ |post| {:post => post} } if posts
       end
     end
-    
+
     get_next_unread_post
-    
+
     respond_to do |wants|
       wants.js do
         # js template
@@ -90,7 +90,7 @@ class PostsController < ApplicationController
       end
     end
   end
-  
+
   def search
     if @api_rss
       @limit = INDEX_RSS_LIMIT if not @limit
@@ -98,9 +98,9 @@ class PostsController < ApplicationController
       @limit = INDEX_DEF_LIMIT_1 * 2 if not @limit
       @limit += 1
     end
-    
+
     conditions, values, error = build_search_conditions
-    
+
     if @from_older and not @api_rss
       conditions << 'date < ?'
       values << @from_older
@@ -119,21 +119,21 @@ class PostsController < ApplicationController
           "'#{params[:personal_class]}' is not a valid personal class" and return
       end
     end
-    
+
     @search_params = params.except(:api_key, :api_agent,
       :format, :action, :controller, :source, :commit, :validate, :utf8, :_)
-    
+
     if error
       generic_error(:bad_request, error[0], error[1]) and return
     elsif params[:validate]
       render :partial => 'search_redirect' and return
     end
-    
+
     @search_mode = @flat_mode = true
     if @search_params.include?(:starred) and @search_params.reject{ |k,v| v.blank? }.length == 1
       @starred_only = true
     end
-    
+
     scope = Post.scoped
     scope = scope.sticky if params[:sticky]
     scope = scope.thread_parents if params[:original]
@@ -146,20 +146,20 @@ class PostsController < ApplicationController
       @posts_older.delete_at(-1) if @posts_older.length == @limit
     end
     @posts_older.map!{ |post| {:post => post} }
-    
+
     get_next_unread_post
-    
+
     respond_to do |wants|
       wants.js { render 'index' }
       wants.rss { render 'search' }
       wants.json { render :json => { :posts_older => @posts_older, :more_older => @more_older } }
     end
   end
-  
+
   def search_entry
     render 'shared/dialog'
   end
-  
+
   def next_unread
     get_next_unread_post
     if params[:mark_read]
@@ -171,7 +171,7 @@ class PostsController < ApplicationController
       )
     }.merge(params[:mark_read] ? { :was_unread => was_unread } : {})
   end
-  
+
   def show
     respond_to do |wants|
       wants.js do
@@ -184,7 +184,7 @@ class PostsController < ApplicationController
           @not_found = true
         end
       end
-      
+
       wants.json do
         if params[:mark_read]
           was_unread = @post.mark_read_for_user(@current_user)
@@ -197,7 +197,7 @@ class PostsController < ApplicationController
       end
     end
   end
-  
+
   def new
     @new_post = Post.new(:newsgroup => @newsgroup)
     if @post
@@ -212,17 +212,17 @@ class PostsController < ApplicationController
       wants.json { render :json => { :new_post => { :subject => @new_post.subject, :body => @new_post.body } } }
     end
   end
-  
+
   def create
     post_newsgroups = []
     @sync_error = nil
     body = params[:body] || params[:post].andand[:body]
     subject = params[:subject] || params[:post].andand[:subject]
-  
+
     if subject.blank?
       generic_error :bad_request, 'subject_missing', "Posting requires a subject line" and return
     end
-    
+
     if not @newsgroup
       generic_error :bad_request, 'newsgroup_missing', "Posting requires a newsgroup" and return
     elsif not @newsgroup.posting_allowed?
@@ -230,7 +230,7 @@ class PostsController < ApplicationController
         "Newsgroup '#{@newsgroup.name}' does not allow posting" and return
     end
     post_newsgroups << @newsgroup
-    
+
     if not params[:crosspost_to].blank?
       crosspost_to = Newsgroup.find_by_name(params[:crosspost_to])
       if crosspost_to.nil?
@@ -245,7 +245,7 @@ class PostsController < ApplicationController
       end
       post_newsgroups << crosspost_to
     end
-    
+
     # TODO: Generalize the concept of "extra cross-post newsgroups" as a configuration option
     if params[:crosspost_sysadmin]
       n = Newsgroup.find_by_name('csh.lists.sysadmin')
@@ -255,7 +255,7 @@ class PostsController < ApplicationController
       end
       post_newsgroups << n
     end
-    
+
     if params[:crosspost_alumni]
       n = Newsgroup.find_by_name('csh.lists.alumni')
       if post_newsgroups.include?(n)
@@ -264,7 +264,7 @@ class PostsController < ApplicationController
       end
       post_newsgroups << n
     end
-    
+
     reply_newsgroup = reply_post = nil
     if params[:reply_newsgroup]
       reply_newsgroup = Newsgroup.find_by_name(params[:reply_newsgroup])
@@ -273,9 +273,9 @@ class PostsController < ApplicationController
         generic_error :not_found, 'post_not_found', "Can't reply to nonexistent post number '#{params[:reply_number]}' in newsgroup '#{params[:reply_newsgroup]}'" and return
       end
     end
-    
+
     validate_sticky_attributes(false) or return
-    
+
     post_string = Post.build_message(
       :user => @current_user,
       :newsgroups => post_newsgroups.map(&:name),
@@ -286,7 +286,7 @@ class PostsController < ApplicationController
       :posting_host => remote_host,
       :api_posting_host => params[:posting_host]
     )
-    
+
     new_message_id = nil
     begin
       Net::NNTP.start(NEWS_SERVER) do |nntp|
@@ -296,7 +296,7 @@ class PostsController < ApplicationController
       generic_error :internal_server_error, 'nntp_post_error', 'NNTP server error: ' + $!.message
       log_exception($!) and return
     end
-    
+
     begin
       Net::NNTP.start(NEWS_SERVER) do |nntp|
         post_newsgroups.each{ |n| Newsgroup.sync_group!(nntp, n.name, n.status) }
@@ -311,7 +311,7 @@ class PostsController < ApplicationController
       @sync_error = "Your post was accepted by the news server and does not need to be resubmitted, but an error occurred while resyncing the newsgroups: #{$!.message}"
       log_exception($!)
     end
-    
+
     respond_to do |wants|
       wants.js {}
       wants.json do
@@ -323,32 +323,32 @@ class PostsController < ApplicationController
       end
     end
   end
-  
+
   def destroy
     if @post.nil?
       # API case handled by get_post
       form_error "The post you are trying to cancel doesn't exist" and return
     end
-    
+
     if not @post.newsgroup.posting_allowed?
       generic_error :bad_request, 'newsgroup_locked',
         "Posts in read-only newsgroups cannot be canceled" and return
     end
-    
+
     if not @post.authored_by?(@current_user) and not @current_user.admin?
       generic_error :forbidden, 'requires_admin',
         "Admin privileges are required to cancel a post that you did not author" and return
     end
-    
+
     if @post.children.count != 0
       generic_error :bad_request, 'post_has_replies', "Posts that have replies cannot be canceled" and return
     end
-    
+
     if params[:confirm_cancel].blank?
       generic_error :bad_request, 'confirm_cancel_missing',
         "The 'confirm_cancel' parameter must be present when calling this method" and return
     end
-    
+
     begin
       Net::NNTP.start(NEWS_SERVER) do |nntp|
         nntp.post(@post.build_cancel_message({
@@ -363,7 +363,7 @@ class PostsController < ApplicationController
       generic_error :internal_server_error, 'nntp_post_error', 'NNTP server error: ' + $!.message
       log_exception($!) and return
     end
-    
+
     begin
       Net::NNTP.start(NEWS_SERVER) do |nntp|
         @post.all_newsgroups.each{ |n| Newsgroup.sync_group!(nntp, n.name, n.status) }
@@ -373,7 +373,7 @@ class PostsController < ApplicationController
       @sync_error = "Your cancel was accepted by the news server and does not need to be resubmitted, but an error occurred while resyncing the newsgroups: #{$!.message}"
       log_exception($!)
     end
-    
+
     respond_to do |wants|
       wants.js {}
       wants.json do
@@ -385,12 +385,12 @@ class PostsController < ApplicationController
       end
     end
   end
-  
+
   def destroy_confirm
     @admin_cancel = !@post.authored_by?(@current_user)
     render 'shared/dialog'
   end
-  
+
   def mark_read
     if params[:mark_unread]
       if @post
@@ -421,33 +421,33 @@ class PostsController < ApplicationController
         return
       end
     end
-    
+
     respond_to do |wants|
       wants.js { get_next_unread_post }
       wants.json { head :ok }
     end
   end
-  
+
   def edit_sticky
     render 'shared/dialog'
   end
-  
+
   def update_sticky
     validate_sticky_attributes or return
     update_sticky_attributes
-    
+
     respond_to do |wants|
       wants.js {}
       wants.json { head :ok }
     end
   end
-  
+
   def update_star
     if @post.nil?
       # API case handled by get_post
       @star_error = "The post you are trying to star/unstar doesn't exist" and return
     end
-    
+
     if @post.starred_by_user?(@current_user)
       @post.starred_post_entries.find_by_user_id(@current_user.id).destroy
       @starred = false
@@ -455,15 +455,15 @@ class PostsController < ApplicationController
       StarredPostEntry.create!(:user => @current_user, :post => @post)
       @starred = true
     end
-    
+
     respond_to do |wants|
       wants.js {}
       wants.json { render :json => { :starred => @starred } }
     end
   end
-  
+
   private
-    
+
     def set_list_layout_and_offset
       if params[:from_older] or params[:from_newer]
         @full_layout = false
@@ -483,7 +483,7 @@ class PostsController < ApplicationController
         @full_layout = true
       end
     end
-    
+
     def set_limit_from_params
       if params[:limit]
         begin
@@ -499,7 +499,7 @@ class PostsController < ApplicationController
         end
       end
     end
-    
+
     def validate_sticky_attributes(for_existing_post = true)
       if for_existing_post
         if @post.nil?
@@ -510,16 +510,16 @@ class PostsController < ApplicationController
             "Only the initial post in a thread can be made sticky" and return
         end
       end
-      
+
       if params[:do_sticky] or (@api_access and params[:sticky_until] and not params[:unstick])
         validate_user_can_sticky or return
         if params[:sticky_until].blank?
           generic_error :bad_request, 'sticky_until_missing',
             "An expiration date is required to make a post sticky" and return
         end
-        
+
         @sticky_until = Chronic.parse(params[:sticky_until])
-        
+
         if @sticky_until.nil?
           generic_error :bad_request, 'sticky_until_invalid',
             "The expiration date '#{params[:sticky_until]}' could not be parsed" and return
@@ -533,10 +533,10 @@ class PostsController < ApplicationController
         end
         @sticky_until = nil
       end
-      
+
       return true
     end
-    
+
     def validate_user_can_sticky
       if not @current_user.admin?
         generic_error :forbidden, 'requires_admin',
@@ -546,7 +546,7 @@ class PostsController < ApplicationController
         return true
       end
     end
-    
+
     def update_sticky_attributes
       if @sticky_until
         @post.in_all_newsgroups.each do |post|
@@ -560,12 +560,12 @@ class PostsController < ApplicationController
         end
       end
     end
-    
+
     def build_search_conditions
       conditions = []
       values = []
       error = nil
-      
+
       if not params[:keywords].blank?
         begin
           phrases = Shellwords.split(params[:keywords])
@@ -573,7 +573,7 @@ class PostsController < ApplicationController
           keyword_values = []
           exclude_conditions = []
           exclude_values = []
-          
+
           phrases.each do |phrase|
             if phrase[0] == '-'
               exclude_conditions << '('
@@ -595,8 +595,8 @@ class PostsController < ApplicationController
               keyword_conditions[-1] += ')'
             end
           end
-          
-          conditions << '(' + 
+
+          conditions << '(' +
             '(' + keyword_conditions.join(' and ') + ')' + (
               exclude_conditions.empty? ?
                 '' : ' and not (' + exclude_conditions.join(' or ') + ')'
@@ -606,7 +606,7 @@ class PostsController < ApplicationController
           error = ['keywords_invalid', 'The keywords string contains an unbalanced quote']
         end
       end
-      
+
       if not params[:authors].blank?
         authors = params[:authors].split(',').map(&:strip)
         conditions << '(' + (['author like ?'] * authors.size).join(' or ') + ')'
@@ -614,7 +614,7 @@ class PostsController < ApplicationController
           values << '%' + author + '%'
         end
       end
-      
+
       if not params[:date_from].blank?
         date_from = params[:date_from]
         date_from = 'January 1, ' + date_from if date_from[/^\d{4}$/]
@@ -637,7 +637,7 @@ class PostsController < ApplicationController
           values << date_to
         end
       end
-      
+
       return conditions, values, error
     end
 end

@@ -6,7 +6,7 @@ xml.rss :version => '2.0' do
     xml.pubDate @posts_older.first[:post].date.to_s(:rfc822) if not @posts_older.empty?
     xml.description 'RSS version of the WebNews search API'
     xml.ttl 1
-    
+
     for thread in @posts_older
       post = thread[:post]
       xml.item do
@@ -21,7 +21,7 @@ xml.rss :version => '2.0' do
         xml.pubDate post.date.to_s(:rfc822)
         xml.link root_url + '#!' + post_path(post.newsgroup_name, post.number)
         xml.guid root_url + '#!' + post_path(post.newsgroup_name, post.number)
-      end 
-    end 
-  end 
-end 
+      end
+    end
+  end
+end

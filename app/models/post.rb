@@ -5,9 +5,9 @@ class Post < ActiveRecord::Base
   has_many :starred_post_entries, :dependent => :destroy
   has_many :unread_users, :through => :unread_post_entries, :source => :user
   has_many :starred_users, :through => :starred_post_entries, :source => :user
-  
+
   before_destroy :kill_parent_id
-  
+
   def as_json(options = {})
     if options[:minimal]
       json = { :number => number }
@@ -32,9 +32,9 @@ class Post < ActiveRecord::Base
         json[:cross_posts] = (in_all_newsgroups - [self]).map{ |post| post.as_json(:minimal => true) }
       end
     end
-    
+
     json[:newsgroup] = newsgroup_name
-    
+
     if options[:with_user]
       json.merge!(
         :starred => starred_by_user?(options[:with_user]),
@@ -42,10 +42,10 @@ class Post < ActiveRecord::Base
         :personal_class => personal_class_for_user(options[:with_user])
       )
     end
-    
+
     return json
   end
-  
+
   def author_name
     candidate = author[/(.*)<.*>/, 1]
     if candidate
@@ -54,19 +54,19 @@ class Post < ActiveRecord::Base
       author[/.* \((.*)\)/, 1] || author
     end
   end
-  
+
   def author_email
     author[/.*<(.*)>/, 1] || author[/(.*) \(.*\)/, 1] || author[/\S+@\S+\.\S+/]
   end
-  
+
   def author_username
     author_email.split('@')[0] if author_email
   end
-  
+
   def author_is_local?
     !author_email['@' + LOCAL_DOMAIN].nil? if author_email
   end
-  
+
   def first_line
     body.each_line do |line|
       if not (line.blank? or line[/^>/] or line[/(wrote|writes):$/] or
@@ -79,7 +79,7 @@ class Post < ActiveRecord::Base
     end
     return subject
   end
-  
+
   def quoted_body(start = 0, length = 0)
     author_name + " wrote:\n\n" + if body.blank?
       subject
@@ -93,22 +93,22 @@ class Post < ActiveRecord::Base
       end
     end.split("\n").map{ |line| '>' + line }.join("\n") + "\n\n"
   end
-  
+
   def sigless_body
     return body.                               # Things to strip:
       sub(/(.*)\n-- ?\n.*/m, '\\1').           # The line '--' or '-- ' and all following text ("standard" sig)
       sub(/\n\n[-~].*[[:alpha:]].*\n*\z/, ''). # Non-blank final lines starting with [-~] and containing a letter
       rstrip
   end
-  
+
   def self.sticky
     where('sticky_until is not null and sticky_until > ?', Time.now)
   end
-  
+
   def sticky?
     !sticky_until.nil? and sticky_until > Time.now
   end
-  
+
   def crossposted?(quick = false)
     if quick
       all_newsgroup_names.length > 1
@@ -116,27 +116,27 @@ class Post < ActiveRecord::Base
       in_all_newsgroups.length > 1
     end
   end
-  
+
   def reparented?
     parent_id != original_parent_id
   end
-  
+
   def orphaned?
     reparented? and parent_id == ''
   end
-  
+
   def followup_newsgroup
     Newsgroup.find_by_name(headers[/^Followup-To: (.*)/i, 1])
   end
-  
+
   def exists_in_followup_newsgroup?
     !in_newsgroup(followup_newsgroup).nil?
   end
-  
+
   def all_newsgroups
     all_newsgroup_names.map{ |name| Newsgroup.find_by_name(name) }.reject(&:nil?)
   end
-  
+
   def all_newsgroup_names
     if headers =~ /^Control: cancel/
       ['control.cancel']
@@ -144,45 +144,45 @@ class Post < ActiveRecord::Base
       headers[/^Newsgroups: (.*)/i, 1].split(',').map(&:strip)
     end
   end
-  
+
   def in_newsgroup(newsgroup)
     newsgroup.posts.find_by_message_id(message_id)
   end
-  
+
   def in_all_newsgroups
     all_newsgroups.
       map{ |newsgroup| in_newsgroup(newsgroup) }.
       reject(&:nil?)
   end
-  
+
   def parent
     parent_id == '' ? nil : Post.where(:message_id => parent_id, :newsgroup_name => newsgroup_name).first
   end
-  
+
   def children
     Post.where(:parent_id => message_id, :newsgroup_name => newsgroup_name)
   end
-  
+
   def thread_parent
     message_id == thread_id ? self : all_in_thread.order('date').first
   end
-  
+
   def self.thread_parents
     where('message_id = thread_id')
   end
-  
+
   def all_in_thread
     Post.where(:thread_id => thread_id, :newsgroup_name => newsgroup_name).order('date')
   end
-  
+
   def post_count_in_thread
     all_in_thread.count
   end
-  
+
   def unread_count_in_thread_for_user(user)
     user.unread_post_entries.where(:post_id => all_in_thread.pluck(:id)).count
   end
-  
+
   def thread_tree_for_user(user, flatten = false, as_json = false, all_posts = nil)
     all_posts ||= all_in_thread.order('date').to_a
     {
@@ -204,40 +204,40 @@ class Post < ActiveRecord::Base
       :personal_class => self.personal_class_for_user(user)
     })
   end
-  
+
   def original_parent_id
     headers[/^References: (.*)/i, 1].to_s.split.map{ |r| r[/<.*>/] }[-1] || ''
   end
-  
+
   def original_parent
     Post.where(:message_id => original_parent_id).first
   end
-  
+
   def authored_by?(user)
     author_name == user.real_name or author_email == user.email
   end
-  
+
   def user_in_thread?(user)
     return true if authored_by?(user)
     return all_in_thread.any?{ |post| post.authored_by?(user) }
   end
-  
+
   def self.starred_by_user(user)
     joins(:starred_post_entries).where(:starred_post_entries => { :user_id => user.id })
   end
-  
+
   def starred_by_user?(user)
     starred_users.include?(user)
   end
-  
+
   def self.unread_for_user(user)
     joins(:unread_post_entries).where(:unread_post_entries => { :user_id => user.id })
   end
-  
+
   def unread_for_user?(user)
     !unread_class_for_user(user).nil?
   end
-  
+
   def unread_class_for_user(user)
     entry = user.unread_post_entries.find_by_post_id(self)
     if entry
@@ -250,7 +250,7 @@ class Post < ActiveRecord::Base
       nil
     end
   end
-  
+
   def mark_read_for_user(user)
     was_unread = false
     in_all_newsgroups.each do |post|
@@ -262,7 +262,7 @@ class Post < ActiveRecord::Base
     end
     return was_unread
   end
-  
+
   def mark_unread_for_user(user, user_created)
     UnreadPostEntry.create!(
       :user => user,
@@ -277,7 +277,7 @@ class Post < ActiveRecord::Base
     return true if unread_for_user?(user)
     return all_in_thread.any?{ |post| post.unread_for_user?(user) }
   end
-  
+
   def personal_class_for_user(user, check_thread = true)
     case
       when authored_by?(user) then :mine
@@ -285,11 +285,11 @@ class Post < ActiveRecord::Base
       when check_thread && thread_parent.user_in_thread?(user) then :mine_in_thread
     end
   end
-  
+
   def unread_personal_class_for_user(user)
     PERSONAL_CLASSES[user.unread_posts.where(:thread_id => thread_id).maximum(:personal_level)]
   end
-  
+
   def kill_parent_id
     # Sub-optimal, should re-parent to next reference up the chain
     # (but posts getting canceled when they already have replies is rare)
@@ -297,14 +297,14 @@ class Post < ActiveRecord::Base
       post.update_attributes(:parent_id => '', :thread_id => post.message_id)
     end
   end
-  
+
   def build_cancel_message(params)
     m = "From: #{params[:user].real_name} <#{params[:user].email}>"
     m += "\nSubject: cmsg cancel #{message_id}"
     m += "\nNewsgroups: " + all_newsgroup_names.join(',')
     m += "\nControl: cancel #{message_id}"
     m += "\n" + Post.common_headers(params)
-    
+
     m += "\n\nThe following message was canceled by #{params[:user].real_name}:\n"
     [
       headers[/^From: .*/i],
@@ -315,14 +315,14 @@ class Post < ActiveRecord::Base
     ].each do |header|
       m += "\n  #{header}"
     end
-    
+
     if params[:reason].present?
       m += "\n\n" + Post.flowed_encode('The reason given was: ' + params[:reason])
     end
-    
+
     return m
   end
-  
+
   def self.build_message(params)
     m = "From: #{params[:user].real_name} <#{params[:user].email}>"
     m += "\nSubject: #{sanitize_for_headers(params[:subject])}"
@@ -334,11 +334,11 @@ class Post < ActiveRecord::Base
       m += "\nReferences: #{existing_refs + params[:reply_post].message_id}"
     end
     m += "\n" + common_headers(params)
-    
+
     m += "\n\n#{flowed_encode(params[:body].rstrip)}\n"
     return m
   end
-  
+
   def self.common_headers(params)
     h = "Content-Type: text/plain; charset=utf-8; format=flowed"
     if params[:api_agent]
@@ -353,22 +353,22 @@ class Post < ActiveRecord::Base
     end
     return h
   end
-  
+
   def self.sanitize_for_headers(value)
     value.encode('US-ASCII', :invalid => :replace, :undef => :replace).gsub(/[\t\r\n\f]/, '')
   end
-  
+
   def self.import!(newsgroup, number, headers, body)
     stripped = false
     headers = unwrap_headers(headers)
     headers.encode!('US-ASCII', :invalid => :replace, :undef => :replace)
-  
+
     part_headers, body = multipart_decode(headers, body)
     stripped = true if headers[/^Content-Type:.*mixed/i]
-    
+
     body = body.unpack('m')[0] if part_headers[/^Content-Transfer-Encoding: base64/i]
     body = body.unpack('M')[0] if part_headers[/^Content-Transfer-Encoding: quoted-printable/i]
-    
+
     if part_headers[/^Content-Type:.*(X-|unknown)/i]
       body.encode!('UTF-8', 'US-ASCII', :invalid => :replace, :undef => :replace)
     elsif part_headers[/^Content-Type:.*charset/i]
@@ -389,17 +389,17 @@ class Post < ActiveRecord::Base
         end
       end
     end
-    
+
     if body[/^begin(-base64)? \d{3} /]
       body.gsub!(/^begin \d{3} .*?\nend\n/m, '')
       body.gsub!(/^begin-base64 \d{3} .*?\n====\n/m, '')
       stripped = true
     end
-    
+
     body = flowed_decode(body) if part_headers[/^Content-Type:.*format="?flowed"?/i]
-    
+
     body.rstrip!
-    
+
     date = Time.parse(
       headers[/^Injection-Date: (.*)/i, 1] ||
       headers[/^NNTP-Posting-Date: (.*)/i, 1] ||
@@ -409,13 +409,13 @@ class Post < ActiveRecord::Base
     subject = headers[/^Subject: (.*)/i, 1]
     message_id = headers[/^Message-ID: (.*)/i, 1]
     references = headers[/^References: (.*)/i, 1].to_s.split.map{ |r| r[/<.*>/] }
-    
+
     parent_id = references[-1] || ''
     thread_id = message_id
     possible_thread_id = references[0] || ''
-    
+
     parent = where(:message_id => parent_id, :newsgroup_name => newsgroup.name).first
-    
+
     if parent
       thread_id = parent.thread_id
     elsif parent_id != '' and where(:message_id => parent_id).exists?
@@ -427,7 +427,7 @@ class Post < ActiveRecord::Base
         '(subject = ? or subject = ?) and newsgroup_name = ? and date < ? and date > ?',
         subject, subject.sub(/Re: ?/i, ''), newsgroup.name, date, date - 3.months
       ).order('date').first
-      
+
       if possible_thread_parent
         parent_id = thread_id = possible_thread_parent.message_id
       else
@@ -436,7 +436,7 @@ class Post < ActiveRecord::Base
     else
       parent_id = ''
     end
-    
+
     create!(:newsgroup => newsgroup,
             :number => number,
             :subject => subject,
@@ -449,9 +449,9 @@ class Post < ActiveRecord::Base
             :headers => headers,
             :body => body)
   end
-  
+
   # See RFC 3676 for "format=flowed" spec
-  
+
   def self.flowed_decode(body)
     new_body_lines = []
     body.each_line do |line|
@@ -471,7 +471,7 @@ class Post < ActiveRecord::Base
     end
     return new_body_lines.join("\n")
   end
-  
+
   def self.flowed_encode(body)
     body.split("\n").map do |line|
       line.rstrip!
@@ -488,7 +488,7 @@ class Post < ActiveRecord::Base
       end
     end.join("\n")
   end
-  
+
   def self.multipart_decode(headers, body)
     if headers[/^Content-Type: multipart/i]
       boundary = Regexp.escape(headers[/^Content-Type:.*boundary ?= ?"?([^"]+?)"?(;|$)/i, 1])
@@ -500,7 +500,7 @@ class Post < ActiveRecord::Base
       return headers, body
     end
   end
-  
+
   def self.unwrap_headers(headers)
     headers.gsub(/\n( |\t)/, ' ').gsub(/\t/, ' ')
   end

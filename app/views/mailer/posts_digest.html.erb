@@ -5,7 +5,7 @@
       <li>
         <% thread_parent_alone = (thread_posts.count == 1 and thread_posts.first == thread_parent) %>
         <% new_thread = thread_parent_alone || thread_posts.include?(thread_parent) %>
-        
+
         <b>
           <% if new_thread %>
             <% if thread_parent_alone %>
@@ -17,13 +17,13 @@
             (<%= pluralize(thread_posts.count, 'new reply') %>)
           <% end %>
         </b>
-        
+
         [<%= thread_parent.date.strftime(SHORT_DATE_FORMAT) %>]
         <%= thread_parent.author_name %>:
         <% if new_thread %><b><% end %>
           <%= link_to thread_parent.subject, post_hash_url(thread_parent) %>
         <% if new_thread %></b><% end %>
-        
+
         <% if !thread_parent_alone %>
           <ul style="list-style-type: none; margin-left: 0; padding-left: 0">
             <% (thread_posts - [thread_parent]).each do |post| %>

@@ -1,27 +1,27 @@
 <div id="dialog">
   <h2>Search</h2>
-  
+
   <%= form_tag search_path, :method => 'get', :remote => true do %>
-    
+
     <div class="form_element inline_inputs aligned_field">
       <%= label_tag :newsgroup, 'Newsgroup:' %><%= select_tag :newsgroup,
         options_for_select(
           @newsgroups.map{ |n| [n.name, n.name] }, @newsgroup ? @newsgroup.name : nil
         ), :prompt => '(all regular newsgroups)' %>
     </div>
-    
+
     <div class="form_element inline_inputs aligned_field">
       <%= label_tag :keywords, 'Keywords:' %><%= text_field_tag :keywords, params[:keywords] %>
       <%= check_box_tag :subject_only, 'true', params[:subject_only] %>
       <%= label_tag :subject_only, 'only in subject lines' %>
       <p class="explain">Use "quotes" to search for phrases, minus (-) for exclusion</p>
     </div>
-    
+
     <div class="form_element inline_inputs aligned_field">
       <%= label_tag :authors, 'By authors:' %><%= text_field_tag :authors, params[:authors] %>
       <p class="explain">Enter full or partial usernames, real names, or email addresses, separated by commas</p>
     </div>
-    
+
     <div class="form_element inline_inputs aligned_field">
       <%= label_tag :date_from, 'In date range:' %><%= text_field_tag :date_from,
         params[:date_from], :class => 'date', :placeholder => 'the beginning' %>
@@ -29,7 +29,7 @@
       <%= text_field_tag :date_to, params[:date_to], :class => 'date', :placeholder => 'right now' %>
       <p class="explain">Enter absolute dates ("9/17/2011") or relative dates ("3 weeks ago")</p>
     </div>
-    
+
     <div class="form_element inline_inputs aligned_field">
       <span class="label">Limit search to:</span>
       <%= check_box_tag :original, 'true', params[:original] %>
@@ -41,15 +41,15 @@
       <%= check_box_tag :sticky, 'true', params[:sticky] %>
       <%= label_tag :sticky, 'stickies' %>
     </div>
-    
+
     <%= hidden_field_tag :validate, true %>
-    
+
     <div class="buttons">
       <%= submit_tag 'Search', :class => 'button' %>
       <a href="#" class="button dialog_cancel">Cancel</a>
     </div>
   <% end %>
-  
+
   <div class="loading"></div>
   <div class="errors"></div>
 </div>

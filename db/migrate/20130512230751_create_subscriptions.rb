@@ -8,10 +8,10 @@ class CreateSubscriptions < ActiveRecord::Migration
       t.string :email_type
       t.timestamps
     end
-    
+
     add_index :subscriptions, :user_id
     add_index :subscriptions, :newsgroup_name
-    
+
     User.find_each do |user|
       user.ensure_subscriptions
       if user.preferences[:unread_in_test] == '1'

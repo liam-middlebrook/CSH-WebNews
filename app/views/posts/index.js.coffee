@@ -10,7 +10,7 @@ if <%= @posts_selected ? 'true' : 'false' %> or <%= @search_mode ? 'true' : 'fal
     window.loaded_location != '<%= @search_mode ? "dummy_location" : @newsgroup.name %>'
 
   set_loaded_location()
-  
+
   $('#group_view').html '<%= j render(
     :partial => "posts_list", :layout => "list_layout", :locals => {
       :posts =>
@@ -19,18 +19,18 @@ if <%= @posts_selected ? 'true' : 'false' %> or <%= @search_mode ? 'true' : 'fal
         (@posts_older ? @posts_older : [])
       }
     ) %>'
-  
+
   <% if @more_newer %>
   $('#posts_list_headers').css('line-height', '0')
   <% end %>
-  
+
   $('#posts_list tbody .expanded').removeClass('expanded').addClass('expandable')
   $('#posts_list tbody tr[data-level!="1"]').hide()
   for unread in $('#posts_list tbody .unread[data-level!="1"]')
     expand_thread $($(unread).prevAll('[data-level="1"]')[0])
-  
+
   $('#posts_list .loading').activity(spinner_small)
-  
+
   $('#posts_list').scroll ->
     if not window.active_scroll_load
       view_height = $(this).height()
@@ -38,29 +38,29 @@ if <%= @posts_selected ? 'true' : 'false' %> or <%= @search_mode ? 'true' : 'fal
       scroll_top = $(this).scrollTop()
       needs_older_load = ($('#posts_load_older').length > 0)
       needs_newer_load = ($('#posts_load_newer').length > 0)
-      
+
       if needs_older_load or needs_newer_load
         do_request = false
         request_path = '<%= raw j(
           @search_mode ? request.fullpath + "&" : posts_path(@newsgroup.name) + "?") %>'
-          
+
         if needs_older_load and scroll_top + view_height > content_height - 600
           do_request = true
           request_path += 'from_older=' +
             encodeURIComponent( $('#posts_list tbody tr[data-level="1"]').last().attr('data-date') )
-        
+
         if needs_newer_load and scroll_top < 600
           request_path += '&' if do_request
           do_request = true
           request_path += 'from_newer=' +
             encodeURIComponent( $('#posts_list tbody tr[data-level="1"]').first().attr('data-date') )
-        
+
         if do_request
           window.active_scroll_load = $.getScript request_path
-  
+
   $('#posts_list').scroll()
   $('#posts_list').focus() if not <%= @posts_selected ? 'true' : 'false' %>
-  
+
 else
   $('#posts_list').scrollTop(0)
   $('#posts_list .selected').removeClass('selected')

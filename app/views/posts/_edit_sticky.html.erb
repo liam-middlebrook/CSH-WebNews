@@ -1,18 +1,18 @@
 <div id="dialog">
   <h2>Sticky Post</h2>
-  
+
   <%= form_for @post,
       :url => update_post_sticky_path(:newsgroup_name => @post.newsgroup_name, :number => @post.number),
       :html => { :method => 'put'}, :remote => true do |f| %>
-    
+
     <%= render :partial => 'sticky_fields', :locals => { :post => @post } %>
-    
+
     <div class="buttons">
       <%= f.submit 'Save', :class => 'button green' %>
       <a href="#" class="button red dialog_cancel">Cancel</a>
     </div>
   <% end %>
-  
+
   <div class="loading"></div>
   <div class="errors"></div>
 </div>

@@ -9,9 +9,9 @@ class PagesController < ApplicationController
     if params[:no_user_override]
       redirect_to root_path and return
     end
-    
+
     respond_to do |wants|
-      
+
       wants.html do
         if request.env[ENV_REALNAME]
           @current_user.real_name = request.env[ENV_REALNAME]
@@ -20,20 +20,20 @@ class PagesController < ApplicationController
         get_last_sync_time
         get_next_unread_post
       end
-      
+
       wants.js do
         get_activity_feed
         get_next_unread_post
       end
-      
+
       wants.json do
         get_activity_feed
         render :json => { :activity => @activity }
       end
-      
+
     end
   end
-  
+
   def check_new
     get_last_sync_time
     get_next_unread_post
@@ -42,19 +42,19 @@ class PagesController < ApplicationController
       get_activity_feed
     end
   end
-  
+
   def about
     render 'shared/dialog'
   end
-  
+
   def new_user
     render 'shared/dialog'
   end
-  
+
   def old_user
     render 'shared/dialog'
   end
-  
+
   def rss_caution
     render 'shared/dialog'
   end
@@ -62,9 +62,9 @@ class PagesController < ApplicationController
   def authenticate
     render 'shared/authenticate'
   end
-  
+
   private
-    
+
     def get_activity_feed
       included_newsgroups = Newsgroup.pluck(:name).reject{ |name| name =~ DEFAULT_NEWSGROUP_FILTER }
       newest_in_stickies = Post.sticky.order('date DESC').
@@ -72,7 +72,7 @@ class PagesController < ApplicationController
       newest_in_threads = Post.where(:newsgroup_name => included_newsgroups).
         where('date > ?', 1.month.ago).order('date DESC').uniq_by(&:thread_id)[0...20]
       activity_posts = (newest_in_stickies | newest_in_threads).uniq_by(&:thread_id)
-      
+
       @activity = activity_posts.map do |post|
         thread_parent = post.thread_parent
         unread_count = thread_parent.unread_count_in_thread_for_user(@current_user)

@@ -2,7 +2,7 @@
   <h2>Settings</h2>
   <%= nested_form_for @current_user, :remote => true,
       :url => update_user_path, :html => { :method => 'put'} do |f| %>
-    
+
     <div class="shrinkable">
       <fieldset>
         <legend>My profile</legend>
@@ -14,7 +14,7 @@
           <br>&raquo; <%= link_to 'Change display name on Profiles', PROFILES_URL + @current_user.username %>
         </p>
       </fieldset>
-        
+
       <%= f.fields_for :preferences do |p| %>
         <fieldset>
           <legend>Display options</legend>
@@ -44,7 +44,7 @@
           </div>
         </fieldset>
       <% end %>
-        
+
       <fieldset>
         <legend>Newsgroup settings</legend>
         <table id="user_subscriptions">
@@ -86,7 +86,7 @@
           </tfoot>
         </table>
       </fieldset>
-      
+
       <fieldset>
         <legend>WebNews API</legend>
         <div id="api_settings">
@@ -94,14 +94,14 @@
         </div>
       </fieldset>
     </div>
-    
+
     <div class="buttons">
       <%= f.submit 'Save', :class => 'button green' %>
       <a href="#" class="button red dialog_cancel change_theme"
         data-path="<%= asset_path(current_user_stylesheet) %>">Cancel</a>
     </div>
   <% end %>
-  
+
   <div class="loading"></div>
   <div class="errors"></div>
 </div>

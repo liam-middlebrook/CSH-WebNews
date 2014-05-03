@@ -7,7 +7,7 @@
  * Author: Felix Gnass [fgnass at neteye dot de]
  * Version: 1.0.0
  */
- 
+
 /**
  * Plugin that renders a customisable activity indicator (spinner) using SVG or VML.
  * Patched for latest Chrome compatibility as per https://github.com/neteye/jquery-plugins/pull/59
@@ -67,7 +67,7 @@
 	};
 	
 	/**
-	 * Default rendering strategy. If neither SVG nor VML is available, a div with class-name 'busy' 
+	 * Default rendering strategy. If neither SVG nor VML is available, a div with class-name 'busy'
 	 * is inserted, that can be styled with CSS to display an animated gif as fallback.
 	 */
 	var render = function() {
@@ -109,17 +109,17 @@
 			var el = svg().width(r*2).height(r*2);
 			
 			var g = svg('g', {
-				'stroke-width': d.width, 
-				'stroke-linecap': 'round', 
+				'stroke-width': d.width,
+				'stroke-linecap': 'round',
 				stroke: d.color
 			}).appendTo(svg('g', {transform: 'translate('+ r +','+ r +')'}).appendTo(el));
 			
 			for (var i = 0; i < d.segments; i++) {
 				g.append(svg('line', {
-					x1: 0, 
-					y1: innerRadius, 
-					x2: 0, 
-					y2: innerRadius + d.length, 
+					x1: 0,
+					y1: innerRadius,
+					x2: 0,
+					y2: innerRadius + d.length,
 					transform: 'rotate(' + (360 / d.segments * i) + ', 0, 0)',
 					opacity: $.fn.activity.getOpacity(d, i)
 				}));
@@ -146,7 +146,7 @@
 						var p1 = Math.round(100000 / steps * i) / 1000;
 						var p2 = Math.round(100000 / steps * (i+1) - 1) / 1000;
 						var value = '% { -webkit-transform:rotate(' + Math.round(360 / steps * i) + 'deg); }\n';
-						rule += p1 + value + p2 + value; 
+						rule += p1 + value + p2 + value;
 					}
 					rule += '100% { -webkit-transform:rotate(100deg); }\n}';
 					style.type = 'text/css';
@@ -193,7 +193,7 @@
 			});
 			
 			/**
-			 * Rendering strategy that creates a VML tree. 
+			 * Rendering strategy that creates a VML tree.
 			 */
 			render = function(target, d) {
 			

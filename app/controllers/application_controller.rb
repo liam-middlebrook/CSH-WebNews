@@ -5,9 +5,9 @@ class ApplicationController < ActionController::Base
   protect_from_forgery
   before_filter :set_frame_options, :set_request_format
   before_filter :check_maintenance, :check_auth, :get_or_create_user
-  
+
   private
-  
+
     def check_auth
       if not Newsgroup.select(true).first
         @no_script = true
@@ -30,7 +30,7 @@ class ApplicationController < ActionController::Base
         end
       end
     end
-    
+
     def check_maintenance
       maintenance = File.exists?('tmp/maintenance.txt')
       reloading = File.exists?('tmp/reloading.txt')
@@ -51,14 +51,14 @@ class ApplicationController < ActionController::Base
             explain
           end
         end
-        
+
         respond_to do |wants|
           wants.any(:html, :js) { render 'shared/maintenance' }
           wants.any { generic_error :service_unavailable, 'under_maintenance', @reason + '. ' + @explanation.chomp }
         end
       end
     end
-  
+
     def get_or_create_user
       if params[:api_key]
         @current_user = User.find_by_api_key(params[:api_key])
@@ -109,29 +109,29 @@ class ApplicationController < ActionController::Base
           end
         end
       end
-      
+
       if @current_user
         @current_user.touch
         Time.zone = @current_user.time_zone
         Chronic.time_class = Time.zone
       end
     end
-    
+
     def get_newsgroups_for_nav
       @newsgroups = Newsgroup.all
       @newsgroups_writable = @newsgroups.select{ |n| n.posting_allowed? }
       @newsgroups_readonly = @newsgroups.select{ |n| not n.posting_allowed? and not n.control? }
       @newsgroups_control = @newsgroups.select{ |n| n.control? }
     end
-    
+
     def get_newsgroups_for_search
       @newsgroups = Newsgroup.unscoped.order('status DESC, name')
     end
-    
+
     def get_newsgroups_for_posting
       @newsgroups = Newsgroup.where_posting_allowed
     end
-    
+
     def get_newsgroup
       name = params[:newsgroup] || params[:post].andand[:newsgroup]
       if not name.blank?
@@ -141,7 +141,7 @@ class ApplicationController < ActionController::Base
         end
       end
     end
-    
+
     def get_post
       number = params[:number] || params[:from_number]
       if not params[:newsgroup].blank? and not number.blank?
@@ -155,11 +155,11 @@ class ApplicationController < ActionController::Base
           "Both the 'newsgroup' and 'number' parameters are required to uniquely identify a post"
       end
     end
-    
+
     def get_next_unread_post
       unread_order = "CASE unread_post_entries.user_created WHEN #{Post.sanitize(true)} THEN 2 ELSE 1 END"
       standard_order = 'newsgroup_name, date'
-      
+
       if @post and @current_user.thread_mode == :normal
         order = "#{unread_order},
         CASE newsgroup_name WHEN #{Post.sanitize(@post.newsgroup_name)} THEN 1 ELSE 2 END,
@@ -176,10 +176,10 @@ class ApplicationController < ActionController::Base
       else
         order = "#{unread_order}, #{standard_order}"
       end
-      
+
       @next_unread_post = @current_user.unread_posts.order(order).first
     end
-    
+
     def get_last_sync_time
       if File.exists?('tmp/lastsync.txt')
         @last_sync_time = File.mtime('tmp/lastsync.txt')
@@ -191,22 +191,22 @@ class ApplicationController < ActionController::Base
         @sync_incomplete = true
       end
     end
-    
+
     def form_error(details)
       @error_details = details
       render 'shared/form_error'
     end
-    
+
     def rss_error(status, id, details)
       @error_id, @error_details = id, details
       render 'shared/rss_error', :status => status
     end
-    
+
     def json_error(status, id, details)
       allow_cross_origin_access
       render :status => status, :json => json_error_object(id, details)
     end
-    
+
     def generic_error(status, id, details)
       respond_to do |wants|
         wants.js { form_error(details) }
@@ -214,7 +214,7 @@ class ApplicationController < ActionController::Base
         wants.json { json_error(status, id, details) }
       end
     end
-    
+
     def json_error_object(id, details)
       {
         :error => {
@@ -223,7 +223,7 @@ class ApplicationController < ActionController::Base
         }
       }
     end
-    
+
     def json_sync_warning
       if @sync_warning
         {
@@ -237,16 +237,16 @@ class ApplicationController < ActionController::Base
         {}
       end
     end
-    
+
     def log_exception(exception)
       logger.error(exception.message)
       logger.error(exception.backtrace.join("\n"))
     end
-    
+
     def remote_host
       Resolv.getname(request.remote_ip) rescue request.remote_ip
     end
-    
+
     def prevent_api_access
       head :forbidden if @api_access
     end

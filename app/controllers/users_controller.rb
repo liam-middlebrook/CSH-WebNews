@@ -2,7 +2,7 @@ class UsersController < ApplicationController
   before_filter :prevent_api_access, :only => [:edit, :update, :update_api]
   before_filter :allow_cross_origin_access, :only => [:show, :unread_counts]
   before_filter :get_newsgroups_for_search, :only => :edit
-  
+
   def show
     render :json => {
       :user => @current_user.as_json(:only => [:username, :real_name, :created_at]).
@@ -10,17 +10,17 @@ class UsersController < ApplicationController
         merge(:preferences => @current_user.preferences.slice(:thread_mode, :time_zone))
     }
   end
-  
+
   def edit
     render 'shared/dialog'
   end
-  
+
   def update
     if not @current_user.update_attributes(params[:user].except(:username, :real_name))
       form_error(@current_user.errors.full_messages.join(', '))
     end
   end
-  
+
   def update_api
     if params[:disable]
       @current_user.update_attributes(:api_key => nil, :api_data => nil)
@@ -29,7 +29,7 @@ class UsersController < ApplicationController
       @current_user.update_attributes(:api_key => key, :api_data => nil)
     end
   end
-  
+
   def unread_counts
     render :json => {
       :unread_counts => {
