@@ -2,7 +2,6 @@
 @check_new_interval = 15000
 @check_new_retry_interval = 5000
 @draft_save_interval = 2000
-@delay_click_time = 300
 @spinner_large = {
   segments: 17,
   length: 0,
@@ -26,7 +25,6 @@ window.active_scroll_load = false
 window.active_check_new = false
 window.check_new_timeout = false
 window.draft_save_timer = false
-window.delay_click_timeout = false
 
 jQuery.fn.outerHTML = ->
   $('<div>').append(this.eq(0).clone()).html()
@@ -38,29 +36,6 @@ jQuery.ajaxScript = (method, url, success = null) ->
     dataType: 'script',
     success: success
   }
-
-@click = (elem, extra_data = null) ->
-  if $(elem).is(':visible')
-    $(elem).trigger('click', extra_data)
-    if (href = $(elem).attr('href')) and href[0..1] == '#!'
-      location.hash = href[1..-1]
-
-@delay_click_group = (group_li) ->
-  clearTimeout(window.delay_click_timeout)
-  $('#groups_list .selected').removeClass('selected')
-  $(group_li).addClass('selected')
-  window.delay_click_timeout = setTimeout (->
-    click $(group_li).find('a'), false
-  ), delay_click_time
-
-@delay_click_post = (post_tr) ->
-  clearTimeout(window.delay_click_timeout)
-  $('#posts_list .selected').removeClass('selected')
-  $(post_tr).addClass('selected')
-  scroll_to_selected_post()
-  window.delay_click_timeout = setTimeout (->
-    click post_tr, false
-  ), delay_click_time
 
 @fix_post_header = ->
   if $('#post_header').length > 0
@@ -188,13 +163,13 @@ jQuery.ajaxScript = (method, url, success = null) ->
 
 @open_dialog = (content) ->
   $('#overlay').append(content)
-  key.setScope('dialog')
+  setHotkeyModeDialog()
   # Must be delayed, otherwise outerHeight returns nonsensical values
   setTimeout (-> fix_dialog_height()), 1
 
 @close_dialog = ->
   $('#overlay').remove()
-  key.setScope('main')
+  setHotkeyModeNormal()
   if $('#dashboard').length > 0
     $('#dashboard').focus()
   else
@@ -205,7 +180,7 @@ jQuery.ajaxScript = (method, url, success = null) ->
     view_height = $('#posts_list').height()
     scroll_top = $('#posts_list').scrollTop()
     post_top = $('#posts_list .selected').first().position().top + scroll_top
-    
+
     if post_top + 20 > scroll_top + view_height or post_top < scroll_top
       $('#posts_list').scrollTop(post_top - (view_height / 2))
 
@@ -247,15 +222,15 @@ window.onhashchange = ->
     window.active_navigation.abort() if window.active_navigation
     window.active_navigation = $.getScript location.hash.replace('#!/', '')
     new_location = location.hash.split('/')[1]
-    
+
     if new_location != window.loaded_location
       abort_active_scroll()
       clear_loaded_location()
-      
+
       $('#post_view').empty()
       $('#groups_list .selected').removeClass('selected')
       $('#groups_list [data-name="' + new_location + '"]').addClass('selected')
-      
+
       if new_location == 'home'
         $('#group_view').css('bottom', '0')
         $('#group_view').css('border-bottom', '0')
@@ -264,7 +239,7 @@ window.onhashchange = ->
         $('#group_view').css('bottom', '')
         $('#group_view').css('border-bottom', '')
         $('#post_view').show()
-      
+
       if new_location == 'home' and window.first_load == true
         $('#group_view .loading').activity(spinner_small)
       else
@@ -272,22 +247,24 @@ window.onhashchange = ->
       window.first_load = false
 
 $ ->
+  setHotkeyModeNormal()
+
   chunks.overlay = $('#loader #overlay').clone()
   chunks.ajax_error = $('#loader #ajax_error').clone()
   $('#loader').remove()
-  
+
   target_external_links()
   $('a.resume_draft').hide() if not localStorage['draft_form']
-  
+
   if $('#startup_msg').length > 0
     init_dialog()
     $.getScript $('#startup_msg').attr('data-action')
-  
+
   if location.hash == '' or location.hash.substring(0, 3) != '#!/'
     location.hash = '#!/home'
   else
     window.onhashchange()
-  
+
   set_check_timeout()
 
 $(document).on 'click', 'a[href="#"]', ->
@@ -324,7 +301,7 @@ $(document).on 'click', 'a.post_reply', (e) ->
   added_text.insertBefore('.fullquote')
 
 $(document).on 'click', 'a[href^="#?/"]', ->
-  key.setScope('intermediate')
+  Mousetrap.reset()
   init_dialog()
   request_path = @href.replace('#?/', '')
   if $(this).attr('data-href-append')
@@ -336,14 +313,14 @@ $(document).on 'click', 'a[href^="#?/"]', ->
 $(document).on 'click', 'a.mark_read', ->
   reset_check_timeout()
   $('#next_unread').attr('href', '#')
-  
+
   path = 'mark_read'
   after_func = null
   scope = $(this).attr('data-scope')
   newsgroup = $('#groups_list .selected').attr('data-name') || $(this).attr('data-newsgroup')
   number = $('#posts_list .selected').attr('data-number') || $(this).attr('data-number')
   thread_id = $('#posts_list .selected').attr('data-thread')
-  
+
   if scope == 'thread'
     path += '?in_thread=true'
     path += '&newsgroup=' + encodeURIComponent(newsgroup) + '&number=' + number
@@ -383,7 +360,7 @@ $(document).on 'click', 'a.mark_read', ->
       abort_active_scroll()
       $('#posts_list tbody tr').removeClass('unread')
       after_func = -> $('#posts_list').scroll()
-  
+
   $.ajaxScript 'PUT', path, after_func
   return false
 
@@ -459,15 +436,15 @@ $(document).on 'click', '#posts_list .expander', (e) ->
 
 $(document).on 'click', '#posts_list tbody tr', (e, do_toggle = true) ->
   tr = $(this)
-  
+
   href = tr.find('a').attr('href')
   if href.substring(0, 3) == '#~/'
     $.getScript href.replace('#~/', '')
   else
     location.hash = href
-  
+
   toggle_thread_expand(tr, true) if do_toggle
-  
+
   $('#posts_list .selected').removeClass('selected')
   tr.addClass('selected')
   return false

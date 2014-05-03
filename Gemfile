@@ -11,6 +11,7 @@ gem 'chronic'
 gem 'andand'
 gem 'whenever'
 gem 'nested_form'
+gem 'mousetrap-rails'
 
 # Asset template engines
 gem 'sass-rails'

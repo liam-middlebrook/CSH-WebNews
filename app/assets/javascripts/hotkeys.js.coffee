@@ -1,125 +1,150 @@
-# FIXME: Characters requiring a Shift modifier on US keyboards must actually
-# be assigned as Shift+<unshifted_character>. Assigning to e.g. '?' or '#' in
-# keymaster does not work. See https://github.com/madrobby/keymaster/issues/29
+@delayClickTime = 300
+@delayClickTimeout = null
 
-$ ->
-  key.filter = (event) ->
-    event.preventDefault() if event.keyCode == 27
-    # https://github.com/grantovich/CSH-WebNews/issues/54
-    # https://github.com/madrobby/keymaster/issues/36
-    return !event.ctrlKey
-  
-  key.setScope('main')
-  
-  # Select the next/previous post
-  key 'k', 'main', ->
-    prev_post = $('#posts_list .selected').prevAll('tr:visible')[0]
-    if prev_post
-      delay_click_post prev_post
-    else if $('#posts_list .selected').length == 0
-      delay_click_post $('#posts_list tbody tr:visible').last()
-  key 'j', 'main', ->
-    next_post = $('#posts_list .selected').nextAll('tr:visible')[0]
-    if next_post
-      delay_click_post next_post
-    else if $('#posts_list .selected').length == 0
-      delay_click_post $('#posts_list tbody tr:visible').first()
-  
-  # Select the next/previous thread
-  key 'shift+k', 'main', ->
-    prev_thread = $('#posts_list .selected').prevAll('tr[data-level="1"]')[0]
-    if prev_thread
-      delay_click_post prev_thread
-    else if $('#posts_list .selected').length == 0
-      delay_click_post $('#posts_list tr[data-level="1"]').last()
-  key 'shift+j', 'main', ->
-    next_thread = $('#posts_list .selected').nextAll('tr[data-level="1"]')[0]
-    if next_thread
-      delay_click_post next_thread
-    else if $('#posts_list .selected').length == 0
-      delay_click_post $('#posts_list tr[data-level="1"]').first()
-  
-  # Select the next/previous newsgroup
-  key 'alt+k', 'main', ->
-    prev_group = $('#groups_list .selected').prev('li')[0]
-    if prev_group
-      delay_click_group $(prev_group)
+click = (elem, extraData = null) ->
+  if $(elem).is(':visible')
+    $(elem).trigger('click', extraData)
+    if (href = $(elem).attr('href')) and href[0..1] == '#!'
+      location.hash = href[1..-1]
+
+delayClickGroup = (groupElem) ->
+  clearTimeout(@delayClickTimeout)
+  $('#groups_list .selected').removeClass('selected')
+  $(groupElem).addClass('selected')
+  @delayClickTimeout = setTimeout (->
+    click $(groupElem).find('a'), false
+  ), @delayClickTime
+
+delayClickPost = (postRow) ->
+  clearTimeout(@delayClickTimeout)
+  $('#posts_list .selected').removeClass('selected')
+  $(postRow).addClass('selected')
+  scroll_to_selected_post()
+  @delayClickTimeout = setTimeout (->
+    click postRow, false
+  ), @delayClickTime
+
+selectPreviousPost = ->
+  prevPostRow = $('#posts_list .selected').prevAll('tr:visible')[0]
+  if prevPostRow
+    delayClickPost prevPostRow
+  else if $('#posts_list .selected').length == 0
+    delayClickPost $('#posts_list tbody tr:visible').last()
+
+selectNextPost = ->
+  nextPostRow = $('#posts_list .selected').nextAll('tr:visible')[0]
+  if nextPostRow
+    delayClickPost nextPostRow
+  else if $('#posts_list .selected').length == 0
+    delayClickPost $('#posts_list tbody tr:visible').first()
+
+selectPreviousThread = ->
+  prevThreadRow = $('#posts_list .selected').prevAll('tr[data-level="1"]')[0]
+  if prevThreadRow
+    delayClickPost prevThreadRow
+  else if $('#posts_list .selected').length == 0
+    delayClickPost $('#posts_list tr[data-level="1"]').last()
+
+selectNextThread = ->
+  nextThreadRow = $('#posts_list .selected').nextAll('tr[data-level="1"]')[0]
+  if nextThreadRow
+    delayClickPost nextThreadRow
+  else if $('#posts_list .selected').length == 0
+    delayClickPost $('#posts_list tr[data-level="1"]').first()
+
+selectPreviousGroup = ->
+  prevGroupElem = $('#groups_list .selected').prev('li')[0]
+  if prevGroupElem
+    delayClickGroup $(prevGroupElem)
+  else
+    prevGroupElem = $('#groups_list .selected').parent('ul').prev('ul').children('li').last()[0]
+    if prevGroupElem
+      delayClickGroup $(prevGroupElem)
     else
-      prev_group = $('#groups_list .selected').parent('ul').prev('ul').children('li').last()[0]
-      if prev_group
-        delay_click_group $(prev_group)
-      else
-        delay_click_group $('#groups_list li').last()
-  key 'alt+j', 'main', ->
-    next_group = $('#groups_list .selected').next('li')[0]
-    if next_group
-      delay_click_group $(next_group)
+      delayClickGroup $('#groups_list li').last()
+
+selectNextGroup = ->
+  nextGroupElem = $('#groups_list .selected').next('li')[0]
+  if nextGroupElem
+    delayClickGroup $(nextGroupElem)
+  else
+    nextGroupElem = $('#groups_list .selected').parent('ul').next('ul').children('li').first()[0]
+    if nextGroupElem
+      delayClickGroup $(nextGroupElem)
     else
-      next_group = $('#groups_list .selected').parent('ul').next('ul').children('li').first()[0]
-      if next_group
-        delay_click_group $(next_group)
-      else
-        delay_click_group $('#groups_list li').first()
-  
-  # Expand or collapse the current post/thread
-  key 'e', 'main', -> toggle_thread_expand($('#posts_list .selected'))
-  key 'shift+e', 'main', ->
-    selected = $('#posts_list .selected')
-    if selected.attr('data-level') != '1'
-      selected = selected.prevAll('tr[data-level="1"]')[0]
-      click selected, false
-    toggle_thread_expand($(selected))
-  
-  # Mark read buttons
-  key 'alt+shift+i', 'main', -> click $('#mark_all_read_button')
-  key 'alt+i', 'main', -> click $('#mark_group_read_button')
-  key 'shift+i', 'main', -> click $('#mark_thread_read_button')
-  
-  # Toolbar functions
-  key 'esc', 'main', -> click $('#home_button')
-  key 'n', 'main', -> click $('#next_unread')
-  key 'shift+s', 'main', -> click $('#starred_button')
-  key 'shift+`', 'main', -> click $('#settings_button')
-  key 'shift+/', 'main', -> click $('#about_button')
-  key '/', 'main', ->
-    for button in ['#revise_search_button', '#newsgroup_search_button', '#search_button']
-      if $(button).length > 0
-        click $(button)
-        return
-  key 'c', 'main', -> click $('#group_view .new_draft')
-  key 'r', 'main', -> click $('#post_view .new_draft')
-  key 'h', 'main', -> click $('#show_headers_button')
-  key 'u', 'main', -> click $('#mark_unread_button')
-  key 't', 'main', -> click $('#sticky_post_button')
-  key 'shift+3', 'main', -> click $('#cancel_post_button')
-  key 's', 'main', -> click $('#star_post_button')
-  key 'q', 'main', -> click $('#show_quote_button')
-  key 'd', 'main', -> click $('#reading_mode_button')
-  key 'v', 'main', -> click $('#view_in_newsgroup_button')
-  
-  # Dialog functions
-  key 'alt+s', 'dialog', ->
-    click $('#dialog form input[type="submit"]')
-  key 'alt+m', 'dialog', ->
-    # Need this so it doesn't double-trigger... why only here?
-    setTimeout (-> click $('.buttons .minimize_draft')), 1
-  key 'alt+m', 'main', ->
-    click $('.resume_draft')
-  key 'alt+q', 'dialog', ->
-    click $('.dialog_cancel.clear_draft')
-  key 'esc', 'dialog', ->
-    if $('.buttons .minimize_draft').length > 0
-      # See above
-      setTimeout (-> click $('.buttons .minimize_draft')), 1
-    else
-      click $('.dialog_cancel')
-  
-  # Change keyboard focus for scrolling
-  key 'alt+up', 'main', ->
-    $('#posts_list').focus()
-    $('#group_view').css('background-color', '#ffc')
-    setTimeout (-> $('#group_view').css('background-color', '')), 150
-  key 'alt+down', 'main', ->
-    $('#post_view .content').focus()
-    $('#post_view').css('background-color', '#ffc')
-    setTimeout (-> $('#post_view').css('background-color', '')), 150
+      delayClickGroup $('#groups_list li').first()
+
+toggleCurrentPost = ->
+  toggle_thread_expand($('#posts_list .selected'))
+
+toggleCurrentThread = ->
+  selectedPostRow = $('#posts_list .selected')
+  if selectedPostRow.attr('data-level') == '1'
+    toggle_thread_expand($(selectedPostRow))
+  else
+    currentThreadRow = selectedPostRow.prevAll('tr[data-level="1"]')[0]
+    click currentThreadRow, false
+    toggle_thread_expand($(currentThreadRow))
+
+clickMostSpecificSearch = ->
+  for searchButton in ['#revise_search_button', '#newsgroup_search_button', '#search_button']
+    if $(searchButton).length > 0
+      click $(searchButton)
+      return false # to prevent activating page search in Firefox
+
+closeDialogOrMinimizeDraft = ->
+  if $('.buttons .minimize_draft').length > 0
+    click $('.buttons .minimize_draft')
+  else
+    click $('.dialog_cancel')
+
+focusOnThreadView = ->
+  $('#posts_list').focus()
+  $('#group_view').css('background-color', '#ffc')
+  setTimeout (-> $('#group_view').css('background-color', '')), 150
+
+focusOnPostView = ->
+  $('#post_view .content').focus()
+  $('#post_view').css('background-color', '#ffc')
+  setTimeout (-> $('#post_view').css('background-color', '')), 150
+
+@setHotkeyModeNormal = ->
+  Mousetrap.reset()
+  Mousetrap.bind
+    'k': selectPreviousPost
+    'j': selectNextPost
+    'shift+k': selectPreviousThread
+    'shift+j': selectNextThread
+    'alt+k': selectPreviousGroup
+    'alt+j': selectNextGroup
+    'e': toggleCurrentPost
+    'shift+e': toggleCurrentThread
+    'alt+shift+i': -> click $('#mark_all_read_button')
+    'alt+i': -> click $('#mark_group_read_button')
+    'shift+i': -> click $('#mark_thread_read_button')
+    'esc': -> click $('#home_button')
+    'n': -> click $('#next_unread')
+    'shift+s': -> click $('#starred_button')
+    '~': -> click $('#settings_button')
+    '?': -> click $('#about_button')
+    '/': clickMostSpecificSearch
+    'c': -> click $('#group_view .new_draft')
+    'r': -> click $('#post_view .new_draft')
+    'h': -> click $('#show_headers_button')
+    'u': -> click $('#mark_unread_button')
+    't': -> click $('#sticky_post_button')
+    '#': -> click $('#cancel_post_button')
+    's': -> click $('#star_post_button')
+    'q': -> click $('#show_quote_button')
+    'd': -> click $('#reading_mode_button')
+    'v': -> click $('#view_in_newsgroup_button')
+    'alt+m': -> click $('.resume_draft')
+    'alt+up': focusOnThreadView
+    'alt+down': focusOnPostView
+
+@setHotkeyModeDialog = ->
+  Mousetrap.reset()
+  Mousetrap.bindGlobal 'alt+s', -> click $('#dialog input[type="submit"]')
+  Mousetrap.bindGlobal 'alt+m', -> click $('.buttons .minimize_draft')
+  Mousetrap.bindGlobal 'alt+q', -> click $('.dialog_cancel.clear_draft')
+  Mousetrap.bindGlobal 'esc', closeDialogOrMinimizeDraft
