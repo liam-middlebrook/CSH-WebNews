@@ -26,17 +26,6 @@ window.active_check_new = false
 window.check_new_timeout = false
 window.draft_save_timer = false
 
-jQuery.fn.outerHTML = ->
-  $('<div>').append(this.eq(0).clone()).html()
-
-jQuery.ajaxScript = (method, url, success = null) ->
-  $.ajax {
-    url: url,
-    type: method,
-    dataType: 'script',
-    success: success
-  }
-
 @fix_post_header = ->
   if $('#post_header').length > 0
     $('#post_view .content').css('top', $('#post_header').outerHeight() + 'px');
@@ -413,7 +402,7 @@ $(document).on 'click', 'a.resume_draft', ->
   open_dialog(localStorage['draft_html'])
   for elem in JSON.parse(localStorage['draft_form'])
     $('#dialog form [name="' + elem.name + '"]').val(elem.value)
-  $('#post_body').putCursorAtEnd() if $('#post_body').val() != ''
+  $('#post_body').focusAtEnd() if $('#post_body').val() != ''
   set_draft_interval()
 
 $(document).on 'click', '#new_post [type="submit"]', (e) ->

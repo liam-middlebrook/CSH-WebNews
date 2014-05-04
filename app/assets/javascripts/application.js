@@ -1,6 +1,5 @@
 //= require jquery
 //= require jquery_ujs
-//= require put_cursor
 //= require mousetrap
 //= require mousetrap/plugins
 //= require activity-indicator
