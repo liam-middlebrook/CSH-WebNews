@@ -12,6 +12,7 @@ gem 'andand'
 gem 'whenever'
 gem 'nested_form'
 gem 'mousetrap-rails'
+gem 'font-awesome-sass'
 
 # Asset template engines
 gem 'sass-rails'

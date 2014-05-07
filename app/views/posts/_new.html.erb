@@ -1,5 +1,11 @@
 <div id="dialog">
-  <h2><%= params[:number] ? 'Post Reply' : 'Post New' %></h2>
+  <h2>
+    <% if params[:number] %>
+      <%= icon('reply') %> Reply to post
+    <% else %>
+      <%= icon('file') %> New post
+    <% end %>
+  </h2>
 
   <%= form_for @new_post,
       :url => create_post_path, :html => { :method => 'post' }, :remote => true do |f| %>
@@ -69,10 +75,15 @@
     <% end %>
 
     <div class="buttons">
-      <%= f.submit 'Submit', :class => 'button green' %>
-      <a href="#" class="button yellow dialog_cancel minimize_draft">Minimize</a>
-      <a href="#" class="button red dialog_cancel clear_draft"
-        data-confirm="Really abandon this post?">Abandon</a>
+      <button type="submit" class="button green">
+        <%= icon('file-text') %> Post
+      </button>
+      <a href="#" class="button yellow dialog_cancel minimize_draft">
+        <%= icon('chevron-up') %> Minimize
+      </a>
+      <a href="#" class="button red dialog_cancel clear_draft" data-confirm="Really discard this draft?">
+        <%= icon('times') %> Discard
+      </a>
     </div>
   <% end %>
 

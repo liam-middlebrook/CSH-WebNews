@@ -7,9 +7,14 @@
 
   h1 {
     color: $border_button;
-    font-size: 160%;
+    font-size: 140%;
     vertical-align: middle;
     display: inline;
+  }
+
+  h1:hover + #home_button {
+    color: $bg_light;
+    background-color: $border_button;
   }
 
   .user_info {

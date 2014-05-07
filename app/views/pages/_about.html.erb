@@ -1,5 +1,5 @@
 <div id="dialog">
-  <h2>About WebNews</h2>
+  <h2><%= icon('question-circle') %> About WebNews</h2>
 
   <p>WebNews is an <a href="https://github.com/grantovich/CSH-WebNews">open-source project</a> maintained by Alex Grant, a.k.a. <a href="https://wiki.csh.rit.edu/wiki/User:Grantovich">Grantovich</a>.   </p>
 
@@ -9,14 +9,14 @@
     <li>Something not working? Detailed bug reports are appreciated on the <a href="https://github.com/grantovich/CSH-WebNews/issues">issue tracker</a>.</li>
   </ul>
 
-  <h3>Hotkey Reference</h3>
+  <h3><%= icon('keyboard-o') %> Keyboard Shortcuts</h3>
   <div class="shrinkable">
     <table class="hotkeys_container">
       <tr>
         <td>
           <table class="hotkeys">
             <tr><td><span class="key">Esc</span></td><td>Home</td></tr>
-            <tr><td><span class="key">n</span></td><td>Next Unread</td></tr>
+            <tr><td><span class="key">n</span></td><td>Next unread</td></tr>
             <tr><td><span class="key">/</span></td><td>Search</td></tr>
             <tr><td><span class="key">Shift</span>+<span class="key">s</span></td><td>Starred</td></tr>
             <tr><td><span class="key">~</span></td><td>Settings</td></tr>
@@ -36,16 +36,16 @@
         </td>
         <td>
           <table class="hotkeys">
-            <tr><td><span class="key">c</span></td><td>Post New</td></tr>
-            <tr><td><span class="key">r</span></td><td>Post Reply</td></tr>
-            <tr><td><span class="key">u</span></td><td>Mark Unread</td></tr>
+            <tr><td><span class="key">c</span></td><td>Post</td></tr>
+            <tr><td><span class="key">r</span></td><td>Reply</td></tr>
+            <tr><td><span class="key">u</span></td><td>Mark unread</td></tr>
             <tr><td><span class="key">s</span></td><td>Star/unstar</td></tr>
             <tr><td><span class="key">t</span></td><td>Sticky/unsticky</td></tr>
             <tr><td><span class="key">#</span></td><td>Cancel post</td></tr>
-            <tr><td><span class="key">h</span></td><td>Show/hide headers</td></tr>
-            <tr><td><span class="key">q</span></td><td>Show/hide quoted text</td></tr>
-            <tr><td><span class="key">d</span></td><td>Enable/disable reading mode</td></tr>
-            <tr><td><span class="key">v</span></td><td>View in Newsgroup (from search)</td></tr>
+            <tr><td><span class="key">h</span></td><td>Toggle headers</td></tr>
+            <tr><td><span class="key">q</span></td><td>Toggle quoted text</td></tr>
+            <tr><td><span class="key">d</span></td><td>Toggle reading mode</td></tr>
+            <tr><td><span class="key">v</span></td><td>View in newsgroup (from search)</td></tr>
             <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
             <tr><td><span class="key">Alt</span>+<span class="key">s</span></td><td>Submit dialog</td></tr>
             <tr><td><span class="key">Alt</span>+<span class="key">m</span></td><td>Minimize/restore draft</td></tr>
@@ -58,6 +58,6 @@
   </div>
 
   <div class="buttons">
-    <a href="#" class="button dialog_cancel">Close</a>
+    <a href="#" class="button dialog_cancel"><%= icon('times') %> Close</a>
   </div>
 </div>

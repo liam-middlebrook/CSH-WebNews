@@ -21,30 +21,32 @@ end
     <% if @search_mode %>
       <span class="explain" style="margin-right: -10px">To see all post actions:</span>
       <a id="view_in_newsgroup_button" class="button"
-        href="#!<%= post_path(@newsgroup.name, post.number) %>">View in Newsgroup</a>
+          href="#!<%= post_path(@newsgroup.name, post.number) %>">
+        <%= icon('external-link-square', '', class: 'fa-flip-horizontal') %> View in Newsgroup
+      </a>
     <% else %>
       <% if @newsgroup.posting_allowed? %>
         <a class="button new_draft post_reply"
-          href="#?<%= new_post_path(:newsgroup => @newsgroup.name, :number => post.number) %>">Post Reply</a>
+          href="#?<%= new_post_path(:newsgroup => @newsgroup.name, :number => post.number) %>"><%= icon('reply') %> Reply</a>
       <% end %>
       <% if not post.authored_by?(@current_user) %>
         <a id="mark_unread_button" class="button mark_unread"
-          href="#~<%= mark_read_path(:mark_unread => true, :newsgroup => @newsgroup.name, :number => @post.number) %>">Mark Unread</a>
+          href="#~<%= mark_read_path(:mark_unread => true, :newsgroup => @newsgroup.name, :number => @post.number) %>"><%= icon('asterisk') %> Mark Unread</a>
       <% end %>
       <% if @current_user.admin? and post == post.thread_parent %>
         <a id="sticky_post_button" class="button orange"
-          href="#?<%= edit_post_sticky_path(:newsgroup => @newsgroup.name, :number => post.number) %>">Sticky</a>
+          href="#?<%= edit_post_sticky_path(:newsgroup => @newsgroup.name, :number => post.number) %>"><%= icon('thumb-tack') %> Sticky</a>
       <% end %>
       <% if @newsgroup.posting_allowed? and post.children.count == 0 %>
         <% if post.authored_by?(@current_user) or @current_user.admin? %>
-          <a id="cancel_post_button" class="button<%= @admin_cancel ? ' orange' : '' %>" href="#?<%= confirm_destroy_post_path(:newsgroup => @newsgroup.name, :number => post.number) %>">Cancel</a>
+          <a id="cancel_post_button" class="button<%= @admin_cancel ? ' orange' : '' %>" href="#?<%= confirm_destroy_post_path(:newsgroup => @newsgroup.name, :number => post.number) %>"><%= icon('trash-o') %> Cancel</a>
         <% end %>
       <% end %>
     <% end %>
 
     <a id="star_post_button" title="Star this post"
       class="button<%= post.starred_by_user?(@current_user) ? ' starred' : '' %>"
-      href="#~<%= update_post_star_path(:newsgroup => @newsgroup.name, :number => post.number) %>">&nbsp;</a>
+      href="#~<%= update_post_star_path(:newsgroup => @newsgroup.name, :number => post.number) %>"><%= icon('star') %></a>
   </div>
 
   <%= gravatar_image post.author_email, 40 %>
@@ -54,17 +56,17 @@ end
       <%= author_line(post) %>
       <a class="smallbutton"
         href="#!<%= search_path(:authors => [post.author_name, "<#{post.author_email}>"].join(',')) %>"
-        title="Search for posts by this user">Posts</a>
+        title="Search for posts by this user"><%= icon('search') %></a>
       <% if post.author_is_local? %>
         <a class="smallbutton" href="<%= PROFILES_URL + post.author_username %>"
-          title="Go to this user's profile page">Profile</a>
+          title="Open this user's profile page"><%= icon('user') %></a>
         <a class="smallbutton" href="<%= WIKI_USER_URL + post.author_username.capitalize %>"
-          title="Go to this user's wiki page">Wiki</a>
+          title="Open this user's wiki page"><%= icon('book') %></a>
       <% end %>
     </span> &mdash;
     <span class="date"><%= post.date.strftime(DATE_FORMAT) %></span>
     <a id="show_headers_button" class="smallbutton toggle" href="#"
-      data-selector="#post_view .headers" data-text="Hide Headers">Show Headers</a>
+      data-selector="#post_view .headers" data-text="Hide headers">Show headers</a>
   </div>
   <% if post.date > Time.now + 60.seconds %>
     <div class="notice">

@@ -78,11 +78,14 @@
       .expander {
         width: 16px;
         display: inline-block;
-        background-repeat: no-repeat;
-        background-position: left center;
-        &.expandable { background-image: url('expander-closed.png'); }
-        &.expanded { background-image: url('expander-open.png'); }
-        &.expandable:hover, &.expanded:hover { background-color: $bg_expand_hover; }
+        text-align: center;
+        &.expanded i {
+          -webkit-transform: rotate(45deg);
+          transform: rotate(45deg);
+        }
+        &.expandable:hover, &.expanded:hover {
+          background-color: $bg_expand_hover;
+        }
       }
 
       tr[data-level]:not([data-level="1"]) {

@@ -1,5 +1,5 @@
 <div id="dialog">
-  <h2>Search</h2>
+  <h2><%= icon('search') %> Search</h2>
 
   <%= form_tag search_path, :method => 'get', :remote => true do %>
 
@@ -45,8 +45,8 @@
     <%= hidden_field_tag :validate, true %>
 
     <div class="buttons">
-      <%= submit_tag 'Search', :class => 'button' %>
-      <a href="#" class="button dialog_cancel">Cancel</a>
+      <button type="submit" class="button"><%= icon('search') %> Search</button>
+      <a href="#" class="button dialog_cancel"><%= icon('times') %> Cancel</a>
     </div>
   <% end %>
 

@@ -277,7 +277,7 @@ $(document).on 'click', '.remove_nested_fields[data-association="subscriptions"]
   adjust_shrinkable_original_height(0 - $('#subscription_rows tr').first().height())
 
 $(document).on 'click', 'a.new_draft', (e) ->
-  if localStorage['draft_form'] and not confirm('Really abandon your saved draft and start a new post?')
+  if localStorage['draft_form'] and not confirm('Really discard your saved draft and start a new post?')
     e.stopImmediatePropagation()
     return false
 
@@ -438,8 +438,8 @@ $(document).on 'click', '#posts_list tbody tr', (e, do_toggle = true) ->
   tr.addClass('selected')
   return false
 
-$(document).on 'mousedown', 'a, input', -> this.style.outlineStyle = 'none'
-$(document).on 'blur', 'a, input', -> this.style.outlineStyle = ''
+$(document).on 'mousedown', 'a, button, input', -> this.style.outlineStyle = 'none'
+$(document).on 'blur', 'a, button, input', -> this.style.outlineStyle = ''
 
 $(document).on 'focus', 'a, input, select, textarea, button', ->
   if $('#dialog').length > 0 and $(this).parents('#dialog').length == 0

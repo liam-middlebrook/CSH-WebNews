@@ -144,7 +144,7 @@ focusOnPostView = ->
 
 @setHotkeyModeDialog = ->
   Mousetrap.reset()
-  Mousetrap.bindGlobal 'alt+s', -> click $('#dialog input[type="submit"]')
+  Mousetrap.bindGlobal 'alt+s', -> click $('#dialog [type="submit"]')
   Mousetrap.bindGlobal 'alt+m', -> click $('.buttons .minimize_draft')
   Mousetrap.bindGlobal 'alt+q', -> click $('.dialog_cancel.clear_draft')
   Mousetrap.bindGlobal 'esc', closeDialogOrMinimizeDraft

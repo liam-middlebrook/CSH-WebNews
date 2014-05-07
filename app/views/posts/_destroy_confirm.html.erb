@@ -1,5 +1,5 @@
 <div id="dialog">
-  <h2>Really cancel this post?</h2>
+  <h2><%= icon('exclamation-triangle') %> Cancel this post?</h2>
   <%= form_for @post,
       :url => destroy_post_path(@post.newsgroup_name, @post.number),
       :html => { :method => 'delete'}, :remote => true do |f| %>
@@ -8,9 +8,9 @@
 
     <p>Canceling this post will remove it from WebNews and the news server.</p>
 
-    <p><b>However,</b> the post may remain cached elsewhere in the form of WebNews email notifications, mailing list messages, or copies downloaded by other news clients. Canceling it will not prevent users from reading or replying to these copies.</p>
+    <p><b>However,</b> the post may remain cached elsewhere in the form of email notifications, mailing list messages, or copies downloaded by other news clients. Canceling it will not prevent users from reading or replying to these copies.</p>
 
-    <p>Canceling will create a corresponding message in the <i>control.cancel</i> newsgroup, containing some information about the canceled post (author, date, subject line) and optionally a <b>reason for canceling</b> that you specify.</p>
+    <p>Canceling will create a corresponding message in the <i>control.cancel</i> newsgroup, containing some information about the canceled post (author, date, subject line) and anything you enter in the <b>reason for canceling</b> box below.</p>
 
     <div class="form_element">
       <%= text_field_tag :reason, nil, :placeholder => 'Reason for canceling (optional)' %>
@@ -21,8 +21,8 @@
     <% end %>
 
     <div class="buttons">
-      <button name="commit" type="submit" class="button red">I understand, cancel this post</button>
-      <a href="#" class="button dialog_cancel">Never mind</a>
+      <button name="commit" type="submit" class="button red"><%= icon('trash-o') %> Cancel this post</button>
+      <a href="#" class="button dialog_cancel"><%= icon('times') %> Never mind</a>
     </div>
   <% end %>
 

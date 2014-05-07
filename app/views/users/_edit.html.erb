@@ -1,11 +1,11 @@
 <div id="dialog">
-  <h2>Settings</h2>
+  <h2><%= icon('cog') %> Settings</h2>
   <%= nested_form_for @current_user, :remote => true,
       :url => update_user_path, :html => { :method => 'put'} do |f| %>
 
     <div class="shrinkable">
       <fieldset>
-        <legend>My profile</legend>
+        <legend><%= icon('user') %> Profile</legend>
         <%= gravatar_image @current_user.email, 50 %>
         <p class="user_info">
           <span class="real_name"><%= @current_user.real_name %></span>
@@ -17,7 +17,7 @@
 
       <%= f.fields_for :preferences do |p| %>
         <fieldset>
-          <legend>Display options</legend>
+          <legend><%= icon('laptop') %> Display options</legend>
           <div class="form_element aligned_field">
             <span class="label">Color scheme:</span>
             <% AVAILABLE_THEMES.each do |theme| %>
@@ -34,8 +34,7 @@
             <%= p.label :thread_mode, 'Flat', :value => 'flat' %>
             <%= p.radio_button :thread_mode, 'hybrid', :checked => @current_user.thread_mode == :hybrid %>
             <%= p.label :thread_mode, 'Hybrid', :value => 'hybrid' %>
-            <a href="#" class="smallbutton explain_button toggle" title="What's this?" data-selector="#hybrid_view_explain">?</a>
-            <span id="hybrid_view_explain" class="explain">flattens replies, but keeps them grouped under the first post</span>
+            <span class="explain">(flattens replies, but groups them under the first post)</span>
           </div>
           <div class="form_element aligned_field">
             <%= p.label :time_zone, 'Time zone preference:' %>
@@ -46,7 +45,7 @@
       <% end %>
 
       <fieldset>
-        <legend>Newsgroup settings</legend>
+        <legend><%= icon('inbox') %> Newsgroup settings</legend>
         <table id="user_subscriptions">
           <thead>
             <tr>
@@ -73,14 +72,14 @@
                 <td><%= sub.select :unread_level, options_for_select(PERSONAL_CODES_DESCRIPTIONS, sub.object.unread_level), :include_blank => '(use default)' %></td>
                 <td><%= sub.select :email_level, options_for_select(PERSONAL_CODES_DESCRIPTIONS, sub.object.email_level), :include_blank => '(use default)' %></td>
                 <td><%= sub.select :digest_type, options_for_select(DIGEST_TYPES_DESCRIPTIONS, sub.object.digest_type), :include_blank => '(use default)' %></td>
-                <td><%= sub.link_to_remove '&times;'.html_safe, :class => 'smallbutton' %></td>
+                <td><%= sub.link_to_remove icon('times').html_safe, :class => 'smallbutton' %></td>
               </tr>
             <% end %>
           </tbody>
           <tfoot>
             <tr>
               <td colspan="5">
-                <%= f.link_to_add '+ Add newsgroup', :subscriptions, :class => 'smallbutton', 'data-target' => '#subscription_rows' %>
+                <%= f.link_to_add "#{icon('plus')} Add newsgroup".html_safe, :subscriptions, :class => 'smallbutton', 'data-target' => '#subscription_rows' %>
               </td>
             </tr>
           </tfoot>
@@ -88,7 +87,7 @@
       </fieldset>
 
       <fieldset>
-        <legend>WebNews API</legend>
+        <legend><%= icon('key') %> WebNews API</legend>
         <div id="api_settings">
           <%= render 'api_settings' %>
         </div>
@@ -96,9 +95,13 @@
     </div>
 
     <div class="buttons">
-      <%= f.submit 'Save', :class => 'button green' %>
+      <button type="submit" class="button green">
+        <%= icon('check') %> Save
+      </button>
       <a href="#" class="button red dialog_cancel change_theme"
-        data-path="<%= asset_path(current_user_stylesheet) %>">Cancel</a>
+          data-path="<%= asset_path(current_user_stylesheet) %>">
+        <%= icon('times') %> Cancel
+      </a>
     </div>
   <% end %>
 

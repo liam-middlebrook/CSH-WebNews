@@ -14,7 +14,11 @@ newsgroup_name = @newsgroup ? @newsgroup.name : post.newsgroup_name
   data-thread="<%= post.thread_id %>">
   <td>
     <% (level - 1).times do %><div class="indent"><% end %>
-    <span class="expander<%= expanded ? ' expanded' : '' %>">&nbsp;</span>
+    <% if expanded %>
+      <span class="expander expanded"><%= icon('caret-right') %></span>
+    <% else %>
+      <span class="expander">&nbsp;</span>
+    <% end %>
     <a href="#<%= @search_mode ? '~' : '!' %><%=
       post_path(newsgroup_name, post.number) + (@search_mode ? '?search_mode=true' : '')
     %>"><%=
