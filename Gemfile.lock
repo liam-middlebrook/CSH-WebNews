@@ -30,8 +30,11 @@ GEM
       multi_json (~> 1.0)
     andand (1.3.3)
     arel (3.0.3)
+    binding_of_caller (0.7.2)
+      debug_inspector (>= 0.0.1)
     builder (3.0.4)
     chronic (0.10.2)
+    coderay (1.1.0)
     coffee-rails (3.2.2)
       coffee-script (>= 2.2.0)
       railties (~> 3.2.0)
@@ -39,6 +42,7 @@ GEM
       coffee-script-source
       execjs
     coffee-script-source (1.7.0)
+    debug_inspector (0.0.2)
     erubis (2.7.0)
     execjs (2.0.2)
     font-awesome-sass (4.0.3.1)
@@ -53,12 +57,24 @@ GEM
     mail (2.5.4)
       mime-types (~> 1.16)
       treetop (~> 1.4.8)
+    method_source (0.8.2)
     mime-types (1.25.1)
     mousetrap-rails (1.4.6)
     multi_json (1.10.0)
     mysql2 (0.3.15)
     nested_form (0.3.2)
     polyglot (0.3.4)
+    pry (0.9.12.6)
+      coderay (~> 1.0)
+      method_source (~> 0.8)
+      slop (~> 3.4)
+    pry-nav (0.2.3)
+      pry (~> 0.9.10)
+    pry-rails (0.3.2)
+      pry (>= 0.9.10)
+    pry-stack_explorer (0.4.9.1)
+      binding_of_caller (>= 0.7)
+      pry (>= 0.9.11)
     rack (1.4.5)
     rack-cache (1.2)
       rack (>= 0.4)
@@ -91,6 +107,7 @@ GEM
       railties (~> 3.2.0)
       sass (>= 3.1.10)
       tilt (~> 1.3)
+    slop (3.5.0)
     sprockets (2.2.2)
       hike (~> 1.2)
       multi_json (~> 1.0)
@@ -122,6 +139,9 @@ DEPENDENCIES
   mousetrap-rails
   mysql2
   nested_form
+  pry-nav
+  pry-rails
+  pry-stack_explorer
   rails (= 3.2.18)
   rails_autolink
   sass-rails
