@@ -424,8 +424,8 @@ class Post < ActiveRecord::Base
       parent_id = thread_id = possible_thread_id
     elsif subject =~ /Re:/i
       possible_thread_parent = where(
-        '(subject = ? or subject = ?) and newsgroup_name = ? and date < ? and date > ?',
-        subject, subject.sub(/Re: ?/i, ''), newsgroup.name, date, date - 3.months
+        '(subject = ? or subject = ?) and newsgroup_name = ? and parent_id = ? and date < ? and date > ?',
+        subject, subject.sub(/Re: ?/i, ''), newsgroup.name, '', date, date - 3.months
       ).order('date').first
 
       if possible_thread_parent
