@@ -64,12 +64,12 @@ window.draft_save_timer = false
   if enable
     $('#post_view').css('top', $('#group_view').css('top'))
     $('#post_view').css('margin-top', $('#group_view').css('margin-top'))
-    $('#post_view .body').css('font-size', '120%').css('max-width', '50em')
+    $('#post_view .body').css('font-size', '120%')
     $('#group_view').hide()
     $('#reading_mode_button').addClass('enabled')
   else
     $('#post_view').css('top', '').css('margin-top', '')
-    $('#post_view .body').css('font-size', '').css('max-width', '')
+    $('#post_view .body').css('font-size', '')
     $('#group_view').show()
     $('#reading_mode_button').removeClass('enabled')
     scroll_to_selected_post()
