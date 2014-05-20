@@ -171,8 +171,7 @@ module ApplicationHelper
           html_body.gsub!("#{MARK_STRING}1\n",
             '<span id="added_post_text"><a href="#"
               id="show_quote_button" class="smallbutton showquote toggle"
-              data-selector="#post_view .fullquote"
-              data-text="Hide quoted text">Show quoted text</a>' +
+              data-selector="#post_view .fullquote">Quoted text</a>' +
               "\n" + '</span><div class="fullquote">'
           )
         end

@@ -73,32 +73,25 @@ window.draft_save_timer = false
     $('#group_view').show()
     $('#reading_mode_button').removeClass('enabled')
     scroll_to_selected_post()
-  # Button width was fixed in ajaxComplete, so need to reset it
-  $('#show_quote_button').width('')
-  $('#show_quote_button').width($('#show_quote_button').width() + 1)
 
 @target_external_links = ->
   $('a[href^="http"]:not([href*="' + window.location.host + '"])').attr('target', '_blank')
 
 @init_toggle = (elem, pretoggle = true) ->
   elem = $(elem)
-  if not elem.hasClass('init_toggled')
-    elem.width(elem.width() + 1)
-    elem.addClass('init_toggled')
+  if not elem.is('[data-toggle-initialized]')
+    elem.attr('data-toggle-initialized', '')
     if pretoggle
       toggle_content(elem)
+      elem.prepend('<i class="fa fa-chevron-down"></i> ')
     else
-      exchange_toggle_text(elem)
+      elem.prepend('<i class="fa fa-chevron-up"></i> ')
 
 @toggle_content = (elem) ->
-  $($(elem).attr('data-selector')).toggle()
-
-@exchange_toggle_text = (elem) ->
   elem = $(elem)
-  new_text = elem.attr('data-text')
-  if new_text
-    elem.attr('data-text', elem.text())
-    elem.text(new_text)
+  $(elem.attr('data-selector')).toggle()
+  if elem.find('i').length > 0
+    elem.find('i').toggleClass('fa-chevron-up fa-chevron-down')
 
 @set_loaded_location = ->
   window.loaded_location = location.hash.split('/')[1]
@@ -261,7 +254,6 @@ $(document).on 'click', 'a[href="#"]', ->
 
 $(document).on 'click', '.toggle', ->
   toggle_content(this)
-  exchange_toggle_text(this)
 
 $(document).on 'click', '#crosspost_toggle', ->
   toggled = $($(this).attr('data-selector'))

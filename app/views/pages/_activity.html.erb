@@ -6,7 +6,7 @@
         <td>
           <a href="#" id="mark_read_toggle"
             class="smallbutton toggle <%= @activity.any?{ |item| item[:unread_count] > 0 } ? '' : 'invisible' %>"
-            data-text="Done" data-selector=".activity a.mark_read">Mark Read...</a>
+            data-selector=".activity a.mark_read">Mark Read</a>
         </td>
       </tr>
       <% activity_breakout(@activity).each do |header, items| %>

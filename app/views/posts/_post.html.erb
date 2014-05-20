@@ -66,7 +66,7 @@ end
     </span> &mdash;
     <span class="date"><%= post.date.strftime(DATE_FORMAT) %></span>
     <a id="show_headers_button" class="smallbutton toggle" href="#"
-      data-selector="#post_view .headers" data-text="Hide headers">Show headers</a>
+      data-selector="#post_view .headers">Headers</a>
   </div>
   <% if post.date > Time.now + 60.seconds %>
     <div class="notice">
