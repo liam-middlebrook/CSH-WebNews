@@ -68,9 +68,12 @@ class Post < ActiveRecord::Base
   end
 
   def first_line
-    body.each_line do |line|
-      if not (line.blank? or line[/^>/] or line[/(wrote|writes):$/] or
-          line[/^In article/] or line[/^On.*\d{4}.*:/] or line[/wrote in message/] or
+    sigless_body.each_line do |line|
+      line.chomp!
+      if line[/[[:word:]]/] and not (
+          line.blank? or line[/^>/] or
+          line[/(wrote|writes):$/] or line[/^In article/] or
+          line[/^On.*\d{4}.*:/] or line[/wrote in message/] or
           line[/news:.*\.\.\.$/] or line[/^\W*snip\W*$/])
         first = line.sub(/ +$/, '')
         first = first.rstrip + '...' if first[/\w\n/]
