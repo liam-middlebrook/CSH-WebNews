@@ -1,7 +1,7 @@
 class Newsgroup < ActiveRecord::Base
   has_many :unread_post_entries, :dependent => :destroy
   has_many :posts, :foreign_key => :newsgroup_name, :primary_key => :name, :dependent => :destroy
-  has_many :subscriptions, :dependent => :destroy
+  has_many :subscriptions, :foreign_key => :newsgroup_name, :primary_key => :name, :dependent => :destroy
 
   default_scope :order => 'name'
   scope :where_posting_allowed, where(:status => 'y')
