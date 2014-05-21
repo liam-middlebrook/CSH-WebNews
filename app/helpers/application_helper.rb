@@ -25,6 +25,19 @@ module ApplicationHelper
       '#!' + post_path(post.newsgroup_name, post.number)
   end
 
+  def abbrev_newsgroup(newsgroup_name)
+    if newsgroup_name =~ /^control/
+      newsgroup_name
+    else
+      newsgroup_name.gsub(/([^.])[^.]*\./, '\\1.')
+    end
+  end
+
+  def newsgroup_header(newsgroup)
+    html_escape(abbrev_newsgroup(newsgroup.name)).
+      sub(/(.*\.)/, '<span class="abbreviated">\\1</span>').html_safe
+  end
+
   def author_line(post)
     post.author_name + if post.author_email != post.author_name
       if post.author_is_local?

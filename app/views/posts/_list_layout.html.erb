@@ -31,7 +31,13 @@
   <% end %>
 </div>
 <div id="group_header">
-  <h2><%= @search_mode ? (@starred_only ? 'Starred Posts' : 'Search Results') : @newsgroup.name %></h2>
+  <h2>
+    <% if @search_mode %>
+      <%= @starred_only ? 'Starred Posts' : 'Search Results' %>
+    <% else %>
+      <%= newsgroup_header(@newsgroup) %>
+    <% end %>
+  </h2>
 </div>
 <div id="posts_list" tabindex="-1">
   <table>
