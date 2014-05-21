@@ -408,8 +408,8 @@ class Post < ActiveRecord::Base
       headers[/^NNTP-Posting-Date: (.*)/i, 1] ||
       headers[/^Date: (.*)/i, 1]
     )
-    author = headers[/^From: (.*)/i, 1]
-    subject = headers[/^Subject: (.*)/i, 1]
+    author = header_decode(headers[/^From: (.*)/i, 1])
+    subject = header_decode(headers[/^Subject: (.*)/i, 1])
     message_id = headers[/^Message-ID: (.*)/i, 1]
     references = headers[/^References: (.*)/i, 1].to_s.split.map{ |r| r[/<.*>/] }
 
@@ -506,5 +506,13 @@ class Post < ActiveRecord::Base
 
   def self.unwrap_headers(headers)
     headers.gsub(/\n( |\t)/, ' ').gsub(/\t/, ' ')
+  end
+
+  def self.header_decode(header)
+    begin
+      Rfc2047.decode(header)
+    rescue Rfc2047::Unparseable
+      header
+    end
   end
 end

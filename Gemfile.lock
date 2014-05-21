@@ -1,3 +1,9 @@
+GIT
+  remote: git://github.com/ConradIrwin/rfc2047-ruby.git
+  revision: 46bbe4177c2955d40126a36e1e9f3ec9e4f3a66a
+  specs:
+    rfc2047 (0.2)
+
 GEM
   remote: http://rubygems.org/
   specs:
@@ -144,6 +150,7 @@ DEPENDENCIES
   pry-stack_explorer
   rails (= 3.2.18)
   rails_autolink
+  rfc2047!
   sass-rails
   sqlite3
   uglifier

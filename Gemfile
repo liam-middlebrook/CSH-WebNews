@@ -13,6 +13,7 @@ gem 'whenever'
 gem 'nested_form'
 gem 'mousetrap-rails'
 gem 'font-awesome-sass'
+gem 'rfc2047', github: 'ConradIrwin/rfc2047-ruby'
 
 # Asset template engines
 gem 'sass-rails'
