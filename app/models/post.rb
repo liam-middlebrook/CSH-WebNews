@@ -302,22 +302,18 @@ class Post < ActiveRecord::Base
   end
 
   def build_cancel_message(params)
-    m = "From: #{params[:user].real_name} <#{params[:user].email}>"
+    m = "From: #{Post.header_encode(params[:user].real_name)} <#{params[:user].email}>"
     m += "\nSubject: cmsg cancel #{message_id}"
     m += "\nNewsgroups: " + all_newsgroup_names.join(',')
     m += "\nControl: cancel #{message_id}"
     m += "\n" + Post.common_headers(params)
 
     m += "\n\nThe following message was canceled by #{params[:user].real_name}:\n"
-    [
-      headers[/^From: .*/i],
-      headers[/^Subject: .*/i],
-      headers[/^Date: .*/i],
-      headers[/^Newsgroups: .*/i],
-      headers[/^Message-ID: .*/i]
-    ].each do |header|
-      m += "\n  #{header}"
-    end
+    m += "\n  From: " + author
+    m += "\n  Subject: " + subject
+    m += "\n  Date: " + date.to_s(:rfc822)
+    m += "\n  Newsgroups: " + all_newsgroup_names.join(',')
+    m += "\n  " + headers[/^Message-ID: .*/i]
 
     if params[:reason].present?
       m += "\n\n" + Post.flowed_encode('The reason given was: ' + params[:reason])
@@ -327,8 +323,8 @@ class Post < ActiveRecord::Base
   end
 
   def self.build_message(params)
-    m = "From: #{params[:user].real_name} <#{params[:user].email}>"
-    m += "\nSubject: #{sanitize_for_headers(params[:subject])}"
+    m = "From: #{header_encode(params[:user].real_name)} <#{params[:user].email}>"
+    m += "\nSubject: #{header_encode(params[:subject])}"
     m += "\nNewsgroups: #{params[:newsgroups].join(',')}"
     m += "\nFollowup-To: #{params[:newsgroups].first}" if params[:newsgroups].size > 1
     if params[:reply_post]
@@ -346,19 +342,24 @@ class Post < ActiveRecord::Base
     h = "Content-Type: text/plain; charset=utf-8; format=flowed"
     if params[:api_agent]
       h += "\nUser-Agent: CSH-WebNews-API"
-      h += "\nX-WebNews-API-Agent: #{sanitize_for_headers(params[:api_agent])}"
+      h += "\nX-WebNews-API-Agent: #{header_encode(params[:api_agent])}"
     else
       h += "\nUser-Agent: CSH-WebNews"
     end
     h += "\nX-WebNews-Posting-Host: #{params[:posting_host]}"
     if params[:api_posting_host]
-      h += "\nX-WebNews-API-Posting-Host: #{sanitize_for_headers(params[:api_posting_host])}"
+      h += "\nX-WebNews-API-Posting-Host: #{header_encode(params[:api_posting_host])}"
     end
     return h
   end
 
-  def self.sanitize_for_headers(value)
-    value.encode('US-ASCII', :invalid => :replace, :undef => :replace).gsub(/[\t\r\n\f]/, '')
+  def self.header_encode(value)
+    if value == value.encode('US-ASCII', :invalid => :replace, :undef => :replace)
+      value.gsub(/[\t\r\n\f]/, '')
+    else
+      # Simple RFC2047 encode. TODO: Contribute this to the rfc2047 gem?
+      [value].pack('m').split("\n").map{ |text| "=?utf-8?b?#{text}?=" }.join("\n ")
+    end
   end
 
   def self.import!(newsgroup, number, headers, body)
