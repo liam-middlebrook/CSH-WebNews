@@ -1,7 +1,7 @@
 <% if @not_found %>
 
 $('#post_view').html '<%= j render("not_found") %>'
-document.title = '<%= @newsgroup.name %> \u00bb Post not found!'
+document.title = '<%= abbrev_newsgroup(@newsgroup.name) %> \u00bb Post not found!'
 if window.loaded_location != '<%= @newsgroup.name %>'
   $.getScript '<%= posts_path(@newsgroup.name) %>?not_found=true'
 else
@@ -26,7 +26,7 @@ select_post = (showing) ->
 $('#post_view').html '<%= j render(@post) %>'
 
 <% if not @search_mode %>
-document.title = '<%= @newsgroup.name %> \u00bb <%= raw j(@post.subject) %>'
+document.title = '<%= abbrev_newsgroup(@newsgroup.name) %> \u00bb <%= raw j(@post.subject) %>'
 <% end %>
 
 if $('#posts_list tr[data-id="<%= @post.id %>"]').length == 0

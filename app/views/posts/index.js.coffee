@@ -1,7 +1,7 @@
 <% if @full_layout %>
 
 <% if not @posts_selected %>
-document.title = '<%= @search_mode ? 'Search Results' : @newsgroup.name %>'
+document.title = '<%= @search_mode ? 'Search Results' : abbrev_newsgroup(@newsgroup.name) %>'
 $('#next_unread').attr('href', '<%= next_unread_href %>')
 <% if not @not_found %>$('#post_view').empty()<% end %>
 <% end %>
