@@ -1,4 +1,3 @@
-require 'net/nntp'
 $in_rake = true
 
 def with_notifier

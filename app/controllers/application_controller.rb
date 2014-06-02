@@ -1,7 +1,4 @@
 class ApplicationController < ActionController::Base
-  require 'net/nntp'
-  require 'shellwords'
-  require 'resolv'
   protect_from_forgery
   before_filter :set_frame_options, :set_request_format
   before_filter :check_maintenance, :check_auth, :get_or_create_user

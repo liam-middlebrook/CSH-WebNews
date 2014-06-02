@@ -11,6 +11,10 @@ require File.expand_path('../webnews', __FILE__)
 
 module Webnews
   class Application < Rails::Application
+    require 'net/nntp'
+    require 'shellwords'
+    require 'resolv'
+
     # Settings in config/environments/* take precedence over those specified here.
     # Application configuration should go into files in config/initializers
     # -- all .rb files in that directory are automatically loaded.
