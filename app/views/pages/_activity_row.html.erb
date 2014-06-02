@@ -12,6 +12,13 @@ end
   <td>
     <%= newest_post.date.strftime(SHORT_DATE_FORMAT) %>
   </td>
+  <td class="newsgroup">
+    <% if cross_posted %>
+      (multiple)
+    <% else %>
+      <%= abbrev_newsgroup_html(thread_parent.newsgroup_name) %>
+    <% end %>
+  </td>
   <td>
     <%= truncate(maybe_you(newest_post.author_name, true)) %>
     <% if newest_post == thread_parent %>
@@ -21,10 +28,12 @@ end
     <% end %>
   </td>
   <td class="post_count">
-    <span class="counter"><%= post_count %></span>
+    <% if post_count > 1 %>
+      <span class="counter"><%= post_count %></span>
+    <% end %>
   </td>
   <td class="unread_count">
-    <% if unread_count > 0 %>
+    <% if post_count > 1 && unread_count > 0 %>
       <span class="counter unread <%= unread_class %>"><%= unread_count %></span>
     <% end %>
   </td>
@@ -35,12 +44,6 @@ end
     <span class="byline">
       <% if newest_post != thread_parent %>
         by <%= truncate(maybe_you(thread_parent.author_name)) %>
-      <% end %>
-      in
-      <% if cross_posted %>
-        multiple newsgroups
-      <% else %>
-        <%= thread_parent.newsgroup_name %>
       <% end %>
     </span>
   </td>

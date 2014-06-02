@@ -33,8 +33,8 @@ module ApplicationHelper
     end
   end
 
-  def newsgroup_header(newsgroup)
-    html_escape(abbrev_newsgroup(newsgroup.name)).
+  def abbrev_newsgroup_html(newsgroup_name)
+    html_escape(abbrev_newsgroup(newsgroup_name)).
       sub(/(.*\.)/, '<span class="abbreviated">\\1</span>').html_safe
   end
 

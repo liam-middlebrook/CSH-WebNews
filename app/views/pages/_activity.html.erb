@@ -2,7 +2,7 @@
   <% if not @activity.nil? %>
     <% if @activity.any? %>
       <tr>
-        <td colspan="5">&nbsp;</td>
+        <td colspan="6">&nbsp;</td>
         <td>
           <a href="#" id="mark_read_toggle"
             class="smallbutton toggle <%= @activity.any?{ |item| item[:unread_count] > 0 } ? '' : 'invisible' %>"
@@ -11,7 +11,7 @@
       </tr>
       <% activity_breakout(@activity).each do |header, items| %>
         <tr class="header">
-          <th colspan="6"><%= header %></th>
+          <th colspan="7"><%= header %></th>
         </tr>
         <% items.each do |item| %>
           <%= render :partial => 'activity_row', :locals => {

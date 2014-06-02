@@ -40,6 +40,13 @@
         padding: 5px;
         padding-right: 10px;
 
+        &.newsgroup {
+          color: $text_normal;
+          text-align: right;
+
+          .abbreviated { color: $text_light; }
+        }
+
         &.subject {
           white-space: normal;
           text-indent: -16px;

@@ -35,7 +35,7 @@
     <% if @search_mode %>
       <%= @starred_only ? 'Starred Posts' : 'Search Results' %>
     <% else %>
-      <%= newsgroup_header(@newsgroup) %>
+      <%= abbrev_newsgroup_html(@newsgroup.name) %>
     <% end %>
   </h2>
 </div>
