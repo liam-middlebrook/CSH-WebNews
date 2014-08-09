@@ -216,8 +216,8 @@ class PostsController < ApplicationController
   def create
     post_newsgroups = []
     @sync_error = nil
-    body = params[:body] || params[:post].andand[:body]
-    subject = params[:subject] || params[:post].andand[:subject]
+    body = params[:body] || params[:post].try(:fetch, :body, nil)
+    subject = params[:subject] || params[:post].try(:fetch, :subject, nil)
 
     if subject.blank?
       generic_error :bad_request, 'subject_missing', "Posting requires a subject line" and return

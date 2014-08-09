@@ -130,7 +130,7 @@ class ApplicationController < ActionController::Base
     end
 
     def get_newsgroup
-      name = params[:newsgroup] || params[:post].andand[:newsgroup]
+      name = params[:newsgroup] || params[:post].try(:fetch, :newsgroup, nil)
       if not name.blank?
         @newsgroup = Newsgroup.find_by_name(name)
         if @api_access and not @newsgroup

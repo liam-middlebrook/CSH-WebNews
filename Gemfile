@@ -8,7 +8,6 @@ gem 'mysql2', :group => :production
 gem 'jquery-rails'
 gem 'rails_autolink'
 gem 'chronic'
-gem 'andand'
 gem 'whenever'
 gem 'nested_form'
 gem 'mousetrap-rails'

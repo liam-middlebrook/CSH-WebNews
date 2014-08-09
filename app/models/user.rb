@@ -40,7 +40,7 @@ class User < ActiveRecord::Base
   end
 
   def theme
-    preferences[:theme].andand.to_sym || :classic
+    preferences[:theme].try(:to_sym) || :classic
   end
 
   def time_zone
@@ -48,7 +48,7 @@ class User < ActiveRecord::Base
   end
 
   def thread_mode
-    preferences[:thread_mode].andand.to_sym || :normal
+    preferences[:thread_mode].try(:to_sym) || :normal
   end
 
   def ensure_subscriptions
