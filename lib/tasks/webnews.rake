@@ -17,7 +17,11 @@ namespace :webnews do
 
   desc "Sync all newsgroups, adding unread post data for any new posts"
   task :sync => :environment do
-    with_notifier{ Newsgroup.sync_all! }
+    if File.exists?('tmp/maintenance.txt') and not ENV['FORCE']
+      puts 'Skipping sync because maintenance mode is on (use FORCE=true to override)'
+    else
+      with_notifier{ Newsgroup.sync_all! }
+    end
   end
 
   desc "Remove unread post entries for users considered 'inactive'"
