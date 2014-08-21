@@ -11,7 +11,6 @@ require File.expand_path('../webnews', __FILE__)
 
 module Webnews
   class Application < Rails::Application
-    require 'net/nntp'
     require 'shellwords'
     require 'resolv'
 
