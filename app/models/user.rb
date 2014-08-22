@@ -16,8 +16,13 @@ class User < ActiveRecord::Base
   serialize :preferences, Hash
   serialize :api_data, Hash
 
-  scope :active, where('updated_at >= ?', 3.months.ago)
-  scope :inactive, where('updated_at < ?', 3.months.ago)
+  def self.active
+    where('updated_at >= ?', 3.months.ago)
+  end
+
+  def self.inactive
+    where('updated_at < ?', 3.months.ago)
+  end
 
   def inactive?
     updated_at < 3.months.ago

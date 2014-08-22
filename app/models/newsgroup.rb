@@ -3,8 +3,7 @@ class Newsgroup < ActiveRecord::Base
   has_many :posts, :foreign_key => :newsgroup_name, :primary_key => :name, :dependent => :destroy
   has_many :subscriptions, :foreign_key => :newsgroup_name, :primary_key => :name, :dependent => :destroy
 
-  default_scope :order => 'name'
-  scope :where_posting_allowed, where(:status => 'y')
+  default_scope -> { order(:name) }
 
   def as_json(options = {})
     if options[:for_user]
@@ -25,6 +24,10 @@ class Newsgroup < ActiveRecord::Base
 
   def posting_allowed?
     status == 'y'
+  end
+
+  def self.where_posting_allowed
+    where(:status => 'y')
   end
 
   def unread_for_user(user)

@@ -16,7 +16,7 @@ class UsersController < ApplicationController
   end
 
   def update
-    if not @current_user.update_attributes(params[:user].except(:username, :real_name))
+    if not @current_user.update_attributes(user_params)
       form_error(@current_user.errors.full_messages.join(', '))
     end
   end
@@ -38,5 +38,18 @@ class UsersController < ApplicationController
         :in_reply => @current_user.unread_count_in_reply
       }
     }
+  end
+
+  private
+
+  def user_params
+    subscription_attributes = [
+      :id, :_destroy, :newsgroup_name, :unread_level, :email_level, :digest_type
+    ]
+    params.require(:user).permit(
+      :preferences => [:theme, :thread_mode, :time_zone],
+      :default_subscription_attributes => subscription_attributes,
+      :subscriptions_attributes => subscription_attributes
+    )
   end
 end
