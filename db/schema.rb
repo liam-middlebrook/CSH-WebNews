@@ -11,11 +11,13 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140822012950) do
+ActiveRecord::Schema.define(:version => 20140822021710) do
 
   create_table "newsgroups", :force => true do |t|
-    t.text "name"
-    t.text "status"
+    t.text     "name"
+    t.text     "status"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   add_index "newsgroups", ["name"], :name => "index_newsgroups_on_name"
@@ -45,8 +47,9 @@ ActiveRecord::Schema.define(:version => 20140822012950) do
   add_index "posts", ["thread_id"], :name => "index_posts_on_thread_id"
 
   create_table "starred_post_entries", :force => true do |t|
-    t.integer "user_id"
-    t.integer "post_id"
+    t.integer  "user_id"
+    t.integer  "post_id"
+    t.datetime "created_at"
   end
 
   add_index "starred_post_entries", ["post_id"], :name => "index_starred_post_entries_on_post_id"
@@ -59,8 +62,8 @@ ActiveRecord::Schema.define(:version => 20140822012950) do
     t.integer  "unread_level"
     t.integer  "email_level"
     t.text     "digest_type"
-    t.datetime "created_at",     :null => false
-    t.datetime "updated_at",     :null => false
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   add_index "subscriptions", ["newsgroup_name"], :name => "index_subscriptions_on_newsgroup_name"
