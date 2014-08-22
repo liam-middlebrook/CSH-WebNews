@@ -53,10 +53,12 @@ class PostsController < ApplicationController
     end
 
     if @posts_older
+      @posts_older = @posts_older.to_a
       @more_older = @posts_older.length > 0 && !@posts_older[@limit - 1].nil?
       @posts_older.delete_at(-1) if @posts_older.length == @limit
     end
     if @posts_newer
+      @posts_newer = @posts_newer.to_a
       @more_newer = @posts_newer.length > 0 && !@posts_newer[@limit - 1].nil?
       @posts_newer.delete_at(-1) if @posts_newer.length == @limit
       @posts_newer.reverse!
@@ -134,13 +136,15 @@ class PostsController < ApplicationController
       @starred_only = true
     end
 
-    scope = Post.scoped
+    scope = Post.all
     scope = scope.sticky if params[:sticky]
     scope = scope.thread_parents if params[:original]
     scope = scope.starred_by_user(@current_user) if params[:starred]
     scope = scope.unread_for_user(@current_user) if params[:unread]
     scope = scope.where(:newsgroup_name => @newsgroup.name) if @newsgroup
-    @posts_older = scope.where(conditions.join(' and '), *values).order('date DESC').limit(@limit)
+    scope = scope.where(conditions.join(' and '), *values).order('date DESC').limit(@limit)
+
+    @posts_older = scope.to_a
     if not @api_rss
       @more_older = @posts_older.length > 0 && !@posts_older[@limit - 1].nil?
       @posts_older.delete_at(-1) if @posts_older.length == @limit

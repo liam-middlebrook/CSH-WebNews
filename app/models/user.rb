@@ -3,10 +3,10 @@ class User < ActiveRecord::Base
   has_many :starred_post_entries, :dependent => :destroy
   has_many :unread_posts, :through => :unread_post_entries, :source => :post
   has_many :starred_posts, :through => :starred_post_entries, :source => :post
-  has_one :default_subscription, :class_name => Subscription,
-    :conditions => 'newsgroup_name IS NULL', :autosave => true, :dependent => :destroy
-  has_many :subscriptions,
-    :conditions => 'newsgroup_name IS NOT NULL', :autosave => true, :dependent => :destroy
+  has_one :default_subscription, -> { where(:newsgroup_name => nil) },
+    :class_name => Subscription, :autosave => true, :dependent => :destroy
+  has_many :subscriptions, -> { where.not(:newsgroup_name => nil) },
+    :autosave => true, :dependent => :destroy
 
   accepts_nested_attributes_for :default_subscription
   accepts_nested_attributes_for :subscriptions, :allow_destroy => true, :reject_if => :all_blank
