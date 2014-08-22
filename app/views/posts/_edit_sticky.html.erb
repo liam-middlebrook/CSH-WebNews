@@ -2,10 +2,10 @@
   <h2><%= icon('thumb-tack') %> Sticky thread</h2>
 
   <%= form_for @post,
-      :url => update_post_sticky_path(:newsgroup_name => @post.newsgroup_name, :number => @post.number),
-      :html => { :method => 'put'}, :remote => true do |f| %>
+      url: update_post_sticky_path(newsgroup_name: @post.newsgroup_name, number: @post.number),
+      html: { method: 'put'}, remote: true do |f| %>
 
-    <%= render :partial => 'sticky_fields', :locals => { :post => @post } %>
+    <%= render partial: 'sticky_fields', locals: { post: @post } %>
 
     <div class="buttons">
       <button type="submit" class="button green"><%= icon('check') %> Save</button>

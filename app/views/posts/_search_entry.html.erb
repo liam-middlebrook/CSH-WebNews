@@ -1,13 +1,13 @@
 <div id="dialog">
   <h2><%= icon('search') %> Search</h2>
 
-  <%= form_tag search_path, :method => 'get', :remote => true do %>
+  <%= form_tag search_path, method: 'get', remote: true do %>
 
     <div class="form_element inline_inputs aligned_field">
       <%= label_tag :newsgroup, 'Newsgroup:' %><%= select_tag :newsgroup,
         options_for_select(
           @newsgroups.map{ |n| [n.name, n.name] }, @newsgroup ? @newsgroup.name : nil
-        ), :prompt => '(all regular newsgroups)' %>
+        ), prompt: '(all regular newsgroups)' %>
     </div>
 
     <div class="form_element inline_inputs aligned_field">
@@ -24,9 +24,9 @@
 
     <div class="form_element inline_inputs aligned_field">
       <%= label_tag :date_from, 'In date range:' %><%= text_field_tag :date_from,
-        params[:date_from], :class => 'date', :placeholder => 'the beginning' %>
+        params[:date_from], class: 'date', placeholder: 'the beginning' %>
       <%= label_tag :date_to, 'to' %>
-      <%= text_field_tag :date_to, params[:date_to], :class => 'date', :placeholder => 'right now' %>
+      <%= text_field_tag :date_to, params[:date_to], class: 'date', placeholder: 'right now' %>
       <p class="explain">Enter absolute dates ("9/17/2011") or relative dates ("3 weeks ago")</p>
     </div>
 

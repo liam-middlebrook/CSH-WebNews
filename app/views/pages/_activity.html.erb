@@ -14,15 +14,15 @@
           <th colspan="7"><%= header %></th>
         </tr>
         <% items.each do |item| %>
-          <%= render :partial => 'activity_row', :locals => {
-            :newest_post => item[:newest_post],
-            :thread_parent => item[:thread_parent],
-            :next_unread => item[:next_unread],
-            :post_count => item[:post_count],
-            :unread_count => item[:unread_count],
-            :personal_class => item[:personal_class],
-            :unread_class => item[:unread_class],
-            :cross_posted => item[:cross_posted]
+          <%= render partial: 'activity_row', locals: {
+            newest_post: item[:newest_post],
+            thread_parent: item[:thread_parent],
+            next_unread: item[:next_unread],
+            post_count: item[:post_count],
+            unread_count: item[:unread_count],
+            personal_class: item[:personal_class],
+            unread_class: item[:unread_class],
+            cross_posted: item[:cross_posted]
           } %>
         <% end %>
       <% end %>

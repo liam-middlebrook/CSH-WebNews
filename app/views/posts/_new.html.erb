@@ -8,7 +8,7 @@
   </h2>
 
   <%= form_for @new_post,
-      :url => create_post_path, :html => { :method => 'post' }, :remote => true do |f| %>
+      url: create_post_path, html: { method: 'post' }, remote: true do |f| %>
 
     <% if @post %>
       <div class="form_element with_links">
@@ -41,7 +41,7 @@
       <div class="form_element inline_inputs crosspost_options">
         <%= label_tag :crosspost_to, 'Cross-post to:' %>
         <%= select_tag :crosspost_to,
-          options_from_collection_for_select(@newsgroups, :name, :name), :include_blank => true %>
+          options_from_collection_for_select(@newsgroups, :name, :name), include_blank: true %>
         &mdash;
         <%= check_box_tag :crosspost_sysadmin %>
         <%= label_tag :crosspost_sysadmin, 'also to csh.lists.sysadmin' %>
@@ -52,11 +52,11 @@
     <% end %>
 
     <div class="form_element">
-      <%= f.text_field :subject, :placeholder => 'Subject' %>
+      <%= f.text_field :subject, placeholder: 'Subject' %>
     </div>
 
     <div class="form_element">
-      <%= f.text_area :body, :rows => 25, :class => 'shrinkable' %>
+      <%= f.text_area :body, rows: 25, class: 'shrinkable' %>
     </div>
     <p class="explain close">
       See the <a href="https://github.com/grantovich/CSH-WebNews/wiki/Tips">tips page</a> on the WebNews wiki to learn about posting features like automatic draft saving and footnote linking.
@@ -70,7 +70,7 @@
     <% if not @post and @current_user.admin? %>
       <fieldset>
         <legend><span class="role_badge">Admin</span></legend>
-        <%= render :partial => 'sticky_fields', :locals => { :post => @new_post } %>
+        <%= render partial: 'sticky_fields', locals: { post: @new_post } %>
       </fieldset>
     <% end %>
 

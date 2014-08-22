@@ -12,7 +12,7 @@ class Mailer < ActionMailer::Base
       "posted in thread \"#{post.thread_parent.subject}\""
     end
 
-    mail(:to => user.email, :subject => "[#{post.newsgroup_name}] #{post.author_name} #{author_action}")
+    mail(to: user.email, subject: "[#{post.newsgroup_name}] #{post.author_name} #{author_action}")
   end
 
   def posts_digest(user, start_at, end_at, target_digest_type)
@@ -34,7 +34,7 @@ class Mailer < ActionMailer::Base
     end
 
     if @posts.any?
-      mail(:to => user.email, :subject => "#{title} (#{@posts.count} new posts)")
+      mail(to: user.email, subject: "#{title} (#{@posts.count} new posts)")
     end
   end
 end

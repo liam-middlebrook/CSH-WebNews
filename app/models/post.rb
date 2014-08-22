@@ -1,35 +1,35 @@
 class Post < ActiveRecord::Base
-  belongs_to :newsgroup, :foreign_key => :newsgroup_name, :primary_key => :name
-  belongs_to :sticky_user, :class_name => 'User'
-  has_many :unread_post_entries, :dependent => :destroy
-  has_many :starred_post_entries, :dependent => :destroy
-  has_many :unread_users, :through => :unread_post_entries, :source => :user
-  has_many :starred_users, :through => :starred_post_entries, :source => :user
+  belongs_to :newsgroup, foreign_key: :newsgroup_name, primary_key: :name
+  belongs_to :sticky_user, class_name: 'User'
+  has_many :unread_post_entries, dependent: :destroy
+  has_many :starred_post_entries, dependent: :destroy
+  has_many :unread_users, through: :unread_post_entries, source: :user
+  has_many :starred_users, through: :starred_post_entries, source: :user
 
   before_destroy :kill_parent_id
 
   def as_json(options = {})
     if options[:minimal]
-      json = { :number => number }
+      json = { number: number }
     else
       only = [:number, :subject, :date, :sticky_until]
       only += [:body] if options[:with_all]
       only += [:headers] if options[:with_headers]
       json = super(
-        :only => only,
-        :include => {:sticky_user => {:only => [:username, :real_name]}},
-        :methods => [:author_name, :author_email]
+        only: only,
+        include: { sticky_user: { only: [:username, :real_name] } },
+        methods: [:author_name, :author_email]
       )
       if options[:with_all]
         json[:stripped] = stripped
         json[:parent] = original_parent ?
-          original_parent.as_json(:minimal => true) :
-          parent.as_json(:minimal => true)
-        json[:thread_parent] = thread_parent.as_json(:minimal => true) if not thread_parent == self
+          original_parent.as_json(minimal: true) :
+          parent.as_json(minimal: true)
+        json[:thread_parent] = thread_parent.as_json(minimal: true) if not thread_parent == self
         json[:reparented] = reparented? && !orphaned?
         json[:orphaned] = orphaned? && !original_parent
         json[:followup_to] = followup_newsgroup.name if followup_newsgroup
-        json[:cross_posts] = (in_all_newsgroups - [self]).map{ |post| post.as_json(:minimal => true) }
+        json[:cross_posts] = (in_all_newsgroups - [self]).map{ |post| post.as_json(minimal: true) }
       end
     end
 
@@ -37,9 +37,9 @@ class Post < ActiveRecord::Base
 
     if options[:with_user]
       json.merge!(
-        :starred => starred_by_user?(options[:with_user]),
-        :unread_class => unread_class_for_user(options[:with_user]),
-        :personal_class => personal_class_for_user(options[:with_user])
+        starred: starred_by_user?(options[:with_user]),
+        unread_class: unread_class_for_user(options[:with_user]),
+        personal_class: personal_class_for_user(options[:with_user])
       )
     end
 
@@ -159,11 +159,11 @@ class Post < ActiveRecord::Base
   end
 
   def parent
-    parent_id == '' ? nil : Post.where(:message_id => parent_id, :newsgroup_name => newsgroup_name).first
+    parent_id == '' ? nil : Post.where(message_id: parent_id, newsgroup_name: newsgroup_name).first
   end
 
   def children
-    Post.where(:parent_id => message_id, :newsgroup_name => newsgroup_name)
+    Post.where(parent_id: message_id, newsgroup_name: newsgroup_name)
   end
 
   def thread_parent
@@ -175,7 +175,7 @@ class Post < ActiveRecord::Base
   end
 
   def all_in_thread
-    Post.where(:thread_id => thread_id, :newsgroup_name => newsgroup_name).order('date')
+    Post.where(thread_id: thread_id, newsgroup_name: newsgroup_name).order('date')
   end
 
   def post_count_in_thread
@@ -183,19 +183,19 @@ class Post < ActiveRecord::Base
   end
 
   def unread_count_in_thread_for_user(user)
-    user.unread_post_entries.where(:post_id => all_in_thread.pluck(:id)).count
+    user.unread_post_entries.where(post_id: all_in_thread.pluck(:id)).count
   end
 
   def thread_tree_for_user(user, flatten = false, as_json = false, all_posts = nil)
     all_posts ||= all_in_thread.order('date').to_a
     {
-      :post => (as_json ? self.as_json(:with_user => user) : self),
-      :children => if flatten
+      post: (as_json ? self.as_json(with_user: user) : self),
+      children: if flatten
         all_posts.reject{ |p| p == self }.map{ |p| {
-          :post => (as_json ? p.as_json(:with_user => user) : p), :children => []
+          post: (as_json ? p.as_json(with_user: user) : p), children: []
         }.merge(as_json ? {} : {
-          :unread => p.unread_for_user?(user),
-          :personal_class => p.personal_class_for_user(user)
+          unread: p.unread_for_user?(user),
+          personal_class: p.personal_class_for_user(user)
         })}
       else
         all_posts.
@@ -203,8 +203,8 @@ class Post < ActiveRecord::Base
           map{ |p| p.thread_tree_for_user(user, flatten, as_json, all_posts) }
       end
     }.merge(as_json ? {} : {
-      :unread => self.unread_for_user?(user),
-      :personal_class => self.personal_class_for_user(user)
+      unread: self.unread_for_user?(user),
+      personal_class: self.personal_class_for_user(user)
     })
   end
 
@@ -213,7 +213,7 @@ class Post < ActiveRecord::Base
   end
 
   def original_parent
-    Post.where(:message_id => original_parent_id).first
+    Post.where(message_id: original_parent_id).first
   end
 
   def authored_by?(user)
@@ -226,7 +226,7 @@ class Post < ActiveRecord::Base
   end
 
   def self.starred_by_user(user)
-    joins(:starred_post_entries).where(:starred_post_entries => { :user_id => user.id })
+    joins(:starred_post_entries).where(starred_post_entries: { user_id: user.id })
   end
 
   def starred_by_user?(user)
@@ -234,7 +234,7 @@ class Post < ActiveRecord::Base
   end
 
   def self.unread_for_user(user)
-    joins(:unread_post_entries).where(:unread_post_entries => { :user_id => user.id })
+    joins(:unread_post_entries).where(unread_post_entries: { user_id: user.id })
   end
 
   def unread_for_user?(user)
@@ -257,7 +257,7 @@ class Post < ActiveRecord::Base
   def mark_read_for_user(user)
     was_unread = false
     in_all_newsgroups.each do |post|
-      entry = post.unread_post_entries.where(:user_id => user.id).first
+      entry = post.unread_post_entries.where(user_id: user.id).first
       if entry
         entry.destroy
         was_unread = true
@@ -268,11 +268,11 @@ class Post < ActiveRecord::Base
 
   def mark_unread_for_user(user, user_created)
     UnreadPostEntry.create!(
-      :user => user,
-      :newsgroup => newsgroup,
-      :post => self,
-      :personal_level => PERSONAL_CODES[personal_class_for_user(user)],
-      :user_created => user_created
+      user: user,
+      newsgroup: newsgroup,
+      post: self,
+      personal_level: PERSONAL_CODES[personal_class_for_user(user)],
+      user_created: user_created
     )
   end
 
@@ -292,14 +292,14 @@ class Post < ActiveRecord::Base
   def unread_personal_class_for_user(user)
     # Quirk: Using `maximum` on a column from an implicit join table appears to
     # sometimes return a string, hence `to_i`. Check this again under Rails 4.
-    PERSONAL_CLASSES[user.unread_posts.where(:thread_id => thread_id).maximum(:personal_level).to_i]
+    PERSONAL_CLASSES[user.unread_posts.where(thread_id: thread_id).maximum(:personal_level).to_i]
   end
 
   def kill_parent_id
     # Sub-optimal, should re-parent to next reference up the chain
     # (but posts getting canceled when they already have replies is rare)
-    Post.where(:parent_id => message_id).each do |post|
-      post.update_attributes(:parent_id => '', :thread_id => post.message_id)
+    Post.where(parent_id: message_id).each do |post|
+      post.update_attributes(parent_id: '', thread_id: post.message_id)
     end
   end
 
@@ -356,7 +356,7 @@ class Post < ActiveRecord::Base
   end
 
   def self.header_encode(value)
-    if value == value.encode('US-ASCII', :invalid => :replace, :undef => :replace)
+    if value == value.encode('US-ASCII', invalid: :replace, undef: :replace)
       value.gsub(/[\t\r\n\f]/, '')
     else
       # Simple RFC2047 encode. TODO: Contribute this to the rfc2047 gem?
@@ -367,7 +367,7 @@ class Post < ActiveRecord::Base
   def self.import!(newsgroup, number, headers, body)
     stripped = false
     headers = unwrap_headers(headers)
-    headers.encode!('US-ASCII', :invalid => :replace, :undef => :replace)
+    headers.encode!('US-ASCII', invalid: :replace, undef: :replace)
 
     part_headers, body = multipart_decode(headers, body)
     stripped = true if headers[/^Content-Type:.*mixed/i]
@@ -376,13 +376,13 @@ class Post < ActiveRecord::Base
     body = body.unpack('M')[0] if part_headers[/^Content-Transfer-Encoding: quoted-printable/i]
 
     if part_headers[/^Content-Type:.*(X-|unknown)/i]
-      body.encode!('UTF-8', 'US-ASCII', :invalid => :replace, :undef => :replace)
+      body.encode!('UTF-8', 'US-ASCII', invalid: :replace, undef: :replace)
     elsif part_headers[/^Content-Type:.*charset/i]
       begin
         body.encode!('UTF-8', part_headers[/^Content-Type:.*charset="?([^"]+?)"?(;|$)/i, 1],
-          :invalid => :replace, :undef => :replace)
+          invalid: :replace, undef: :replace)
       rescue
-        body.encode!('UTF-8', 'US-ASCII', :invalid => :replace, :undef => :replace)
+        body.encode!('UTF-8', 'US-ASCII', invalid: :replace, undef: :replace)
       end
     else
       begin
@@ -391,7 +391,7 @@ class Post < ActiveRecord::Base
         begin
           body.encode!('UTF-8', 'Windows-1252')
         rescue
-          body.encode!('UTF-8', 'US-ASCII', :invalid => :replace, :undef => :replace)
+          body.encode!('UTF-8', 'US-ASCII', invalid: :replace, undef: :replace)
         end
       end
     end
@@ -420,13 +420,13 @@ class Post < ActiveRecord::Base
     thread_id = message_id
     possible_thread_id = references[0] || ''
 
-    parent = where(:message_id => parent_id, :newsgroup_name => newsgroup.name).first
+    parent = where(message_id: parent_id, newsgroup_name: newsgroup.name).first
 
     if parent
       thread_id = parent.thread_id
-    elsif parent_id != '' and where(:message_id => parent_id).exists?
+    elsif parent_id != '' and where(message_id: parent_id).exists?
       parent_id = ''
-    elsif possible_thread_id != '' and where(:message_id => possible_thread_id, :newsgroup_name => newsgroup.name).exists?
+    elsif possible_thread_id != '' and where(message_id: possible_thread_id, newsgroup_name: newsgroup.name).exists?
       parent_id = thread_id = possible_thread_id
     elsif subject =~ /Re:/i
       possible_thread_parent = where(
@@ -443,17 +443,17 @@ class Post < ActiveRecord::Base
       parent_id = ''
     end
 
-    create!(:newsgroup => newsgroup,
-            :number => number,
-            :subject => subject,
-            :author => author,
-            :date => date,
-            :message_id => message_id,
-            :parent_id => parent_id,
-            :thread_id => thread_id,
-            :stripped => stripped,
-            :headers => headers,
-            :body => body)
+    create!(newsgroup: newsgroup,
+            number: number,
+            subject: subject,
+            author: author,
+            date: date,
+            message_id: message_id,
+            parent_id: parent_id,
+            thread_id: thread_id,
+            stripped: stripped,
+            headers: headers,
+            body: body)
   end
 
   # See RFC 3676 for "format=flowed" spec

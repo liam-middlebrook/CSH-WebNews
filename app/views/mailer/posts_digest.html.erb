@@ -30,7 +30,7 @@
               <li>
                 [<%= post.date.strftime(SHORT_DATE_FORMAT) %>]
                 <%= post.author_name %>:
-                <%= link_to truncate(post.first_line, :length => 80), post_hash_url(post) %>
+                <%= link_to truncate(post.first_line, length: 80), post_hash_url(post) %>
               </li>
             <% end %>
           </ul>

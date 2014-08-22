@@ -1,12 +1,12 @@
-<%= render :partial => 'post_row', :locals => {
-  :post => tree[:post],
-  :level => level,
-  :unread => tree[:unread],
-  :tr_class => tree[:personal_class],
-  :expanded => (tree[:children].count > 0),
-  :skip_class => true
+<%= render partial: 'post_row', locals: {
+  post: tree[:post],
+  level: level,
+  unread: tree[:unread],
+  tr_class: tree[:personal_class],
+  expanded: (tree[:children].count > 0),
+  skip_class: true
 } %>
 
 <% tree[:children].each do |child_tree| %>
-  <%= render :partial => 'post_tree', :locals => { :tree => child_tree, :level => level + 1 } %>
+  <%= render partial: 'post_tree', locals: { tree: child_tree, level: level + 1 } %>
 <% end %>

@@ -27,26 +27,26 @@ end
     <% else %>
       <% if @newsgroup.posting_allowed? %>
         <a class="button new_draft post_reply"
-          href="#?<%= new_post_path(:newsgroup => @newsgroup.name, :number => post.number) %>"><%= icon('reply') %> Reply</a>
+          href="#?<%= new_post_path(newsgroup: @newsgroup.name, number: post.number) %>"><%= icon('reply') %> Reply</a>
       <% end %>
       <% if not post.authored_by?(@current_user) %>
         <a id="mark_unread_button" class="button mark_unread"
-          href="#~<%= mark_read_path(:mark_unread => true, :newsgroup => @newsgroup.name, :number => @post.number) %>"><%= icon('asterisk') %> Unread</a>
+          href="#~<%= mark_read_path(mark_unread: true, newsgroup: @newsgroup.name, number: @post.number) %>"><%= icon('asterisk') %> Unread</a>
       <% end %>
       <% if @current_user.admin? and post == post.thread_parent %>
         <a id="sticky_post_button" class="button orange"
-          href="#?<%= edit_post_sticky_path(:newsgroup => @newsgroup.name, :number => post.number) %>"><%= icon('thumb-tack') %> Sticky</a>
+          href="#?<%= edit_post_sticky_path(newsgroup: @newsgroup.name, number: post.number) %>"><%= icon('thumb-tack') %> Sticky</a>
       <% end %>
       <% if @newsgroup.posting_allowed? and post.children.count == 0 %>
         <% if post.authored_by?(@current_user) or @current_user.admin? %>
-          <a id="cancel_post_button" class="button<%= @admin_cancel ? ' orange' : '' %>" href="#?<%= confirm_destroy_post_path(:newsgroup => @newsgroup.name, :number => post.number) %>"><%= icon('trash-o') %> Cancel</a>
+          <a id="cancel_post_button" class="button<%= @admin_cancel ? ' orange' : '' %>" href="#?<%= confirm_destroy_post_path(newsgroup: @newsgroup.name, number: post.number) %>"><%= icon('trash-o') %> Cancel</a>
         <% end %>
       <% end %>
     <% end %>
 
     <a id="star_post_button" title="Star this post"
       class="button<%= post.starred_by_user?(@current_user) ? ' starred' : '' %>"
-      href="#~<%= update_post_star_path(:newsgroup => @newsgroup.name, :number => post.number) %>"><%= icon('star') %></a>
+      href="#~<%= update_post_star_path(newsgroup: @newsgroup.name, number: post.number) %>"><%= icon('star') %></a>
   </div>
 
   <%= gravatar_image post.author_email, 40 %>
@@ -55,7 +55,7 @@ end
     <span class="author">
       <%= author_line(post) %>
       <a class="smallbutton"
-        href="#!<%= search_path(:authors => [post.author_name, "<#{post.author_email}>"].join(',')) %>"
+        href="#!<%= search_path(authors: [post.author_name, "<#{post.author_email}>"].join(',')) %>"
         title="Search for posts by this user"><%= icon('search') %></a>
       <% if post.author_is_local? %>
         <a class="smallbutton" href="<%= PROFILES_URL + post.author_username %>"

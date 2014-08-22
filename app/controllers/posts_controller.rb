@@ -1,10 +1,10 @@
 class PostsController < ApplicationController
   before_filter :get_newsgroup
-  before_filter :get_post, :except => [:search, :search_entry, :create]
-  before_filter :get_newsgroups_for_search, :only => :search_entry
-  before_filter :get_newsgroups_for_posting, :only => :new
-  before_filter :set_list_layout_and_offset, :only => [:index, :search]
-  before_filter :set_limit_from_params, :only => [:index, :search]
+  before_filter :get_post, except: [:search, :search_entry, :create]
+  before_filter :get_newsgroups_for_search, only: :search_entry
+  before_filter :get_newsgroups_for_posting, only: :new
+  before_filter :set_list_layout_and_offset, only: [:index, :search]
+  before_filter :set_limit_from_params, only: [:index, :search]
 
   def index
     @not_found = true if params[:not_found]
@@ -44,7 +44,7 @@ class PostsController < ApplicationController
       if @flat_mode
         @posts_newer = @newsgroup.posts.where(date_condition, @from_newer).order('date').limit(@limit)
       else
-        from_newer_post = @newsgroup.posts.where(:date => @from_newer).first
+        from_newer_post = @newsgroup.posts.where(date: @from_newer).first
         @from_newer = from_newer_post.thread_parent.date if from_newer_post
         @posts_newer = @newsgroup.posts.
           where("parent_id = ? and #{date_condition}", '', @from_newer).
@@ -71,9 +71,9 @@ class PostsController < ApplicationController
         posts.map!{ |post| post.thread_tree_for_user(@current_user, flatten, @api_access) } if posts
       end
     else
-      @posts_selected = {:post => thread_selected} if thread_selected
+      @posts_selected = { post: thread_selected } if thread_selected
       [@posts_older, @posts_newer].each do |posts|
-        posts.map!{ |post| {:post => post} } if posts
+        posts.map!{ |post| { post: post } } if posts
       end
     end
 
@@ -85,10 +85,10 @@ class PostsController < ApplicationController
       end
       wants.json do
         json = {}
-        json.merge!(:posts_selected => @posts_selected) if @posts_selected
-        json.merge!(:posts_older => @posts_older, :more_older => @more_older) if @posts_older
-        json.merge!(:posts_newer => @posts_newer, :more_newer => @more_newer) if @posts_newer
-        render :json => json
+        json.merge!(posts_selected: @posts_selected) if @posts_selected
+        json.merge!(posts_older: @posts_older, more_older: @more_older) if @posts_older
+        json.merge!(posts_newer: @posts_newer, more_newer: @more_newer) if @posts_newer
+        render json: json
       end
     end
   end
@@ -128,7 +128,7 @@ class PostsController < ApplicationController
     if error
       generic_error(:bad_request, error[0], error[1]) and return
     elsif params[:validate]
-      render :partial => 'search_redirect' and return
+      render partial: 'search_redirect' and return
     end
 
     @search_mode = @flat_mode = true
@@ -141,7 +141,7 @@ class PostsController < ApplicationController
     scope = scope.thread_parents if params[:original]
     scope = scope.starred_by_user(@current_user) if params[:starred]
     scope = scope.unread_for_user(@current_user) if params[:unread]
-    scope = scope.where(:newsgroup_name => @newsgroup.name) if @newsgroup
+    scope = scope.where(newsgroup_name: @newsgroup.name) if @newsgroup
     scope = scope.where(conditions.join(' and '), *values).order('date DESC').limit(@limit)
 
     @posts_older = scope.to_a
@@ -149,14 +149,14 @@ class PostsController < ApplicationController
       @more_older = @posts_older.length > 0 && !@posts_older[@limit - 1].nil?
       @posts_older.delete_at(-1) if @posts_older.length == @limit
     end
-    @posts_older.map!{ |post| {:post => post} }
+    @posts_older.map!{ |post| { post: post } }
 
     get_next_unread_post
 
     respond_to do |wants|
       wants.js { render 'index' }
       wants.rss { render 'search' }
-      wants.json { render :json => { :posts_older => @posts_older, :more_older => @more_older } }
+      wants.json { render json: { posts_older: @posts_older, more_older: @more_older } }
     end
   end
 
@@ -169,11 +169,11 @@ class PostsController < ApplicationController
     if params[:mark_read]
       was_unread = @next_unread_post.mark_read_for_user(@current_user)
     end
-    render :json => {
-      :post => @next_unread_post.as_json(
-        :with_user => @current_user, :with_all => true, :with_headers => params[:with_headers]
+    render json: {
+      post: @next_unread_post.as_json(
+        with_user: @current_user, with_all: true, with_headers: params[:with_headers]
       )
-    }.merge(params[:mark_read] ? { :was_unread => was_unread } : {})
+    }.merge(params[:mark_read] ? { was_unread: was_unread } : {})
   end
 
   def show
@@ -193,17 +193,17 @@ class PostsController < ApplicationController
         if params[:mark_read]
           was_unread = @post.mark_read_for_user(@current_user)
         end
-        render :json => {
-          :post => @post.as_json(
-            :with_user => @current_user, :with_all => true, :with_headers => params[:with_headers]
-          ).merge(params[:html_body] ? { :body => view_context.post_html_body(@post) } : {})
-        }.merge(params[:mark_read] ? { :was_unread => was_unread } : {})
+        render json: {
+          post: @post.as_json(
+            with_user: @current_user, with_all: true, with_headers: params[:with_headers]
+          ).merge(params[:html_body] ? { body: view_context.post_html_body(@post) } : {})
+        }.merge(params[:mark_read] ? { was_unread: was_unread } : {})
       end
     end
   end
 
   def new
-    @new_post = Post.new(:newsgroup => @newsgroup)
+    @new_post = Post.new(newsgroup: @newsgroup)
     if @post
       @new_post.subject = 'Re: ' + @post.subject.sub(/^Re: ?/, '')
       @new_post.body = @post.quoted_body(params[:quote_start].to_i, params[:quote_length].to_i)
@@ -213,7 +213,7 @@ class PostsController < ApplicationController
     end
     respond_to do |wants|
       wants.js { render 'shared/dialog' }
-      wants.json { render :json => { :new_post => { :subject => @new_post.subject, :body => @new_post.body } } }
+      wants.json { render json: { new_post: { subject: @new_post.subject, body: @new_post.body } } }
     end
   end
 
@@ -272,7 +272,7 @@ class PostsController < ApplicationController
     reply_newsgroup = reply_post = nil
     if params[:reply_newsgroup]
       reply_newsgroup = Newsgroup.find_by_name(params[:reply_newsgroup])
-      reply_post = Post.where(:newsgroup_name => params[:reply_newsgroup], :number => params[:reply_number]).first
+      reply_post = Post.where(newsgroup_name: params[:reply_newsgroup], number: params[:reply_number]).first
       if reply_post.nil?
         generic_error :not_found, 'post_not_found', "Can't reply to nonexistent post number '#{params[:reply_number]}' in newsgroup '#{params[:reply_newsgroup]}'" and return
       end
@@ -281,14 +281,14 @@ class PostsController < ApplicationController
     validate_sticky_attributes(false) or return
 
     post_string = Post.build_message(
-      :user => @current_user,
-      :newsgroups => post_newsgroups.map(&:name),
-      :subject => subject,
-      :body => body.to_s,
-      :reply_post => reply_post,
-      :api_agent => params[:api_agent],
-      :posting_host => remote_host,
-      :api_posting_host => params[:posting_host]
+      user: @current_user,
+      newsgroups: post_newsgroups.map(&:name),
+      subject: subject,
+      body: body.to_s,
+      reply_post: reply_post,
+      api_agent: params[:api_agent],
+      posting_host: remote_host,
+      api_posting_host: params[:posting_host]
     )
 
     new_message_id = nil
@@ -322,7 +322,7 @@ class PostsController < ApplicationController
         if @sync_error
           json_error :internal_server_error, 'nntp_sync_error', @sync_error
         else
-          render :json => { :post => @post.as_json(:minimal => true) }
+          render json: { post: @post.as_json(minimal: true) }
         end
       end
     end
@@ -356,11 +356,11 @@ class PostsController < ApplicationController
     begin
       Net::NNTP.start(NEWS_SERVER) do |nntp|
         nntp.post(@post.build_cancel_message({
-          :user => @current_user,
-          :reason => params[:reason],
-          :api_agent => params[:api_agent],
-          :posting_host => remote_host,
-          :api_posting_host => params[:posting_host]
+          user: @current_user,
+          reason: params[:reason],
+          api_agent: params[:api_agent],
+          posting_host: remote_host,
+          api_posting_host: params[:posting_host]
         }))
       end
     rescue
@@ -401,7 +401,7 @@ class PostsController < ApplicationController
         if not @post.unread_for_user?(@current_user)
           @post.mark_unread_for_user(@current_user, true)
         else
-          @current_user.unread_post_entries.find_by_post_id(@post).update_attributes!(:user_created => true)
+          @current_user.unread_post_entries.find_by_post_id(@post).update_attributes!(user_created: true)
         end
       else
         generic_error :bad_request, 'number_missing',
@@ -411,12 +411,12 @@ class PostsController < ApplicationController
     else
       if @post
         if params[:in_thread]
-          @current_user.unread_post_entries.where(:post_id => Post.where(:thread_id => @post.thread_id)).destroy_all
+          @current_user.unread_post_entries.where(post_id: Post.where(thread_id: @post.thread_id)).destroy_all
         else
           @post.mark_read_for_user(@current_user)
         end
       elsif @newsgroup
-        @current_user.unread_post_entries.where(:newsgroup_id => @newsgroup.id).destroy_all
+        @current_user.unread_post_entries.where(newsgroup_id: @newsgroup.id).destroy_all
       elsif params[:all_posts]
         @current_user.unread_post_entries.destroy_all
       else
@@ -456,13 +456,13 @@ class PostsController < ApplicationController
       @post.starred_post_entries.find_by_user_id(@current_user.id).destroy
       @starred = false
     else
-      StarredPostEntry.create!(:user => @current_user, :post => @post)
+      StarredPostEntry.create!(user: @current_user, post: @post)
       @starred = true
     end
 
     respond_to do |wants|
       wants.js {}
-      wants.json { render :json => { :starred => @starred } }
+      wants.json { render json: { starred: @starred } }
     end
   end
 
@@ -554,12 +554,12 @@ class PostsController < ApplicationController
     def update_sticky_attributes
       if @sticky_until
         @post.in_all_newsgroups.each do |post|
-          post.update_attributes(:sticky_user => @current_user, :sticky_until => @sticky_until)
+          post.update_attributes(sticky_user: @current_user, sticky_until: @sticky_until)
         end
       else
         if not @post.sticky_until.nil?
           @post.in_all_newsgroups.each do |post|
-            post.update_attributes(:sticky_user => @current_user, :sticky_until => Time.now - 1.second)
+            post.update_attributes(sticky_user: @current_user, sticky_until: Time.now - 1.second)
           end
         end
       end

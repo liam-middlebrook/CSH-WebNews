@@ -1,9 +1,9 @@
 class PagesController < ApplicationController
-  before_filter :get_newsgroups_for_nav, :only => [:home, :check_new]
-  before_filter :get_newsgroup, :only => :check_new
-  before_filter :get_post, :only => :check_new
-  before_filter :allow_cross_origin_access, :only => :home
-  skip_before_filter :check_auth, :get_or_create_user, :only => :authenticate
+  before_filter :get_newsgroups_for_nav, only: [:home, :check_new]
+  before_filter :get_newsgroup, only: :check_new
+  before_filter :get_post, only: :check_new
+  before_filter :allow_cross_origin_access, only: :home
+  skip_before_filter :check_auth, :get_or_create_user, only: :authenticate
 
   def home
     if params[:no_user_override]
@@ -28,7 +28,7 @@ class PagesController < ApplicationController
 
       wants.json do
         get_activity_feed
-        render :json => { :activity => @activity }
+        render json: { activity: @activity }
       end
 
     end
@@ -69,7 +69,7 @@ class PagesController < ApplicationController
       included_newsgroups = Newsgroup.pluck(:name).reject{ |name| name =~ DEFAULT_NEWSGROUP_FILTER }
       newest_in_stickies = Post.sticky.order('date DESC').
         map{ |post| post.all_in_thread.order('date').last }.uniq(&:thread_id)
-      newest_in_threads = Post.where(:newsgroup_name => included_newsgroups).
+      newest_in_threads = Post.where(newsgroup_name: included_newsgroups).
         where('date > ?', 1.month.ago).order('date DESC').uniq(&:thread_id)[0...20]
       activity_posts = (newest_in_stickies | newest_in_threads).uniq(&:thread_id)
 
@@ -77,14 +77,14 @@ class PagesController < ApplicationController
         thread_parent = post.thread_parent
         unread_count = thread_parent.unread_count_in_thread_for_user(@current_user)
         {
-          :thread_parent => thread_parent,
-          :newest_post => post,
-          :cross_posted => post.crossposted?(true),
-          :next_unread => @current_user.unread_posts.where(:thread_id => post.thread_id).order('date').first,
-          :post_count => thread_parent.post_count_in_thread,
-          :unread_count => unread_count,
-          :personal_class => thread_parent.personal_class_for_user(@current_user),
-          :unread_class => (unread_count > 0 ? thread_parent.unread_personal_class_for_user(@current_user) : nil)
+          thread_parent: thread_parent,
+          newest_post: post,
+          cross_posted: post.crossposted?(true),
+          next_unread: @current_user.unread_posts.where(thread_id: post.thread_id).order('date').first,
+          post_count: thread_parent.post_count_in_thread,
+          unread_count: unread_count,
+          personal_class: thread_parent.personal_class_for_user(@current_user),
+          unread_class: (unread_count > 0 ? thread_parent.unread_personal_class_for_user(@current_user) : nil)
         }
       end
     end

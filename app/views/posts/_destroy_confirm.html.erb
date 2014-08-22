@@ -1,8 +1,8 @@
 <div id="dialog">
   <h2><%= icon('exclamation-triangle') %> Cancel this post?</h2>
   <%= form_for @post,
-      :url => destroy_post_path(@post.newsgroup_name, @post.number),
-      :html => { :method => 'delete'}, :remote => true do |f| %>
+      url: destroy_post_path(@post.newsgroup_name, @post.number),
+      html: { method: 'delete'}, remote: true do |f| %>
 
     <%= hidden_field_tag :confirm_cancel, 'y' %>
 
@@ -13,7 +13,7 @@
     <p>Canceling will create a corresponding message in the <i>control.cancel</i> newsgroup, containing some information about the canceled post (author, date, subject line) and anything you enter in the <b>reason for canceling</b> box below.</p>
 
     <div class="form_element">
-      <%= text_field_tag :reason, nil, :placeholder => 'Reason for canceling (optional)' %>
+      <%= text_field_tag :reason, nil, placeholder: 'Reason for canceling (optional)' %>
     </div>
 
     <% if @admin_cancel %>

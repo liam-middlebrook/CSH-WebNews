@@ -35,9 +35,9 @@ INDEX_RSS_LIMIT = 10   # Maximum limit for the built-in search RSS feed
 # Default subscriptions that are copied to new users on creation
 # (must include one newsgroup-less "default" setting with all options set)
 NEW_USER_SUBSCRIPTIONS = [
-  { :unread_level => 0, :email_level => 3, :digest_type => 'none' },
-  { :newsgroup_name => 'control.cancel', :unread_level => 3, :email_level => 3, :digest_type => 'none' },
-  { :newsgroup_name => 'csh.test', :unread_level => 3, :email_level => 3, :digest_type => 'none' }
+  { unread_level: 0, email_level: 3, digest_type: 'none' },
+  { newsgroup_name: 'control.cancel', unread_level: 3, email_level: 3, digest_type: 'none' },
+  { newsgroup_name: 'csh.test', unread_level: 3, email_level: 3, digest_type: 'none' }
 ]
 
 # Set true to disable authentication and auto-login as a test user with admin privileges

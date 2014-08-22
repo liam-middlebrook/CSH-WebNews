@@ -12,8 +12,8 @@ if <%= @posts_selected ? 'true' : 'false' %> or <%= @search_mode ? 'true' : 'fal
   set_loaded_location()
 
   $('#group_view').html '<%= j render(
-    :partial => "posts_list", :layout => "list_layout", :locals => {
-      :posts =>
+    partial: "posts_list", layout: "list_layout", locals: {
+      posts:
         (@posts_newer ? @posts_newer : []) +
         (@posts_selected ? [@posts_selected] : []) +
         (@posts_older ? @posts_older : [])
@@ -69,7 +69,7 @@ else
 
 <% if @posts_older %>
 $('#posts_list tbody').append '<%=
-  j render(:partial => "posts_list", :locals => { :posts => @posts_older }) %>'
+  j render(partial: "posts_list", locals: { posts: @posts_older }) %>'
 from_tr = $('#posts_list tr[data-date="<%= @from_older %>"]').nextAll('[data-level="1"]').first()
 from_tr.nextAll().addBack().find('.expanded').removeClass('expanded').addClass('expandable')
 from_tr.nextAll('[data-level!="1"]').hide()
@@ -79,7 +79,7 @@ for unread in from_tr.nextAll('.unread[data-level!="1"]')
 
 <% if @posts_newer %>
 $('#posts_list tbody').prepend '<%=
-  j render(:partial => "posts_list", :locals => { :posts => @posts_newer }) %>'
+  j render(partial: "posts_list", locals: { posts: @posts_newer }) %>'
 from_tr = $('#posts_list tr[data-date="<%= @from_newer %>"]').prevAll('[data-level="1"]').first()
 tr_height = from_tr.height()
 from_tr.prevAll().addBack().find('.expanded').removeClass('expanded').addClass('expandable')

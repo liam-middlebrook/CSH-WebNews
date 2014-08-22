@@ -1,13 +1,13 @@
 class UsersController < ApplicationController
-  before_filter :prevent_api_access, :only => [:edit, :update, :update_api]
-  before_filter :allow_cross_origin_access, :only => [:show, :unread_counts]
-  before_filter :get_newsgroups_for_search, :only => :edit
+  before_filter :prevent_api_access, only: [:edit, :update, :update_api]
+  before_filter :allow_cross_origin_access, only: [:show, :unread_counts]
+  before_filter :get_newsgroups_for_search, only: :edit
 
   def show
-    render :json => {
-      :user => @current_user.as_json(:only => [:username, :real_name, :created_at]).
-        merge(:is_admin => @current_user.admin?).
-        merge(:preferences => @current_user.preferences.slice(:thread_mode, :time_zone))
+    render json: {
+      user: @current_user.as_json(only: [:username, :real_name, :created_at]).
+        merge(is_admin: @current_user.admin?).
+        merge(preferences: @current_user.preferences.slice(:thread_mode, :time_zone))
     }
   end
 
@@ -23,19 +23,19 @@ class UsersController < ApplicationController
 
   def update_api
     if params[:disable]
-      @current_user.update_attributes(:api_key => nil, :api_data => nil)
+      @current_user.update_attributes(api_key: nil, api_data: nil)
     elsif params[:enable]
       key = SecureRandom.hex(8) until !key.nil? && User.find_by_api_key(key).nil?
-      @current_user.update_attributes(:api_key => key, :api_data => nil)
+      @current_user.update_attributes(api_key: key, api_data: nil)
     end
   end
 
   def unread_counts
-    render :json => {
-      :unread_counts => {
-        :normal => @current_user.unread_count,
-        :in_thread => @current_user.unread_count_in_thread,
-        :in_reply => @current_user.unread_count_in_reply
+    render json: {
+      unread_counts: {
+        normal: @current_user.unread_count,
+        in_thread: @current_user.unread_count_in_thread,
+        in_reply: @current_user.unread_count_in_reply
       }
     }
   end
@@ -47,9 +47,9 @@ class UsersController < ApplicationController
       :id, :_destroy, :newsgroup_name, :unread_level, :email_level, :digest_type
     ]
     params.require(:user).permit(
-      :preferences => [:theme, :thread_mode, :time_zone],
-      :default_subscription_attributes => subscription_attributes,
-      :subscriptions_attributes => subscription_attributes
+      preferences: [:theme, :thread_mode, :time_zone],
+      default_subscription_attributes: subscription_attributes,
+      subscriptions_attributes: subscription_attributes
     )
   end
 end

@@ -1,15 +1,15 @@
 class User < ActiveRecord::Base
-  has_many :unread_post_entries, :dependent => :destroy
-  has_many :starred_post_entries, :dependent => :destroy
-  has_many :unread_posts, :through => :unread_post_entries, :source => :post
-  has_many :starred_posts, :through => :starred_post_entries, :source => :post
-  has_one :default_subscription, -> { where(:newsgroup_name => nil) },
-    :class_name => Subscription, :autosave => true, :dependent => :destroy
-  has_many :subscriptions, -> { where.not(:newsgroup_name => nil) },
-    :autosave => true, :dependent => :destroy
+  has_many :unread_post_entries, dependent: :destroy
+  has_many :starred_post_entries, dependent: :destroy
+  has_many :unread_posts, through: :unread_post_entries, source: :post
+  has_many :starred_posts, through: :starred_post_entries, source: :post
+  has_one :default_subscription, -> { where(newsgroup_name: nil) },
+    class_name: Subscription, autosave: true, dependent: :destroy
+  has_many :subscriptions, -> { where.not(newsgroup_name: nil) },
+    autosave: true, dependent: :destroy
 
   accepts_nested_attributes_for :default_subscription
-  accepts_nested_attributes_for :subscriptions, :allow_destroy => true, :reject_if => :all_blank
+  accepts_nested_attributes_for :subscriptions, allow_destroy: true, reject_if: :all_blank
 
   before_save :ensure_subscriptions
 
@@ -70,16 +70,16 @@ class User < ActiveRecord::Base
   end
 
   def unread_count_in_thread
-    unread_post_entries.where(:personal_level => PERSONAL_CODES[:mine_in_thread]).count
+    unread_post_entries.where(personal_level: PERSONAL_CODES[:mine_in_thread]).count
   end
 
   def unread_count_in_reply
-    unread_post_entries.where(:personal_level => PERSONAL_CODES[:mine_reply]).count
+    unread_post_entries.where(personal_level: PERSONAL_CODES[:mine_reply]).count
   end
 
   def self.clean_unread!
     inactive.each do |user|
-      UnreadPostEntry.where(:user_id => user.id).delete_all
+      UnreadPostEntry.where(user_id: user.id).delete_all
     end
   end
 end

@@ -1,7 +1,7 @@
 <div id="dialog">
   <h2><%= icon('cog') %> Settings</h2>
-  <%= nested_form_for @current_user, :remote => true,
-      :url => update_user_path, :html => { :method => 'put'} do |f| %>
+  <%= nested_form_for @current_user, remote: true,
+      url: update_user_path, html: { method: 'put'} do |f| %>
 
     <div class="shrinkable">
       <fieldset>
@@ -21,25 +21,25 @@
           <div class="form_element aligned_field">
             <span class="label">Color scheme:</span>
             <% AVAILABLE_THEMES.each do |theme| %>
-              <%= p.radio_button :theme, theme, :checked => @current_user.theme == theme,
-                :class => 'change_theme', :data => { :path => asset_path(theme_stylesheet(theme)) } %>
-              <%= p.label :theme, theme.to_s.capitalize, :value => theme %>
+              <%= p.radio_button :theme, theme, checked: @current_user.theme == theme,
+                class: 'change_theme', data: { path: asset_path(theme_stylesheet(theme)) } %>
+              <%= p.label :theme, theme.to_s.capitalize, value: theme %>
             <% end %>
           </div>
           <div class="form_element aligned_field">
             <span class="label">Newsgroup view:</span>
-            <%= p.radio_button :thread_mode, 'normal', :checked => @current_user.thread_mode == :normal %>
-            <%= p.label :thread_mode, 'Threaded', :value => 'normal' %>
-            <%= p.radio_button :thread_mode, 'flat', :checked => @current_user.thread_mode == :flat %>
-            <%= p.label :thread_mode, 'Flat', :value => 'flat' %>
-            <%= p.radio_button :thread_mode, 'hybrid', :checked => @current_user.thread_mode == :hybrid %>
-            <%= p.label :thread_mode, 'Hybrid', :value => 'hybrid' %>
+            <%= p.radio_button :thread_mode, 'normal', checked: @current_user.thread_mode == :normal %>
+            <%= p.label :thread_mode, 'Threaded', value: 'normal' %>
+            <%= p.radio_button :thread_mode, 'flat', checked: @current_user.thread_mode == :flat %>
+            <%= p.label :thread_mode, 'Flat', value: 'flat' %>
+            <%= p.radio_button :thread_mode, 'hybrid', checked: @current_user.thread_mode == :hybrid %>
+            <%= p.label :thread_mode, 'Hybrid', value: 'hybrid' %>
             <span class="explain">(flattens replies, but groups them under the first post)</span>
           </div>
           <div class="form_element aligned_field">
             <%= p.label :time_zone, 'Time zone preference:' %>
             <%= p.time_zone_select :time_zone,
-              ActiveSupport::TimeZone.us_zones, :default => @current_user.time_zone %>
+              ActiveSupport::TimeZone.us_zones, default: @current_user.time_zone %>
           </div>
         </fieldset>
       <% end %>
@@ -66,20 +66,20 @@
                 <td>&nbsp;</td>
               </tr>
             <% end %>
-            <%= f.fields_for :subscriptions, :wrapper => false do |sub| %>
+            <%= f.fields_for :subscriptions, wrapper: false do |sub| %>
               <tr class="fields">
-                <td><%= sub.select :newsgroup_name, options_for_select(@newsgroups.map{ |n| [n.name, n.name] }, sub.object.newsgroup_name), :prompt => '' %></td>
-                <td><%= sub.select :unread_level, options_for_select(PERSONAL_CODES_DESCRIPTIONS, sub.object.unread_level), :include_blank => '(use default)' %></td>
-                <td><%= sub.select :email_level, options_for_select(PERSONAL_CODES_DESCRIPTIONS, sub.object.email_level), :include_blank => '(use default)' %></td>
-                <td><%= sub.select :digest_type, options_for_select(DIGEST_TYPES_DESCRIPTIONS, sub.object.digest_type), :include_blank => '(use default)' %></td>
-                <td><%= sub.link_to_remove icon('times').html_safe, :class => 'smallbutton' %></td>
+                <td><%= sub.select :newsgroup_name, options_for_select(@newsgroups.map{ |n| [n.name, n.name] }, sub.object.newsgroup_name), prompt: '' %></td>
+                <td><%= sub.select :unread_level, options_for_select(PERSONAL_CODES_DESCRIPTIONS, sub.object.unread_level), include_blank: '(use default)' %></td>
+                <td><%= sub.select :email_level, options_for_select(PERSONAL_CODES_DESCRIPTIONS, sub.object.email_level), include_blank: '(use default)' %></td>
+                <td><%= sub.select :digest_type, options_for_select(DIGEST_TYPES_DESCRIPTIONS, sub.object.digest_type), include_blank: '(use default)' %></td>
+                <td><%= sub.link_to_remove icon('times').html_safe, class: 'smallbutton' %></td>
               </tr>
             <% end %>
           </tbody>
           <tfoot>
             <tr>
               <td colspan="5">
-                <%= f.link_to_add "#{icon('plus')} Add newsgroup".html_safe, :subscriptions, :class => 'smallbutton', 'data-target' => '#subscription_rows' %>
+                <%= f.link_to_add "#{icon('plus')} Add newsgroup".html_safe, :subscriptions, class: 'smallbutton', 'data-target' => '#subscription_rows' %>
               </td>
             </tr>
           </tfoot>

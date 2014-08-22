@@ -12,14 +12,14 @@ class ApplicationController < ActionController::Base
       elsif not request.env[ENV_USERNAME]
         if not User.select(true).first and not params[:no_user_override]
           if DEVELOPMENT_MODE
-            User.create!(:username => 'nobody', :real_name => 'Testing User')
+            User.create!(username: 'nobody', real_name: 'Testing User')
           else
             @no_script = true
             render 'shared/no_users'
           end
         elsif not DEVELOPMENT_MODE and not params[:api_key]
           respond_to do |wants|
-            wants.html { render 'shared/authenticate', :layout => false }
+            wants.html { render 'shared/authenticate', layout: false }
             wants.js { render 'shared/unauthenticated' }
             wants.any { generic_error :unauthorized, 'api_key_missing',
               "API access requires a key to be provided in the 'api_key' parameter" }
@@ -68,10 +68,10 @@ class ApplicationController < ActionController::Base
         else
           @api_access = true
           @api_rss = request.format.rss?
-          @current_user.update_attributes(:api_data => {
-            :last_access => Time.now,
-            :last_agent => params[:api_agent],
-            :last_ip => request.remote_ip
+          @current_user.update_attributes(api_data: {
+            last_access: Time.now,
+            last_agent: params[:api_agent],
+            last_ip: request.remote_ip
           })
           if params[:thread_mode]
             if ['normal', 'flat', 'hybrid'].include?(params[:thread_mode])
@@ -89,8 +89,8 @@ class ApplicationController < ActionController::Base
         if @current_user.nil?
           if request.format.html?
             @current_user = User.create!(
-              :username => request.env[ENV_USERNAME],
-              :real_name => request.env[ENV_REALNAME]
+              username: request.env[ENV_USERNAME],
+              real_name: request.env[ENV_REALNAME]
             )
             @new_user = true
           else
@@ -142,7 +142,7 @@ class ApplicationController < ActionController::Base
     def get_post
       number = params[:number] || params[:from_number]
       if not params[:newsgroup].blank? and not number.blank?
-        @post = Post.where(:number => number, :newsgroup_name => params[:newsgroup]).first
+        @post = Post.where(number: number, newsgroup_name: params[:newsgroup]).first
         if @api_access and not @post
           generic_error :not_found, 'post_not_found',
             "Post number '#{number}' in newsgroup '#{params[:newsgroup]}' does not exist"
@@ -196,12 +196,12 @@ class ApplicationController < ActionController::Base
 
     def rss_error(status, id, details)
       @error_id, @error_details = id, details
-      render 'shared/rss_error', :status => status
+      render 'shared/rss_error', status: status
     end
 
     def json_error(status, id, details)
       allow_cross_origin_access
-      render :status => status, :json => json_error_object(id, details)
+      render status: status, json: json_error_object(id, details)
     end
 
     def generic_error(status, id, details)
@@ -214,9 +214,9 @@ class ApplicationController < ActionController::Base
 
     def json_error_object(id, details)
       {
-        :error => {
-          :id => id,
-          :details => details
+        error: {
+          id: id,
+          details: details
         }
       }
     end
@@ -224,10 +224,10 @@ class ApplicationController < ActionController::Base
     def json_sync_warning
       if @sync_warning
         {
-          :warning => {
-            :id => 'sync_outdated',
-            :last_sync => @last_sync_time,
-            :details => @sync_warning
+          warning: {
+            id: 'sync_outdated',
+            last_sync: @last_sync_time,
+            details: @sync_warning
           }
         }
       else

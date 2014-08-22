@@ -53,7 +53,7 @@ module ApplicationHelper
     image_tag 'https://secure.gravatar.com/avatar/' +
       Digest::MD5.hexdigest(email.gsub(/\s+/, '').downcase) +
       "?size=#{size}&default=mm&rating=pg",
-      :alt => '', :size => "#{size}x#{size}", :class => 'gravatar'
+      alt: '', size: "#{size}x#{size}", class: 'gravatar'
   end
 
   def next_unread_href
@@ -202,7 +202,7 @@ module ApplicationHelper
       /(\[\d+\])(?!<\/a>)(.*\n {0,3}\1[^\n]*?(https?:[^\s]+).*?(\n|\z))/m,
       '<a href="\\3">\\1</a>\\2'
     )
-    html_body = auto_link(html_body, :link => :urls, :sanitize => false)
+    html_body = auto_link(html_body, link: :urls, sanitize: false)
 
     return html_body
   end

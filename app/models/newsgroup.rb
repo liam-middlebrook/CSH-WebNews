@@ -1,20 +1,20 @@
 class Newsgroup < ActiveRecord::Base
-  has_many :unread_post_entries, :dependent => :destroy
-  has_many :posts, :foreign_key => :newsgroup_name, :primary_key => :name, :dependent => :destroy
-  has_many :subscriptions, :foreign_key => :newsgroup_name, :primary_key => :name, :dependent => :destroy
+  has_many :unread_post_entries, dependent: :destroy
+  has_many :posts, foreign_key: :newsgroup_name, primary_key: :name, dependent: :destroy
+  has_many :subscriptions, foreign_key: :newsgroup_name, primary_key: :name, dependent: :destroy
 
   default_scope -> { order(:name) }
 
   def as_json(options = {})
     if options[:for_user]
       unread = unread_for_user(options[:for_user])
-      super(:except => :id).merge(
-        :unread_count => unread[:count],
-        :unread_class => unread[:personal_class],
-        :newest_date => posts.order(:date).last.try(:date)
+      super(except: :id).merge(
+        unread_count: unread[:count],
+        unread_class: unread[:personal_class],
+        newest_date: posts.order(:date).last.try(:date)
       )
     else
-      super(:except => :id)
+      super(except: :id)
     end
   end
 
@@ -27,15 +27,15 @@ class Newsgroup < ActiveRecord::Base
   end
 
   def self.where_posting_allowed
-    where(:status => 'y')
+    where(status: 'y')
   end
 
   def unread_for_user(user)
     personal_class = nil
-    count = unread_post_entries.where(:user_id => user.id).count
-    max_level = unread_post_entries.where(:user_id => user.id).maximum(:personal_level)
+    count = unread_post_entries.where(user_id: user.id).count
+    max_level = unread_post_entries.where(user_id: user.id).maximum(:personal_level)
     personal_class = PERSONAL_CLASSES[max_level] if max_level
-    return { :count => count, :personal_class => personal_class }
+    return { count: count, personal_class: personal_class }
   end
 
   def self.reimport!(post)
@@ -53,7 +53,7 @@ class Newsgroup < ActiveRecord::Base
       post.delete # Shhh, don't run the destroy handlers
       new_post = Post.import!(post.newsgroup, post.number, head, body)
       entries.each do |entry|
-        entry.update_attributes(:post => new_post)
+        entry.update_attributes(post: new_post)
       end
     ensure
       FileUtils.rm('tmp/syncing.txt')
@@ -67,22 +67,22 @@ class Newsgroup < ActiveRecord::Base
     end
 
     begin
-      if Newsgroup.where(:name => name).exists?
-        newsgroup = Newsgroup.where(:name => name).first
-        newsgroup.update_attributes(:status => status)
+      if Newsgroup.where(name: name).exists?
+        newsgroup = Newsgroup.where(name: name).first
+        newsgroup.update_attributes(status: status)
       else
-        newsgroup = Newsgroup.create!(:name => name, :status => status)
+        newsgroup = Newsgroup.create!(name: name, status: status)
       end
 
       puts nntp.group(newsgroup.name)[1] if $in_rake
-      my_posts = Post.where(:newsgroup_name => newsgroup.name).pluck(:number)
+      my_posts = Post.where(newsgroup_name: newsgroup.name).pluck(:number)
       news_posts = nntp.listgroup(newsgroup.name)[1].map(&:to_i)
       to_delete = my_posts - news_posts
       to_import = news_posts - my_posts
 
       puts "Deleting #{to_delete.size} posts." if $in_rake
       to_delete.each do |number|
-        Post.where(:newsgroup_name => newsgroup.name, :number => number).first.destroy
+        Post.where(newsgroup_name: newsgroup.name, number: number).first.destroy
       end
 
       puts "Importing #{to_import.size} posts." if $in_rake
@@ -99,7 +99,7 @@ class Newsgroup < ActiveRecord::Base
               email_level = subscription.email_level || user.default_subscription.email_level
 
               if personal_level >= unread_level
-                UnreadPostEntry.create!(:user => user, :newsgroup => newsgroup, :post => post, :personal_level => personal_level)
+                UnreadPostEntry.create!(user: user, newsgroup: newsgroup, post: post, personal_level: personal_level)
               end
 
               if personal_level >= email_level

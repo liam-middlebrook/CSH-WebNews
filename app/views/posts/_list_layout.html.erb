@@ -9,7 +9,7 @@
     <a id="rss_feed_button" class="button" title="Get an RSS feed of this search" href="<%=
       if @current_user.api_enabled?
         '#?/rss_caution?dest=' + u(search_path({
-          :format => :rss, :api_key => @current_user.api_key, :api_agent => 'WebNews Search Feed'
+          format: :rss, api_key: @current_user.api_key, api_agent: 'WebNews Search Feed'
         }.merge(@search_params)))
       else
         '#'
@@ -20,12 +20,12 @@
   <% else %>
     <a class="refresh new_posts" href="#!<%= posts_path(@newsgroup.name) %>"></a>
     <% if @newsgroup.posting_allowed? %>
-      <a class="button new_draft" href="#?<%= new_post_path(:newsgroup => @newsgroup.name) %>"><%= icon('file') %> Post</a>
+      <a class="button new_draft" href="#?<%= new_post_path(newsgroup: @newsgroup.name) %>"><%= icon('file') %> Post</a>
     <% else %>
       <span class="explain">This newsgroup is read-only.</span>
     <% end %>
     <a id="newsgroup_search_button" class="button"
-      href="#?<%= search_entry_path(:newsgroup => @newsgroup.name) %>"><%= icon('search') %> Search</a>
+      href="#?<%= search_entry_path(newsgroup: @newsgroup.name) %>"><%= icon('search') %> Search</a>
     <a id="mark_thread_read_button" class="button mark_read" data-scope="thread" href="#"><%= icon('check') %> Read Thread</a>
     <a id="mark_group_read_button" class="button mark_read" data-scope="newsgroup" href="#"><%= icon('check') %> Read All</a>
   <% end %>

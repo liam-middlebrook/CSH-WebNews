@@ -7,6 +7,6 @@
   <%= label_tag :do_sticky, 'Sticky this thread until' %>
   <%= text_field_tag :sticky_until,
     post.sticky? ? post.sticky_until.strftime(DATE_FORMAT) : '',
-    :disabled => !post.persisted? %>
+    disabled: !post.persisted? %>
   <span class="explain">e.g. "<%= (Time.now + 2.weeks).strftime('%-m/%-d %-I%p').downcase %>" or "2 weeks from now"</span>
 </p>

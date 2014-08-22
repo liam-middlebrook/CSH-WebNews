@@ -2,7 +2,7 @@
   <div class="user_info">
     <%= gravatar_image @current_user.email, 28 %>
     <a title="Show all my posts" href="#!<%=
-      search_path(:authors => [@current_user.real_name, "<#{@current_user.email}>"].join(','))
+      search_path(authors: [@current_user.real_name, "<#{@current_user.email}>"].join(','))
     %>">
       <span class="real_name"><%= @current_user.real_name %></span>
       <span class="username">(<%= @current_user.username %>)</span>
@@ -17,7 +17,7 @@
     <h1><a href="#!/home">WebNews</a></h1>
     <a id="home_button" class="button" href="#!/home"><%= icon('home') %></a>
     <a id="search_button" class="button" href="#?<%= search_entry_path %>"><%= icon('search') %> Search</a>
-    <a id="starred_button" class="button" href="#!<%= search_path(:starred => true) %>"><%= icon('star') %> Starred</a>
+    <a id="starred_button" class="button" href="#!<%= search_path(starred: true) %>"><%= icon('star') %> Starred</a>
     <a id="next_unread" class="button" href="<%= next_unread_href %>"><%= icon('arrow-right') %> Next Unread</a>
     <a id="mark_all_read_button" class="button mark_read" data-scope="all" href="#"
       data-confirm="Really mark all posts read?"><%= icon('check') %> Read All</a>

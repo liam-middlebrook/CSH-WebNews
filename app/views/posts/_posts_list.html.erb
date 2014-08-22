@@ -1,7 +1,7 @@
 <% posts.each do |post| %>
   <% if @flat_mode %>
-    <%= render :partial => 'post_row', :locals => { :post => post[:post], :level => 1, :skip_class => false } %>
+    <%= render partial: 'post_row', locals: { post: post[:post], level: 1, skip_class: false } %>
   <% else %>
-    <%= render :partial => 'post_tree', :locals => { :tree => post, :level => 1 } %>
+    <%= render partial: 'post_tree', locals: { tree: post, level: 1 } %>
   <% end %>
 <% end %>
