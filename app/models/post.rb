@@ -290,7 +290,9 @@ class Post < ActiveRecord::Base
   end
 
   def unread_personal_class_for_user(user)
-    PERSONAL_CLASSES[user.unread_posts.where(:thread_id => thread_id).maximum(:personal_level)]
+    # Quirk: Using `maximum` on a column from an implicit join table appears to
+    # sometimes return a string, hence `to_i`. Check this again under Rails 4.
+    PERSONAL_CLASSES[user.unread_posts.where(:thread_id => thread_id).maximum(:personal_level).to_i]
   end
 
   def kill_parent_id
