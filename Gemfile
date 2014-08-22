@@ -2,8 +2,7 @@ source 'http://rubygems.org'
 
 gem 'rails', '3.2.19'
 
-gem 'sqlite3', :groups => [:development, :test]
-gem 'mysql2', :group => :production
+gem 'pg'
 
 gem 'jquery-rails'
 gem 'rails_autolink'
@@ -15,6 +14,7 @@ gem 'font-awesome-sass'
 gem 'thoughtafter-nntp', require: 'nntp'
 gem 'rfc2047', github: 'ConradIrwin/rfc2047-ruby'
 gem 'exception_notification'
+gem 'dotenv-rails'
 
 # Asset template engines
 gem 'sass-rails'

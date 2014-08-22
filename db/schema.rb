@@ -11,24 +11,24 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20131009224837) do
+ActiveRecord::Schema.define(:version => 20140822012950) do
 
   create_table "newsgroups", :force => true do |t|
-    t.string "name"
-    t.string "status"
+    t.text "name"
+    t.text "status"
   end
 
   add_index "newsgroups", ["name"], :name => "index_newsgroups_on_name"
 
   create_table "posts", :force => true do |t|
-    t.string   "newsgroup_name"
+    t.text     "newsgroup_name"
     t.integer  "number"
-    t.string   "subject"
-    t.string   "author"
+    t.text     "subject"
+    t.text     "author"
     t.datetime "date"
-    t.string   "message_id"
-    t.string   "parent_id"
-    t.string   "thread_id"
+    t.text     "message_id"
+    t.text     "parent_id"
+    t.text     "thread_id"
     t.boolean  "stripped"
     t.integer  "sticky_user_id"
     t.datetime "sticky_until"
@@ -55,10 +55,10 @@ ActiveRecord::Schema.define(:version => 20131009224837) do
 
   create_table "subscriptions", :force => true do |t|
     t.integer  "user_id"
-    t.string   "newsgroup_name"
+    t.text     "newsgroup_name"
     t.integer  "unread_level"
     t.integer  "email_level"
-    t.string   "digest_type"
+    t.text     "digest_type"
     t.datetime "created_at",     :null => false
     t.datetime "updated_at",     :null => false
   end
@@ -80,12 +80,12 @@ ActiveRecord::Schema.define(:version => 20131009224837) do
   add_index "unread_post_entries", ["user_id"], :name => "index_unread_post_entries_on_user_id"
 
   create_table "users", :force => true do |t|
-    t.string   "username"
-    t.string   "real_name"
+    t.text     "username"
+    t.text     "real_name"
     t.text     "preferences"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "api_key"
+    t.text     "api_key"
     t.text     "api_data"
   end
 

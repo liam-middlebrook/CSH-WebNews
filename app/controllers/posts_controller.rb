@@ -577,19 +577,19 @@ class PostsController < ApplicationController
           phrases.each do |phrase|
             if phrase[0] == '-'
               exclude_conditions << '('
-              exclude_conditions[-1] += 'subject like ?'
+              exclude_conditions[-1] += 'subject ilike ?'
               exclude_values << '%' + phrase[1..-1] + '%'
               if not params[:subject_only]
-                exclude_conditions[-1] += ' or body like ?'
+                exclude_conditions[-1] += ' or body ilike ?'
                 exclude_values << '%' + phrase[1..-1] + '%'
               end
               exclude_conditions[-1] += ')'
             else
               keyword_conditions << '('
-              keyword_conditions[-1] += 'subject like ?'
+              keyword_conditions[-1] += 'subject ilike ?'
               keyword_values << '%' + phrase + '%'
               if not params[:subject_only]
-                keyword_conditions[-1] += ' or body like ?'
+                keyword_conditions[-1] += ' or body ilike ?'
                 keyword_values << '%' + phrase + '%'
               end
               keyword_conditions[-1] += ')'
@@ -609,7 +609,7 @@ class PostsController < ApplicationController
 
       if not params[:authors].blank?
         authors = params[:authors].split(',').map(&:strip)
-        conditions << '(' + (['author like ?'] * authors.size).join(' or ') + ')'
+        conditions << '(' + (['author ilike ?'] * authors.size).join(' or ') + ')'
         authors.each do |author|
           values << '%' + author + '%'
         end
