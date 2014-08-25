@@ -280,16 +280,16 @@ class PostsController < ApplicationController
 
     validate_sticky_attributes(false) or return
 
-    post_string = Post.build_message(
+    post_string = NNTP::NewPostMessage.new(
       user: @current_user,
-      newsgroups: post_newsgroups.map(&:name),
+      newsgroup_names: post_newsgroups.map(&:name),
       subject: subject,
       body: body.to_s,
-      reply_post: reply_post,
-      api_agent: params[:api_agent],
+      parent_post: reply_post,
+      api_user_agent: params[:api_agent],
       posting_host: remote_host,
       api_posting_host: params[:posting_host]
-    )
+    ).to_s
 
     new_message_id = nil
     begin
@@ -355,13 +355,14 @@ class PostsController < ApplicationController
 
     begin
       Net::NNTP.start(NEWS_SERVER) do |nntp|
-        nntp.post(@post.build_cancel_message({
+        nntp.post(NNTP::CancelMessage.new({
           user: @current_user,
+          post: @post,
           reason: params[:reason],
-          api_agent: params[:api_agent],
+          api_user_agent: params[:api_agent],
           posting_host: remote_host,
           api_posting_host: params[:posting_host]
-        }))
+        }).to_s)
       end
     rescue
       generic_error :internal_server_error, 'nntp_post_error', 'NNTP server error: ' + $!.message
