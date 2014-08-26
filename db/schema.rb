@@ -9,20 +9,29 @@
 # from scratch. The latter is a flawed and unsustainable approach (the more migrations
 # you'll amass, the slower it'll run and the greater likelihood for issues).
 #
-# It's strongly recommended to check this file into your version control system.
+# It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140822021710) do
+ActiveRecord::Schema.define(version: 20140826155556) do
 
-  create_table "newsgroups", :force => true do |t|
+  # These are extensions that must be enabled in order to support this database
+  enable_extension "plpgsql"
+
+  create_table "flags", force: true do |t|
+    t.text     "data"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "newsgroups", force: true do |t|
     t.text     "name"
     t.text     "status"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
-  add_index "newsgroups", ["name"], :name => "index_newsgroups_on_name"
+  add_index "newsgroups", ["name"], name: "index_newsgroups_on_name", using: :btree
 
-  create_table "posts", :force => true do |t|
+  create_table "posts", force: true do |t|
     t.text     "newsgroup_name"
     t.integer  "number"
     t.text     "subject"
@@ -38,25 +47,25 @@ ActiveRecord::Schema.define(:version => 20140822021710) do
     t.text     "body"
   end
 
-  add_index "posts", ["date"], :name => "index_posts_on_date"
-  add_index "posts", ["message_id"], :name => "index_posts_on_message_id"
-  add_index "posts", ["newsgroup_name", "number"], :name => "index_posts_on_newsgroup_name_and_number", :unique => true
-  add_index "posts", ["newsgroup_name"], :name => "index_posts_on_newsgroup_name"
-  add_index "posts", ["parent_id"], :name => "index_posts_on_parent_id"
-  add_index "posts", ["sticky_until"], :name => "index_posts_on_sticky_until"
-  add_index "posts", ["thread_id"], :name => "index_posts_on_thread_id"
+  add_index "posts", ["date"], name: "index_posts_on_date", using: :btree
+  add_index "posts", ["message_id"], name: "index_posts_on_message_id", using: :btree
+  add_index "posts", ["newsgroup_name", "number"], name: "index_posts_on_newsgroup_name_and_number", unique: true, using: :btree
+  add_index "posts", ["newsgroup_name"], name: "index_posts_on_newsgroup_name", using: :btree
+  add_index "posts", ["parent_id"], name: "index_posts_on_parent_id", using: :btree
+  add_index "posts", ["sticky_until"], name: "index_posts_on_sticky_until", using: :btree
+  add_index "posts", ["thread_id"], name: "index_posts_on_thread_id", using: :btree
 
-  create_table "starred_post_entries", :force => true do |t|
+  create_table "starred_post_entries", force: true do |t|
     t.integer  "user_id"
     t.integer  "post_id"
     t.datetime "created_at"
   end
 
-  add_index "starred_post_entries", ["post_id"], :name => "index_starred_post_entries_on_post_id"
-  add_index "starred_post_entries", ["user_id", "post_id"], :name => "index_starred_post_entries_on_user_id_and_post_id", :unique => true
-  add_index "starred_post_entries", ["user_id"], :name => "index_starred_post_entries_on_user_id"
+  add_index "starred_post_entries", ["post_id"], name: "index_starred_post_entries_on_post_id", using: :btree
+  add_index "starred_post_entries", ["user_id", "post_id"], name: "index_starred_post_entries_on_user_id_and_post_id", unique: true, using: :btree
+  add_index "starred_post_entries", ["user_id"], name: "index_starred_post_entries_on_user_id", using: :btree
 
-  create_table "subscriptions", :force => true do |t|
+  create_table "subscriptions", force: true do |t|
     t.integer  "user_id"
     t.text     "newsgroup_name"
     t.integer  "unread_level"
@@ -66,10 +75,10 @@ ActiveRecord::Schema.define(:version => 20140822021710) do
     t.datetime "updated_at"
   end
 
-  add_index "subscriptions", ["newsgroup_name"], :name => "index_subscriptions_on_newsgroup_name"
-  add_index "subscriptions", ["user_id"], :name => "index_subscriptions_on_user_id"
+  add_index "subscriptions", ["newsgroup_name"], name: "index_subscriptions_on_newsgroup_name", using: :btree
+  add_index "subscriptions", ["user_id"], name: "index_subscriptions_on_user_id", using: :btree
 
-  create_table "unread_post_entries", :force => true do |t|
+  create_table "unread_post_entries", force: true do |t|
     t.integer "user_id"
     t.integer "newsgroup_id"
     t.integer "post_id"
@@ -77,12 +86,12 @@ ActiveRecord::Schema.define(:version => 20140822021710) do
     t.boolean "user_created"
   end
 
-  add_index "unread_post_entries", ["newsgroup_id"], :name => "index_unread_post_entries_on_newsgroup_id"
-  add_index "unread_post_entries", ["post_id"], :name => "index_unread_post_entries_on_post_id"
-  add_index "unread_post_entries", ["user_id", "post_id"], :name => "index_unread_post_entries_on_user_id_and_post_id", :unique => true
-  add_index "unread_post_entries", ["user_id"], :name => "index_unread_post_entries_on_user_id"
+  add_index "unread_post_entries", ["newsgroup_id"], name: "index_unread_post_entries_on_newsgroup_id", using: :btree
+  add_index "unread_post_entries", ["post_id"], name: "index_unread_post_entries_on_post_id", using: :btree
+  add_index "unread_post_entries", ["user_id", "post_id"], name: "index_unread_post_entries_on_user_id_and_post_id", unique: true, using: :btree
+  add_index "unread_post_entries", ["user_id"], name: "index_unread_post_entries_on_user_id", using: :btree
 
-  create_table "users", :force => true do |t|
+  create_table "users", force: true do |t|
     t.text     "username"
     t.text     "real_name"
     t.text     "preferences"
@@ -92,7 +101,7 @@ ActiveRecord::Schema.define(:version => 20140822021710) do
     t.text     "api_data"
   end
 
-  add_index "users", ["api_key"], :name => "index_users_on_api_key"
-  add_index "users", ["username"], :name => "index_users_on_username"
+  add_index "users", ["api_key"], name: "index_users_on_api_key", using: :btree
+  add_index "users", ["username"], name: "index_users_on_username", using: :btree
 
 end

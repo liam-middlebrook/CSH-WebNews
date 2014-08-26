@@ -29,7 +29,7 @@ class ApplicationController < ActionController::Base
     end
 
     def check_maintenance
-      maintenance = File.exists?('tmp/maintenance.txt')
+      maintenance = Flag.maintenance_mode?
       reloading = File.exists?('tmp/reloading.txt')
       if maintenance or reloading
         @no_script = true
@@ -41,12 +41,7 @@ class ApplicationController < ActionController::Base
         @explanation = if reloading
           "This could take a while. (#{Newsgroup.count - 1} newsgroups completed so far, started #{File.mtime('tmp/syncing.txt').strftime(SHORT_DATE_FORMAT)})"
         else
-          explain = File.read('tmp/maintenance.txt')
-          if explain.blank?
-            "No explanation was provided for this downtime, but hopefully we'll be back online soon."
-          else
-            explain
-          end
+          Flag.maintenance_reason
         end
 
         respond_to do |wants|

@@ -17,8 +17,10 @@ namespace :webnews do
 
   desc "Sync all newsgroups, adding unread post data for any new posts"
   task sync: :environment do
-    if File.exists?('tmp/maintenance.txt') and not ENV['FORCE']
-      puts 'Skipping sync because maintenance mode is on (use FORCE=true to override)'
+    if Flag.maintenance_mode? && ENV['FORCE'].blank?
+      puts 'Skipping sync because maintenance mode is on.'
+      puts 'Use "rake webnews:sync FORCE=true" to override.'
+      puts
     else
       with_notifier{ Newsgroup.sync_all! }
     end
@@ -32,5 +34,21 @@ namespace :webnews do
   desc "Email post digests for users with digest subscriptions"
   task send_digests: :environment do
     with_notifier{ Subscription.send_digests! }
+  end
+
+  namespace :maintenance do
+    desc 'Turn on maintenance mode'
+    task on: :environment do
+      if ENV['REASON'].present?
+        Flag.maintenance_mode_on!(ENV['REASON'])
+      else
+        puts 'Usage: rake webnews:maintenance:on REASON="Explanation here."'
+      end
+    end
+
+    desc 'Turn off maintenance mode'
+    task off: :environment do
+      Flag.maintenance_mode_off!
+    end
   end
 end
