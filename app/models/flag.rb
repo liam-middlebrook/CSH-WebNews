@@ -1,7 +1,7 @@
 class Flag < ActiveRecord::Base
-  MAINTENANCE = 1
-
   serialize :data, JSON
+
+  MAINTENANCE = 1
 
   def self.maintenance_mode?
     where(id: MAINTENANCE).exists?
@@ -17,5 +17,19 @@ class Flag < ActiveRecord::Base
 
   def self.maintenance_mode_off!
     find_by(id: MAINTENANCE).try(:destroy!)
+  end
+
+  NEWS_SYNC = 2
+
+  def self.with_news_sync_lock(full_sync: false, &block)
+    sync_flag = where(id: NEWS_SYNC).first_or_create!
+    sync_flag.with_lock do
+      yield
+      sync_flag.touch if full_sync
+    end
+  end
+
+  def self.last_full_news_sync_at
+    find_by(id: NEWS_SYNC).try(:updated_at)
   end
 end

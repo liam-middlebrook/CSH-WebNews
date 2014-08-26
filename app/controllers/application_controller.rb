@@ -29,24 +29,17 @@ class ApplicationController < ActionController::Base
     end
 
     def check_maintenance
-      maintenance = Flag.maintenance_mode?
-      reloading = File.exists?('tmp/reloading.txt')
-      if maintenance or reloading
+      if Flag.maintenance_mode?
         @no_script = true
-        @reason = if reloading
-          'WebNews is re-importing all newsgroups'
-        else
-          'WebNews is down for maintenance'
-        end
-        @explanation = if reloading
-          "This could take a while. (#{Newsgroup.count - 1} newsgroups completed so far, started #{File.mtime('tmp/syncing.txt').strftime(SHORT_DATE_FORMAT)})"
-        else
-          Flag.maintenance_reason
-        end
+        @reason = Flag.maintenance_reason
 
         respond_to do |wants|
           wants.any(:html, :js) { render 'shared/maintenance' }
-          wants.any { generic_error :service_unavailable, 'under_maintenance', @reason + '. ' + @explanation.chomp }
+          wants.any {
+            generic_error :service_unavailable,
+              'under_maintenance',
+              'WebNews is down for maintenance: ' + Flag.maintenance_reason
+          }
         end
       end
     end
@@ -173,14 +166,9 @@ class ApplicationController < ActionController::Base
     end
 
     def get_last_sync_time
-      if File.exists?('tmp/lastsync.txt')
-        @last_sync_time = File.mtime('tmp/lastsync.txt')
-        if @last_sync_time < 2.minutes.ago
-          @sync_warning = "Last sync with the news server was #{view_context.time_ago_in_words(@last_sync_time)} ago."
-        end
-      else
-        @sync_warning = 'The initial news server sync was interrupted and could not be resumed. Some newsgroups and/or posts may be missing.'
-        @sync_incomplete = true
+      @last_sync_time = Flag.last_full_news_sync_at
+      if @last_sync_time < 2.minutes.ago
+        @sync_warning = "Last sync with the news server was #{view_context.time_ago_in_words(@last_sync_time)} ago."
       end
     end
 
