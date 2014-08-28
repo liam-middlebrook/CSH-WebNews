@@ -4,9 +4,9 @@
 module NNTP
   module FlowedFormat
     def self.decode_message(message)
-      if message.content_type_parameters.to_h[:format] == 'flowed'
+      if message.content_type_parameters.to_h['format'] == 'flowed'
         message = message.dup
-        message.content_type_parameters.delete(:format)
+        message.content_type_parameters.delete('format')
 
         new_body_lines = []
         message.body.to_s.each_line do |line|
@@ -33,7 +33,7 @@ module NNTP
 
     def self.encode_message(message)
       if (!message.has_content_type? || message.content_type == 'text/plain') &&
-          message.content_type_parameters.to_h[:format] != 'flowed'
+          message.content_type_parameters.to_h['format'] != 'flowed'
         message = message.dup
         message.content_type ||= 'text/plain'
         message.content_type_parameters[:format] = 'flowed'

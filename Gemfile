@@ -12,7 +12,6 @@ gem 'nested_form'
 gem 'mousetrap-rails'
 gem 'font-awesome-sass'
 gem 'thoughtafter-nntp', require: 'nntp'
-gem 'rfc2047', github: 'ConradIrwin/rfc2047-ruby'
 gem 'exception_notification'
 gem 'dotenv-rails'
 

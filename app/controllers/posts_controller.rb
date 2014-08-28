@@ -302,9 +302,7 @@ class PostsController < ApplicationController
     end
 
     begin
-      Net::NNTP.start(NEWS_SERVER) do |nntp|
-        post_newsgroups.each{ |n| Newsgroup.sync_group!(nntp, n.name, n.status) }
-      end
+      NNTP::NewsgroupImporter.new.sync!(post_newsgroups)
       @post = @newsgroup.posts.find_by_message_id(new_message_id)
       if @post
         update_sticky_attributes
@@ -370,10 +368,7 @@ class PostsController < ApplicationController
     end
 
     begin
-      Net::NNTP.start(NEWS_SERVER) do |nntp|
-        @post.all_newsgroups.each{ |n| Newsgroup.sync_group!(nntp, n.name, n.status) }
-        Newsgroup.sync_group!(nntp, 'control.cancel', 'n')
-      end
+      NNTP::NewsgroupImporter.new.sync!(@post.all_newsgroups + Newsgroup.cancel)
     rescue
       @sync_error = "Your cancel was accepted by the news server and does not need to be resubmitted, but an error occurred while resyncing the newsgroups: #{$!.message}"
       log_exception($!)

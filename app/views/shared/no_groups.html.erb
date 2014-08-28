@@ -1,7 +1,7 @@
 <div id="overlay_dimmer"></div>
 <div id="dialog">
   <h2>No newsgroups have been imported</h2>
-  <p>Set <code>NEWS_SERVER</code> to your news server name in <code>config/webnews.rb</code>, then run <code>rake webnews:reload</code> to perform the initial import. Subsequently, <code>rake webnews:sync</code> will resync the newsgroups.</p>
+  <p>Set <code>NEWS_SERVER</code> to your news server name in <code>config/webnews.rb</code>, then run <code>rake webnews:sync QUIET=true</code> to perform the initial import.</p>
   <p>Note that WebNews currently does not support SSL or NNTP authentication. If WebNews is not running on a machine with direct access to the news server, you'll need to set <code>NEWS_SERVER = 'localhost'</code> and create an SSH tunnel redirecting port 119 on your machine to the same port on the news server. This can be done with <code>ssh -N -p 22 username@news-server-name -L 119/localhost/119</code>, or <b>Connection > SSH > Tunnels</b> for PuTTY users. Remember to restart the Rails server after changing the <code>NEWS_SERVER</code> constant!</p>
   <p>(currently <code>NEWS_SERVER</code> is set to <b><code>'<%= NEWS_SERVER %>'</code></b>)</p>
   <div class="buttons">

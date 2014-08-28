@@ -209,7 +209,8 @@ class Post < ActiveRecord::Base
   end
 
   def original_parent_id
-    headers[/^References: (.*)/i, 1].to_s.split.map{ |r| r[/<.*>/] }[-1] || ''
+    last_reference = Array(Mail.new(headers).references)[-1]
+    last_reference.present? ? "<#{last_reference}>" : ''
   end
 
   def original_parent
@@ -298,144 +299,6 @@ class Post < ActiveRecord::Base
     # (but posts getting canceled when they already have replies is rare)
     Post.where(parent_id: message_id).each do |post|
       post.update_attributes(parent_id: '', thread_id: post.message_id)
-    end
-  end
-
-  def self.import!(newsgroup, number, headers, body)
-    stripped = false
-    headers = unwrap_headers(headers)
-    headers.encode!('US-ASCII', invalid: :replace, undef: :replace)
-
-    part_headers, body = multipart_decode(headers, body)
-    stripped = true if headers[/^Content-Type:.*mixed/i]
-
-    body = body.unpack('m')[0] if part_headers[/^Content-Transfer-Encoding: base64/i]
-    body = body.unpack('M')[0] if part_headers[/^Content-Transfer-Encoding: quoted-printable/i]
-
-    if part_headers[/^Content-Type:.*(X-|unknown)/i]
-      body.encode!('UTF-8', 'US-ASCII', invalid: :replace, undef: :replace)
-    elsif part_headers[/^Content-Type:.*charset/i]
-      begin
-        body.encode!('UTF-8', part_headers[/^Content-Type:.*charset="?([^"]+?)"?(;|$)/i, 1],
-          invalid: :replace, undef: :replace)
-      rescue
-        body.encode!('UTF-8', 'US-ASCII', invalid: :replace, undef: :replace)
-      end
-    else
-      begin
-        body.encode!('UTF-8', 'US-ASCII') # RFC 2045 Section 5.2
-      rescue
-        begin
-          body.encode!('UTF-8', 'Windows-1252')
-        rescue
-          body.encode!('UTF-8', 'US-ASCII', invalid: :replace, undef: :replace)
-        end
-      end
-    end
-
-    if body[/^begin(-base64)? \d{3} /]
-      body.gsub!(/^begin \d{3} .*?\nend\n/m, '')
-      body.gsub!(/^begin-base64 \d{3} .*?\n====\n/m, '')
-      stripped = true
-    end
-
-    body = flowed_decode(body) if part_headers[/^Content-Type:.*format="?flowed"?/i]
-
-    body.rstrip!
-
-    date = Time.parse(
-      headers[/^Injection-Date: (.*)/i, 1] ||
-      headers[/^NNTP-Posting-Date: (.*)/i, 1] ||
-      headers[/^Date: (.*)/i, 1]
-    )
-    author = header_decode(headers[/^From: (.*)/i, 1])
-    subject = header_decode(headers[/^Subject: (.*)/i, 1])
-    message_id = headers[/^Message-ID: (.*)/i, 1]
-    references = headers[/^References: (.*)/i, 1].to_s.split.map{ |r| r[/<.*>/] }
-
-    parent_id = references[-1] || ''
-    thread_id = message_id
-    possible_thread_id = references[0] || ''
-
-    parent = where(message_id: parent_id, newsgroup_name: newsgroup.name).first
-
-    if parent
-      thread_id = parent.thread_id
-    elsif parent_id != '' and where(message_id: parent_id).exists?
-      parent_id = ''
-    elsif possible_thread_id != '' and where(message_id: possible_thread_id, newsgroup_name: newsgroup.name).exists?
-      parent_id = thread_id = possible_thread_id
-    elsif subject =~ /Re:/i
-      possible_thread_parent = where(
-        '(subject = ? or subject = ? or subject = ?) and newsgroup_name = ? and parent_id = ? and date < ? and date > ?',
-        subject, subject.sub(/^Re: ?/i, ''), subject.sub(/^Re: ?(\[.+\] )?/i, ''), newsgroup.name, '', date, date - 3.months
-      ).order('date').first
-
-      if possible_thread_parent
-        parent_id = thread_id = possible_thread_parent.message_id
-      else
-        parent_id = ''
-      end
-    else
-      parent_id = ''
-    end
-
-    create!(newsgroup: newsgroup,
-            number: number,
-            subject: subject,
-            author: author,
-            date: date,
-            message_id: message_id,
-            parent_id: parent_id,
-            thread_id: thread_id,
-            stripped: stripped,
-            headers: headers,
-            body: body)
-  end
-
-  # See RFC 3676 for "format=flowed" spec
-
-  def self.flowed_decode(body)
-    new_body_lines = []
-    body.each_line do |line|
-      line.chomp!
-      quotes = line[/^>+/]
-      line.sub!(/^>+/, '')
-      line.sub!(/^ /, '')
-      if line != '-- ' and
-          new_body_lines.length > 0 and
-          !new_body_lines[-1][/^-- $/] and
-          new_body_lines[-1][/ $/] and
-          quotes == new_body_lines[-1][/^>+/]
-        new_body_lines[-1] << line
-      else
-        new_body_lines << quotes.to_s + line
-      end
-    end
-    return new_body_lines.join("\n")
-  end
-
-  def self.multipart_decode(headers, body)
-    if headers[/^Content-Type: multipart/i]
-      boundary = Regexp.escape(headers[/^Content-Type:.*boundary ?= ?"?([^"]+?)"?(;|$)/i, 1])
-      match = /.*?#{boundary}\n(.*?)\n\n(.*?)\n(--)?#{boundary}/m.match(body)
-      part_headers = unwrap_headers(match[1])
-      part_body = match[2]
-      return multipart_decode(part_headers, part_body)
-    else
-      return headers, body
-    end
-  end
-
-  def self.unwrap_headers(headers)
-    headers.gsub(/\n( |\t)/, ' ').gsub(/\t/, ' ')
-  end
-
-  def self.header_decode(header)
-    begin
-      Rfc2047.decode(header)
-    rescue Rfc2047::Unparseable
-      header
     end
   end
 end

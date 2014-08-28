@@ -10,7 +10,7 @@ def with_notifier
 end
 
 namespace :webnews do
-  desc 'Sync all newsgroups (QUIET=true to mark new posts read)'
+  desc 'Sync all newsgroups (QUIET=true to ignore subscriptions)'
   task sync: :environment do
     puts "\nFull sync triggered at #{Time.now}"
 
@@ -19,7 +19,9 @@ namespace :webnews do
       puts 'Use "rake webnews:sync FORCE=true" to override.'
       puts
     else
-      with_notifier{ Newsgroup.sync_all!(mark_unread: ENV['QUIET'].blank?) }
+      with_notifier do
+        NNTP::NewsgroupImporter.new(quiet: ENV['QUIET'].present?).sync_all!
+      end
     end
   end
 
