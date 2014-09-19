@@ -13,13 +13,13 @@
     <% if @post %>
       <div class="form_element with_links">
         Replying to <a class="dialog_cancel minimize_draft"
-          href="#!<%= post_path(@post.newsgroup_name, @post.number) %>"><%= @post.subject %></a>
+          href="#!<%= post_path(@post.primary_newsgroup.name, @post.primary_posting.number) %>"><%= @post.subject %></a>
       </div>
     <% end %>
 
     <div class="form_element">
-      <%= f.label :newsgroup, 'Newsgroup:' %>
-      <%= f.select :newsgroup, options_from_collection_for_select(@newsgroups, :name, :name,
+      <%= label_tag :newsgroup, 'Newsgroup:' %>
+      <%= select_tag :newsgroup, options_from_collection_for_select(@newsgroups, :name, :name,
         @post && @post.followup_newsgroup ? @post.followup_newsgroup.name : @newsgroup.name) %>
       <% if not @post %>
         <a id="crosspost_toggle" href="#"
@@ -63,8 +63,8 @@
     </p>
 
     <% if @post %>
-      <%= hidden_field_tag :reply_newsgroup, @post.newsgroup_name %>
-      <%= hidden_field_tag :reply_number, @post.number %>
+      <%= hidden_field_tag :reply_newsgroup, @post.primary_newsgroup.name %>
+      <%= hidden_field_tag :reply_number, @post.primary_posting.number %>
     <% end %>
 
     <% if not @post and @current_user.admin? %>

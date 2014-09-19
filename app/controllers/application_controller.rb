@@ -130,7 +130,7 @@ class ApplicationController < ActionController::Base
     def get_post
       number = params[:number] || params[:from_number]
       if not params[:newsgroup].blank? and not number.blank?
-        @post = Post.where(number: number, newsgroup_name: params[:newsgroup]).first
+        @post = @newsgroup.postings.find_by(number: number).post
         if @api_access and not @post
           generic_error :not_found, 'post_not_found',
             "Post number '#{number}' in newsgroup '#{params[:newsgroup]}' does not exist"
@@ -143,26 +143,34 @@ class ApplicationController < ActionController::Base
 
     def get_next_unread_post
       unread_order = "CASE unread_post_entries.user_created WHEN #{Post.sanitize(true)} THEN 2 ELSE 1 END"
-      standard_order = 'newsgroup_name, date'
+      standard_order = 'newsgroups.name, date'
 
-      if @post and @current_user.thread_mode == :normal
-        order = "#{unread_order},
-        CASE newsgroup_name WHEN #{Post.sanitize(@post.newsgroup_name)} THEN 1 ELSE 2 END,
-        CASE thread_id WHEN #{Post.sanitize(@post.thread_id)} THEN 1 ELSE 2 END,
-        CASE parent_id WHEN #{Post.sanitize(@post.message_id)} THEN 1 ELSE 2 END,
-        CASE parent_id WHEN #{Post.sanitize(@post.parent_id)} THEN 1 ELSE 2 END, #{standard_order}"
-      elsif @post and @current_user.thread_mode == :hybrid
-        order = "#{unread_order},
-        CASE newsgroup_name WHEN #{Post.sanitize(@post.newsgroup_name)} THEN 1 ELSE 2 END,
-        CASE thread_id WHEN #{Post.sanitize(@post.thread_id)} THEN 1 ELSE 2 END, #{standard_order}"
-      elsif @newsgroup
-        order = "#{unread_order},
-          CASE newsgroup_name WHEN #{Post.sanitize(@newsgroup_name)} THEN 1 ELSE 2 END, #{standard_order}"
+      order = if @newsgroup.present?
+        same_newsgroup_condition = "newsgroups.id = #{@newsgroup.id}"
+        same_newsgroup_order = "CASE WHEN #{same_newsgroup_condition} THEN 1 ELSE 2 END"
+
+        if @post.present? && @current_user.thread_mode == :normal
+          "#{unread_order},
+            #{same_newsgroup_order},
+            CASE WHEN #{same_newsgroup_condition} AND (ancestry LIKE '#{@post.root_id}/%' OR ancestry = '#{@post.root_id}') THEN 1 ELSE 2 END,
+            CASE WHEN #{same_newsgroup_condition} AND (ancestry LIKE '%/#{@post.id}' OR ancestry = '#{@post.id}') THEN 1 ELSE 2 END,
+            CASE WHEN #{same_newsgroup_condition} AND (ancestry LIKE '%/#{@post.parent_id || 'x'}' OR ancestry = '#{@post.parent_id || 'x'}') THEN 1 ELSE 2 END,
+            #{standard_order}"
+        elsif @post.present? && @current_user.thread_mode == :hybrid
+          "#{unread_order},
+            #{same_newsgroup_order},
+            CASE WHEN #{same_newsgroup_condition} AND posts.id = #{@post.root_id} THEN 1 ELSE 2 END,
+            #{standard_order}"
+        else
+          "#{unread_order},
+            #{same_newsgroup_order},
+            #{standard_order}"
+        end
       else
-        order = "#{unread_order}, #{standard_order}"
+        "#{unread_order}, #{standard_order}"
       end
 
-      @next_unread_post = @current_user.unread_posts.order(order).first
+      @next_unread_post = @current_user.unread_posts.joins(postings: :newsgroup).order(order).first
     end
 
     def get_last_sync_time

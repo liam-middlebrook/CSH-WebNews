@@ -10,19 +10,15 @@ module NNTP
       nntp.list[1].map(&:split).map{ |fields| NewsgroupLine.new(*fields) }
     end
 
-    def newsgroup_names
-      nntp.list[1].map{ |line| line.split[0] }
+    def message_ids(newsgroup_names = [])
+      wildmat = newsgroup_names.any? ? newsgroup_names.join(',') : '*'
+      nntp.newnews(wildmat, '19700101', '000000')[1].uniq.map{ |message_id| message_id[1..-2] }
     end
 
-    def article_numbers(newsgroup)
-      nntp.listgroup(newsgroup)[1].map(&:to_i)
-    end
-
-    def article(newsgroup, number)
-      nntp.group(newsgroup) unless @current_newsgroup == newsgroup
-      @current_newsgroup = newsgroup
-
-      nntp.article(number)[1].join("\n")
+    def article(message_id)
+      # nntp-lib calls sprintf with this parameter internally, so any percent
+      # signs in the Message-ID must be doubled
+      nntp.article("<#{message_id.sub('%', '%%')}>")[1].join("\n")
     end
 
     private

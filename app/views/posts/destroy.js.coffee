@@ -3,5 +3,5 @@ alert('<%= j @sync_error %>')
 <% end %>
 
 clear_loaded_location()
-location.hash = '#!<%= posts_path(@post.newsgroup_name) %>'
+location.hash = '#!<%= posts_path(@newsgroup.name) %>'
 close_dialog()

@@ -9,6 +9,8 @@ else
 
 <% else %>
 
+<% posting = @post.postings.find_by(newsgroup_id: @newsgroup.id) %>
+
 select_post = (showing) ->
   post_tr = $('#posts_list tr[data-id="<%= @post.id %>"]')
 
@@ -31,7 +33,7 @@ document.title = '<%= abbrev_newsgroup(@newsgroup.name) %> \u00bb <%= raw j(@pos
 
 if $('#posts_list tr[data-id="<%= @post.id %>"]').length == 0
   $('#group_view').empty().activity(spinner_large)
-  $.getScript '<%= posts_path(@newsgroup.name) %>?from_number=<%= @post.number %>', -> select_post(true)
+  $.getScript '<%= posts_path(@newsgroup.name) %>?from_number=<%= posting.number %>', -> select_post(true)
   $('#post_view .content').focus()
 else
   select_post(false)
@@ -40,7 +42,7 @@ else
 
 <% if @post_was_unread %>
 reset_check_timeout()
-<% @post.all_newsgroups.each do |group| %>
+<% @post.newsgroups.each do |group| %>
 group_li = $('#groups_list li[data-name="<%= group.name %>"]')
 selected = group_li.hasClass('selected')
 read_only = group_li.hasClass('read_only')

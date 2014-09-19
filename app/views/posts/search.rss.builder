@@ -10,7 +10,7 @@ xml.rss :version => '2.0' do
     for thread in @posts_older
       post = thread[:post]
       xml.item do
-        xml.category post.newsgroup_name
+        xml.category post.primary_newsgroup.name
         xml.title post.subject
         xml.author(if post.author_name == post.author_email
           post.author_name
@@ -19,8 +19,8 @@ xml.rss :version => '2.0' do
         end)
         xml.description { xml.cdata! simple_format(post.body) }
         xml.pubDate post.date.to_s(:rfc822)
-        xml.link root_url + '#!' + post_path(post.newsgroup_name, post.number)
-        xml.guid root_url + '#!' + post_path(post.newsgroup_name, post.number)
+        xml.link root_url + '#!' + post_path(post.primary_newsgroup.name, post.primary_posting.number)
+        xml.guid root_url + '#!' + post_path(post.primary_newsgroup.name, post.primary_posting.number)
       end
     end
   end

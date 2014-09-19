@@ -1,9 +1,10 @@
 <%
+posting = post.postings.find_by(newsgroup_id: @newsgroup.id)
 other_groups = []
 if post.crossposted?
-  other_groups = (post.in_all_newsgroups - [post]).map{ |other_post|
-    '<a href="#!' + post_path(other_post.newsgroup_name, other_post.number) + '">' +
-      other_post.newsgroup_name + '</a>'
+  other_groups = post.postings.where.not(newsgroup_id: @newsgroup.id).map{ |other_posting|
+    '<a href="#!' + post_path(other_posting.newsgroup.name, other_posting.number) + '">' +
+      other_posting.newsgroup.name + '</a>'
   }
 end
 %>
@@ -21,32 +22,32 @@ end
     <% if @search_mode %>
       <span class="explain" style="margin-right: -10px">To see all post actions:</span>
       <a id="view_in_newsgroup_button" class="button"
-          href="#!<%= post_path(@newsgroup.name, post.number) %>">
+          href="#!<%= post_path(@newsgroup.name, posting.number) %>">
         <%= icon('external-link-square', '', class: 'fa-flip-horizontal') %> View in Newsgroup
       </a>
     <% else %>
       <% if @newsgroup.posting_allowed? %>
         <a class="button new_draft post_reply"
-          href="#?<%= new_post_path(newsgroup: @newsgroup.name, number: post.number) %>"><%= icon('reply') %> Reply</a>
+          href="#?<%= new_post_path(newsgroup: @newsgroup.name, number: posting.number) %>"><%= icon('reply') %> Reply</a>
       <% end %>
       <% if not post.authored_by?(@current_user) %>
         <a id="mark_unread_button" class="button mark_unread"
-          href="#~<%= mark_read_path(mark_unread: true, newsgroup: @newsgroup.name, number: @post.number) %>"><%= icon('asterisk') %> Unread</a>
+          href="#~<%= mark_read_path(mark_unread: true, newsgroup: @newsgroup.name, number: posting.number) %>"><%= icon('asterisk') %> Unread</a>
       <% end %>
-      <% if @current_user.admin? and post == post.thread_parent %>
+      <% if @current_user.admin? and post.root? %>
         <a id="sticky_post_button" class="button orange"
-          href="#?<%= edit_post_sticky_path(newsgroup: @newsgroup.name, number: post.number) %>"><%= icon('thumb-tack') %> Sticky</a>
+          href="#?<%= edit_post_sticky_path(newsgroup: @newsgroup.name, number: posting.number) %>"><%= icon('thumb-tack') %> Sticky</a>
       <% end %>
       <% if @newsgroup.posting_allowed? and post.children.count == 0 %>
         <% if post.authored_by?(@current_user) or @current_user.admin? %>
-          <a id="cancel_post_button" class="button<%= @admin_cancel ? ' orange' : '' %>" href="#?<%= confirm_destroy_post_path(newsgroup: @newsgroup.name, number: post.number) %>"><%= icon('trash-o') %> Cancel</a>
+          <a id="cancel_post_button" class="button<%= @admin_cancel ? ' orange' : '' %>" href="#?<%= confirm_destroy_post_path(newsgroup: @newsgroup.name, number: posting.number) %>"><%= icon('trash-o') %> Cancel</a>
         <% end %>
       <% end %>
     <% end %>
 
     <a id="star_post_button" title="Star this post"
       class="button<%= post.starred_by_user?(@current_user) ? ' starred' : '' %>"
-      href="#~<%= update_post_star_path(newsgroup: @newsgroup.name, number: post.number) %>"><%= icon('star') %></a>
+      href="#~<%= update_post_star_path(newsgroup: @newsgroup.name, number: posting.number) %>"><%= icon('star') %></a>
   </div>
 
   <%= gravatar_image post.author_email, 40 %>
@@ -74,44 +75,49 @@ end
       Great Scott! This message is from the future! (may indicate a clock sync issue)
     </div>
   <% end %>
-  <% if post.reparented? and
-      not (@current_user.thread_mode == :flat and not post.orphaned?) %>
+
+  <% if post.orphaned? %>
     <div class="notice">
       <span class="icon">!</span>
-      <% if post.orphaned? %>
-        <% if post.original_parent %>
-          This message is a reply to <a href="#!<%=
-            post_path(post.original_parent.newsgroup_name, post.original_parent.number)
-          %>"><%= post.original_parent.subject %></a> in <%= post.original_parent.newsgroup_name %>.
-        <% else %>
-          This message is orphaned. It may be a reply to a canceled message or an off-group email.
-        <% end %>
-      <% else # Not displayed in flat view %>
-        This message was de-threaded. WebNews tried to guess where it belongs, but this may not be correct.
-      <% end %>
+      This message is orphaned. It may be a reply to a canceled message or an off-group email.
+    </div>
+  <% elsif post.dethreaded? && @current_user.thread_mode != :flat %>
+    <div class="notice">
+      <span class="icon">!</span>
+      This message was de-threaded. WebNews tried to guess where it belongs, but this may not be correct.
+    </div>
+  <% elsif post.parent_id? && posting.top_level %>
+    <div class="notice">
+      <span class="icon">!</span>
+      This message is a reply to
+      <a href="#!<%= post_path(post.parent.primary_newsgroup.name, posting.number) %>">
+        <%= post.parent.subject %>
+      </a>
+      in <%= post.parent.primary_newsgroup.name %>.
     </div>
   <% end %>
-  <% if post.crossposted? or
-      (post.followup_newsgroup and not post.newsgroup == post.followup_newsgroup) %>
+
+  <% if post.crossposted? ||
+      (post.followup_newsgroup_id? && @newsgroup.id != post.followup_newsgroup_id) %>
     <div class="notice">
       <span class="icon">!</span>
-      <% if not post.crossposted? %>
+      <% if !post.crossposted? %>
         The author specified that replies to this message should go to <%= post.followup_newsgroup.name %>.
       <% else %>
         This message was cross-posted to <%= raw other_groups.to_sentence %>.
-        <% if not post.followup_newsgroup %>
+        <% if !post.followup_newsgroup_id? %>
           The author did not specify where replies should go.
-        <% elsif post.followup_newsgroup == @newsgroup %>
+        <% elsif post.followup_newsgroup_id == @newsgroup.id %>
           The author specified that replies should go here.
         <% elsif other_groups.length == 1 and post.exists_in_followup_newsgroup? %>
           The author specified that replies should go <a href="#!<%=
-            post_path(post.followup_newsgroup.name, post.in_newsgroup(post.followup_newsgroup).number)
+            post_path(post.followup_newsgroup.name, post.postings.find_by(newsgroup_id: post.followup_newsgroup_id).number)
           %>">there</a>.
         <% else %>
           The author specified that replies should go to
           <% if post.exists_in_followup_newsgroup? %>
             <a href="#!<%=
-              post_path(post.followup_newsgroup.name, post.in_newsgroup(post.followup_newsgroup).number)
+              post_path(post.followup_newsgroup.name, post.postings.find_by(newsgroup_id: post.followup_newsgroup_id).number)
             %>"><%= post.followup_newsgroup.name %></a>.
           <% else %>
             <%= post.followup_newsgroup.name %>.

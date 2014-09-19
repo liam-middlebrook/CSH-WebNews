@@ -1,7 +1,7 @@
 <div id="dialog">
   <h2><%= icon('exclamation-triangle') %> Cancel this post?</h2>
   <%= form_for @post,
-      url: destroy_post_path(@post.newsgroup_name, @post.number),
+      url: destroy_post_path(@post.primary_newsgroup.name, @post.primary_posting.number),
       html: { method: 'delete'}, remote: true do |f| %>
 
     <%= hidden_field_tag :confirm_cancel, 'y' %>

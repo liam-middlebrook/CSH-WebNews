@@ -2,16 +2,17 @@
 expanded ||= false
 unread ||= post.unread_for_user?(@current_user)
 tr_class ||= post.personal_class_for_user(@current_user) if not skip_class
-newsgroup_name = @newsgroup ? @newsgroup.name : post.newsgroup_name
+newsgroup = @newsgroup || post.primary_newsgroup
+number = post.postings.find_by(newsgroup_id: newsgroup.id).number
 %>
 
 <tr class="<%= (post.sticky? ? 'sticky ' : '') + (unread ? 'unread ' : '') + tr_class.to_s %>"
   data-id="<%= post.id %>"
-  data-number="<%= post.number %>"
+  data-number="<%= number %>"
   data-level="<%= level %>"
   data-date="<%= post.date %>"
-  data-parent="<%= post.parent_id == '' ? 'false' : 'true' %>"
-  data-thread="<%= post.thread_id %>">
+  data-parent="<%= post.root? %>"
+  data-thread="<%= post.root_id %>">
   <td>
     <% (level - 1).times do %><div class="indent"><% end %>
     <% if expanded %>
@@ -20,9 +21,9 @@ newsgroup_name = @newsgroup ? @newsgroup.name : post.newsgroup_name
       <span class="expander">&nbsp;</span>
     <% end %>
     <a href="#<%= @search_mode ? '~' : '!' %><%=
-      post_path(newsgroup_name, post.number) + (@search_mode ? '?search_mode=true' : '')
+      post_path(newsgroup.name, number) + (@search_mode ? '?search_mode=true' : '')
     %>"><%=
-      if not @search_mode and @current_user.thread_mode == :normal and post.parent_id != '' and post.subject[/^Re:/i]
+      if not @search_mode and @current_user.thread_mode == :normal and not post.root? and post.subject[/^Re:/i]
         post.first_line
       else
         post.subject
@@ -30,7 +31,7 @@ newsgroup_name = @newsgroup ? @newsgroup.name : post.newsgroup_name
     %></a>
     <% (level - 1).times do %></div><% end %>
   </td>
-  <% if @search_mode and not @newsgroup %><td><%= newsgroup_name %></td><% end %>
+  <% if @search_mode and not @newsgroup %><td><%= newsgroup.name %></td><% end %>
   <td><%= post.author_name %></td>
   <td><%= post.date.strftime(DATE_FORMAT) %></td>
 </tr>

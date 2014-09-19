@@ -11,8 +11,8 @@ class Subscription < ActiveRecord::Base
   }
   validates :digest_type, inclusion: { in: DIGEST_TYPES, allow_blank: true }
 
-  def self.for(newsgroup)
-    find_by_newsgroup_name(newsgroup.name)
+  def self.for(newsgroups)
+    where(newsgroup_name: Array(newsgroups).map(&:name))
   end
 
   def self.send_digests!

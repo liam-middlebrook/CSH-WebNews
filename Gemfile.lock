@@ -27,7 +27,11 @@ GEM
       minitest (~> 5.1)
       thread_safe (~> 0.1)
       tzinfo (~> 1.1)
+    ancestry (2.1.0)
+      activerecord (>= 3.0.0)
     arel (5.0.1.20140414130214)
+    binding_of_caller (0.7.2)
+      debug_inspector (>= 0.0.1)
     builder (3.2.2)
     byebug (2.7.0)
       columnize (~> 0.3)
@@ -42,6 +46,7 @@ GEM
       execjs
     coffee-script-source (1.7.1)
     columnize (0.8.9)
+    debug_inspector (0.0.2)
     debugger-linecache (1.2.0)
     dotenv (0.11.1)
       dotenv-deployment (~> 0.0.2)
@@ -57,6 +62,7 @@ GEM
       sass (~> 3.2)
     hike (1.2.3)
     i18n (0.6.11)
+    interception (0.5)
     jquery-rails (3.1.1)
       railties (>= 3.0, < 5.0)
       thor (>= 0.14, < 2.0)
@@ -81,6 +87,12 @@ GEM
       pry (~> 0.10)
     pry-rails (0.3.2)
       pry (>= 0.9.10)
+    pry-rescue (1.4.1)
+      interception (>= 0.5)
+      pry
+    pry-stack_explorer (0.4.9.1)
+      binding_of_caller (>= 0.7)
+      pry (>= 0.9.11)
     rack (1.5.2)
     rack-test (0.6.2)
       rack (>= 1.0)
@@ -138,6 +150,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  ancestry
   chronic
   coffee-rails
   dotenv-rails
@@ -149,6 +162,8 @@ DEPENDENCIES
   pg
   pry-byebug
   pry-rails
+  pry-rescue
+  pry-stack_explorer
   rails (= 4.1.5)
   rails_autolink
   sass-rails

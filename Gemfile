@@ -8,6 +8,7 @@ gem 'jquery-rails'
 gem 'rails_autolink'
 gem 'chronic'
 gem 'whenever'
+gem 'ancestry'
 gem 'nested_form'
 gem 'mousetrap-rails'
 gem 'font-awesome-sass'
@@ -22,5 +23,7 @@ gem 'uglifier'
 
 group :development do
   gem 'pry-rails'
+  gem 'pry-stack_explorer'
   gem 'pry-byebug'
+  gem 'pry-rescue'
 end

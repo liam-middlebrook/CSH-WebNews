@@ -16,7 +16,7 @@ end
     <% if cross_posted %>
       (multiple)
     <% else %>
-      <%= abbrev_newsgroup_html(thread_parent.newsgroup_name) %>
+      <%= abbrev_newsgroup_html(thread_parent.primary_newsgroup.name) %>
     <% end %>
   </td>
   <td>
@@ -40,7 +40,7 @@ end
   <td class="subject">
     <a class="<%= unread_count > 0 ? "unread #{unread_class}" : personal_class %>"
       data-personal-class="<%= personal_class %>"
-      href="#!<%= post_path(linked_post.newsgroup_name, linked_post.number) %>"><%= thread_parent.subject %></a>
+      href="#!<%= post_path(linked_post.primary_newsgroup.name, linked_post.primary_posting.number) %>"><%= thread_parent.subject %></a>
     <span class="byline">
       <% if newest_post != thread_parent %>
         by <%= truncate(maybe_you(thread_parent.author_name)) %>
@@ -50,8 +50,8 @@ end
   <td class="mark_read">
     <% if unread_count > 0 %>
       <a href="#" class="smallbutton mark_read" data-scope="thread"
-        data-newsgroup="<%= thread_parent.newsgroup_name %>"
-        data-number="<%= thread_parent.number %>">Mark Read</a>
+        data-newsgroup="<%= thread_parent.primary_newsgroup.name %>"
+        data-number="<%= thread_parent.primary_posting.number %>">Mark Read</a>
     <% end %>
   </td>
 </tr>

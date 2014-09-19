@@ -1,14 +1,14 @@
 <% @posts.sort_by(&:date).group_by(&:newsgroup).each do |newsgroup, newsgroup_posts| %>
   <h2><%= newsgroup.name %></h2>
-  <% newsgroup_posts.group_by(&:thread_parent).each do |thread_parent, thread_posts| %>
+  <% newsgroup_posts.group_by(&:root).each do |root, thread_posts| %>
     <ul style="list-style-type: none; margin-left: 0; padding-left: 0">
       <li>
-        <% thread_parent_alone = (thread_posts.count == 1 and thread_posts.first == thread_parent) %>
-        <% new_thread = thread_parent_alone || thread_posts.include?(thread_parent) %>
+        <% root_alone = (thread_posts.count == 1 and thread_posts.first == root) %>
+        <% new_thread = root_alone || thread_posts.include?(root) %>
 
         <b>
           <% if new_thread %>
-            <% if thread_parent_alone %>
+            <% if root_alone %>
               (new thread)
             <% else %>
               (new thread + <%= pluralize(thread_posts.count - 1, 'reply') %>)
@@ -18,15 +18,15 @@
           <% end %>
         </b>
 
-        [<%= thread_parent.date.strftime(SHORT_DATE_FORMAT) %>]
-        <%= thread_parent.author_name %>:
+        [<%= root.date.strftime(SHORT_DATE_FORMAT) %>]
+        <%= root.author_name %>:
         <% if new_thread %><b><% end %>
-          <%= link_to thread_parent.subject, post_hash_url(thread_parent) %>
+          <%= link_to root.subject, post_hash_url(root) %>
         <% if new_thread %></b><% end %>
 
-        <% if !thread_parent_alone %>
+        <% if !root_alone %>
           <ul style="list-style-type: none; margin-left: 0; padding-left: 0">
-            <% (thread_posts - [thread_parent]).each do |post| %>
+            <% (thread_posts - [root]).each do |post| %>
               <li>
                 [<%= post.date.strftime(SHORT_DATE_FORMAT) %>]
                 <%= post.author_name %>:

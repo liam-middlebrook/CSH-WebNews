@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140826155556) do
+ActiveRecord::Schema.define(version: 20140916160844) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -31,29 +31,35 @@ ActiveRecord::Schema.define(version: 20140826155556) do
 
   add_index "newsgroups", ["name"], name: "index_newsgroups_on_name", using: :btree
 
+  create_table "postings", force: true do |t|
+    t.integer "newsgroup_id"
+    t.integer "post_id"
+    t.integer "number"
+    t.boolean "top_level"
+  end
+
+  add_index "postings", ["newsgroup_id"], name: "index_postings_on_newsgroup_id", using: :btree
+  add_index "postings", ["post_id"], name: "index_postings_on_post_id", using: :btree
+
   create_table "posts", force: true do |t|
-    t.text     "newsgroup_name"
-    t.integer  "number"
     t.text     "subject"
     t.text     "author"
     t.datetime "date"
     t.text     "message_id"
-    t.text     "parent_id"
-    t.text     "thread_id"
     t.boolean  "stripped"
     t.integer  "sticky_user_id"
     t.datetime "sticky_until"
     t.text     "headers"
     t.text     "body"
+    t.boolean  "dethreaded"
+    t.integer  "followup_newsgroup_id"
+    t.text     "ancestry"
   end
 
+  add_index "posts", ["ancestry"], name: "index_posts_on_ancestry", using: :btree
   add_index "posts", ["date"], name: "index_posts_on_date", using: :btree
   add_index "posts", ["message_id"], name: "index_posts_on_message_id", using: :btree
-  add_index "posts", ["newsgroup_name", "number"], name: "index_posts_on_newsgroup_name_and_number", unique: true, using: :btree
-  add_index "posts", ["newsgroup_name"], name: "index_posts_on_newsgroup_name", using: :btree
-  add_index "posts", ["parent_id"], name: "index_posts_on_parent_id", using: :btree
   add_index "posts", ["sticky_until"], name: "index_posts_on_sticky_until", using: :btree
-  add_index "posts", ["thread_id"], name: "index_posts_on_thread_id", using: :btree
 
   create_table "starred_post_entries", force: true do |t|
     t.integer  "user_id"
@@ -80,13 +86,11 @@ ActiveRecord::Schema.define(version: 20140826155556) do
 
   create_table "unread_post_entries", force: true do |t|
     t.integer "user_id"
-    t.integer "newsgroup_id"
     t.integer "post_id"
     t.integer "personal_level"
     t.boolean "user_created"
   end
 
-  add_index "unread_post_entries", ["newsgroup_id"], name: "index_unread_post_entries_on_newsgroup_id", using: :btree
   add_index "unread_post_entries", ["post_id"], name: "index_unread_post_entries_on_post_id", using: :btree
   add_index "unread_post_entries", ["user_id", "post_id"], name: "index_unread_post_entries_on_user_id_and_post_id", unique: true, using: :btree
   add_index "unread_post_entries", ["user_id"], name: "index_unread_post_entries_on_user_id", using: :btree

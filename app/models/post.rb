@@ -1,12 +1,23 @@
 class Post < ActiveRecord::Base
-  belongs_to :newsgroup, foreign_key: :newsgroup_name, primary_key: :name
-  belongs_to :sticky_user, class_name: 'User'
-  has_many :unread_post_entries, dependent: :destroy
-  has_many :starred_post_entries, dependent: :destroy
+  belongs_to :sticky_user, class_name: User
+
+  with_options dependent: :destroy do |assoc|
+    assoc.has_many :postings
+    assoc.has_many :unread_post_entries
+    assoc.has_many :starred_post_entries
+  end
+
+  has_many :newsgroups, through: :postings
+  belongs_to :followup_newsgroup, class_name: Newsgroup
   has_many :unread_users, through: :unread_post_entries, source: :user
   has_many :starred_users, through: :starred_post_entries, source: :user
 
-  before_destroy :kill_parent_id
+  has_ancestry orphan_strategy: :adopt
+  before_destroy :mark_children_dethreaded
+
+  validates! :author, :date, :message_id, :subject, presence: true
+  validates! :message_id, uniqueness: true
+  validates! :postings, length: { minimum: 1 }
 
   def as_json(options = {})
     if options[:minimal]
@@ -22,18 +33,16 @@ class Post < ActiveRecord::Base
       )
       if options[:with_all]
         json[:stripped] = stripped
-        json[:parent] = original_parent ?
-          original_parent.as_json(minimal: true) :
-          parent.as_json(minimal: true)
-        json[:thread_parent] = thread_parent.as_json(minimal: true) if not thread_parent == self
-        json[:reparented] = reparented? && !orphaned?
+        json[:parent] = parent.as_json(minimal: true)
+        json[:thread_parent] = root.as_json(minimal: true) unless root?
+        json[:reparented] = dethreaded? && !orphaned?
         json[:orphaned] = orphaned? && !original_parent
         json[:followup_to] = followup_newsgroup.name if followup_newsgroup
-        json[:cross_posts] = (in_all_newsgroups - [self]).map{ |post| post.as_json(minimal: true) }
+        json[:cross_posts] = nil # FIXME: Remove when new API created
       end
     end
 
-    json[:newsgroup] = newsgroup_name
+    json[:newsgroup] = primary_newsgroup.name
 
     if options[:with_user]
       json.merge!(
@@ -44,6 +53,22 @@ class Post < ActiveRecord::Base
     end
 
     return json
+  end
+
+  def self.top_level
+    includes(:postings).where(postings: { top_level: true })
+  end
+
+  def root_in(newsgroup)
+    path.includes(:postings).where(postings: { newsgroup_id: newsgroup.id }).first
+  end
+
+  def primary_posting
+    followup_newsgroup_id? ? postings.find_by(newsgroup_id: followup_newsgroup_id) : postings.first
+  end
+
+  def primary_newsgroup
+    followup_newsgroup_id? ? followup_newsgroup : newsgroups.first
   end
 
   def author_name
@@ -112,109 +137,38 @@ class Post < ActiveRecord::Base
     !sticky_until.nil? and sticky_until > Time.now
   end
 
-  def crossposted?(quick = false)
-    if quick
-      all_newsgroup_names.length > 1
-    else
-      in_all_newsgroups.length > 1
-    end
-  end
-
-  def reparented?
-    parent_id != original_parent_id
+  def crossposted?
+    postings.size > 1
   end
 
   def orphaned?
-    reparented? and parent_id == ''
-  end
-
-  def followup_newsgroup
-    Newsgroup.find_by_name(headers[/^Followup-To: (.*)/i, 1])
+    dethreaded? && root?
   end
 
   def exists_in_followup_newsgroup?
-    !in_newsgroup(followup_newsgroup).nil?
-  end
-
-  def all_newsgroups
-    all_newsgroup_names.map{ |name| Newsgroup.find_by_name(name) }.reject(&:nil?)
-  end
-
-  def all_newsgroup_names
-    if headers =~ /^Control: cancel/
-      ['control.cancel']
-    else
-      headers[/^Newsgroups: (.*)/i, 1].split(',').map(&:strip)
-    end
-  end
-
-  def in_newsgroup(newsgroup)
-    newsgroup.posts.find_by_message_id(message_id)
-  end
-
-  def in_all_newsgroups
-    all_newsgroups.
-      map{ |newsgroup| in_newsgroup(newsgroup) }.
-      reject(&:nil?)
-  end
-
-  def parent
-    parent_id == '' ? nil : Post.where(message_id: parent_id, newsgroup_name: newsgroup_name).first
-  end
-
-  def children
-    Post.where(parent_id: message_id, newsgroup_name: newsgroup_name)
-  end
-
-  def thread_parent
-    message_id == thread_id ? self : all_in_thread.order('date').first
-  end
-
-  def self.thread_parents
-    where('message_id = thread_id')
-  end
-
-  def all_in_thread
-    Post.where(thread_id: thread_id, newsgroup_name: newsgroup_name).order('date')
-  end
-
-  def post_count_in_thread
-    all_in_thread.count
+    postings.exists?(newsgroup_id: followup_newsgroup_id)
   end
 
   def unread_count_in_thread_for_user(user)
-    user.unread_post_entries.where(post_id: all_in_thread.pluck(:id)).count
+    user.unread_post_entries.where(post_id: root.subtree_ids).count
   end
 
-  def thread_tree_for_user(user, flatten = false, as_json = false, all_posts = nil)
-    all_posts ||= all_in_thread.order('date').to_a
-    {
-      post: (as_json ? self.as_json(with_user: user) : self),
-      children: if flatten
-        all_posts.reject{ |p| p == self }.map{ |p| {
-          post: (as_json ? p.as_json(with_user: user) : p), children: []
-        }.merge(as_json ? {} : {
-          unread: p.unread_for_user?(user),
-          personal_class: p.personal_class_for_user(user)
-        })}
+  def newsgroup_thread_tree(newsgroup:, user:, flatten: false, as_json: false, root: true)
+    tree = { post: (as_json ? self.as_json(with_user: user) : self) }
+    tree[:children] = if flatten
+      if root
+        descendants.order(:date).map{ |p| p.newsgroup_thread_tree(root: false, newsgroup: newsgroup, user: user, flatten: flatten, as_json: as_json) }
       else
-        all_posts.
-          select{ |p| p.parent_id == self.message_id }.
-          map{ |p| p.thread_tree_for_user(user, flatten, as_json, all_posts) }
+        []
       end
-    }.merge(as_json ? {} : {
+    else
+      children.order(:date).joins(:postings).where(postings: { newsgroup_id: newsgroup.id }).
+        map{ |p| p.newsgroup_thread_tree(newsgroup: newsgroup, user: user, flatten: flatten, as_json: as_json) }
+    end
+    tree.merge(as_json ? {} : {
       unread: self.unread_for_user?(user),
       personal_class: self.personal_class_for_user(user)
     })
-  end
-
-  def original_parent_id
-    last_reference = Array(Mail.new(headers).references)[-1]
-    last_reference.present? ? "<#{last_reference}>" : ''
-  end
-
-  def original_parent
-    Post.where(message_id: original_parent_id).first
   end
 
   def authored_by?(user)
@@ -223,7 +177,7 @@ class Post < ActiveRecord::Base
 
   def user_in_thread?(user)
     return true if authored_by?(user)
-    return all_in_thread.any?{ |post| post.authored_by?(user) }
+    root.subtree.any?{ |post| post.authored_by?(user) }
   end
 
   def self.starred_by_user(user)
@@ -256,21 +210,18 @@ class Post < ActiveRecord::Base
   end
 
   def mark_read_for_user(user)
-    was_unread = false
-    in_all_newsgroups.each do |post|
-      entry = post.unread_post_entries.where(user_id: user.id).first
-      if entry
-        entry.destroy
-        was_unread = true
-      end
+    entry = unread_post_entries.find_by(user_id: user.id)
+    if entry.present?
+      entry.destroy!
+      true
+    else
+      false
     end
-    return was_unread
   end
 
   def mark_unread_for_user(user, user_created)
     UnreadPostEntry.create!(
       user: user,
-      newsgroup: newsgroup,
       post: self,
       personal_level: PERSONAL_CODES[personal_class_for_user(user)],
       user_created: user_created
@@ -279,26 +230,24 @@ class Post < ActiveRecord::Base
 
   def thread_unread_for_user?(user)
     return true if unread_for_user?(user)
-    return all_in_thread.any?{ |post| post.unread_for_user?(user) }
+    root.subtree.any?{ |post| post.unread_for_user?(user) }
   end
 
   def personal_class_for_user(user, check_thread = true)
     case
       when authored_by?(user) then :mine
       when parent && parent.authored_by?(user) then :mine_reply
-      when check_thread && thread_parent.user_in_thread?(user) then :mine_in_thread
+      when check_thread && root.user_in_thread?(user) then :mine_in_thread
     end
   end
 
   def unread_personal_class_for_user(user)
-    PERSONAL_CLASSES[user.unread_posts.where(thread_id: thread_id).maximum(:personal_level).to_i]
+    PERSONAL_CLASSES[user.unread_posts.merge(root.subtree).maximum(:personal_level).to_i]
   end
 
-  def kill_parent_id
-    # Sub-optimal, should re-parent to next reference up the chain
-    # (but posts getting canceled when they already have replies is rare)
-    Post.where(parent_id: message_id).each do |post|
-      post.update_attributes(parent_id: '', thread_id: post.message_id)
-    end
+  private
+
+  def mark_children_dethreaded
+    children.update_all(dethreaded: true)
   end
 end

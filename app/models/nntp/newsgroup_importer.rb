@@ -1,7 +1,7 @@
 module NNTP
   class NewsgroupImporter
     def initialize(quiet: false)
-      @quiet = quiet
+      @importer = PostImporter.new(quiet: quiet)
     end
 
     def sync_all!
@@ -10,49 +10,49 @@ module NNTP
       Flag.with_news_sync_lock(full_sync: true) do
         puts 'OK' if $in_rake
 
-        groups_to_destroy = Newsgroup.pluck(:name) - Server.newsgroup_names
-        puts "Deleting #{groups_to_destroy.size} newsgroups.\n\n" if $in_rake
-        Newsgroup.where(name: groups_to_destroy).destroy_all
+        local_names = Newsgroup.pluck(:name)
+        remote_newsgroups = Server.newsgroups
+        remote_names = remote_newsgroups.map(&:name)
+        names_to_destroy = local_names - remote_names
+        names_to_create = remote_names - local_names
 
-        Server.newsgroups.each do |remote_newsgroup|
-          puts remote_newsgroup.name if $in_rake
+        if names_to_destroy.any?
+          puts "Deleting newsgroups: #{names_to_destroy.join(', ')}" if $in_rake
+          Newsgroup.where(name: names_to_destroy).destroy_all
+        end
 
+        if names_to_create.any?
+          puts "Creating newsgroups: #{names_to_create.join(', ')}" if $in_rake
+        end
+
+        remote_newsgroups.each do |remote_newsgroup|
           newsgroup = Newsgroup.where(name: remote_newsgroup.name).first_or_initialize
           newsgroup.update!(status: remote_newsgroup.status)
-
-          sync_one(newsgroup)
         end
+
+        sync!
       end
     end
 
-    def sync!(newsgroups)
+    def sync!(newsgroups = [])
       Flag.with_news_sync_lock do
-        Array(newsgroups).each{ |newsgroup| sync_one(newsgroup) }
-      end
-    end
+        local_message_ids = if newsgroups.any?
+          Posting.where(newsgroup_id: newsgroups.map(&:id)).joins(:post).pluck(:message_id)
+        else
+          Post.pluck(:message_id)
+        end
+        remote_message_ids = Server.message_ids(newsgroups.map(&:name))
+        message_ids_to_destroy = local_message_ids - remote_message_ids
+        message_ids_to_import = remote_message_ids - local_message_ids
 
-    private
-
-    def sync_one(newsgroup)
-      Flag.with_news_sync_lock do
-        local_numbers = Post.where(newsgroup_name: newsgroup.name).pluck(:number)
-        remote_numbers = Server.article_numbers(newsgroup.name)
-        numbers_to_destroy = local_numbers - remote_numbers
-        numbers_to_import = remote_numbers - local_numbers
-
-        puts "Deleting #{numbers_to_destroy.size} posts." if $in_rake
-        numbers_to_destroy.each do |number|
-          Post.where(newsgroup_name: newsgroup.name, number: number).first.destroy
+        if message_ids_to_destroy.any?
+          puts "Deleting #{message_ids_to_destroy.size} posts" if $in_rake
+          Post.where(message_id: message_ids_to_destroy).destroy_all
         end
 
-        importer = PostImporter.new(newsgroup: newsgroup, quiet: @quiet)
-
-        puts "Importing #{numbers_to_import.size} posts." if $in_rake
-        numbers_to_import.each do |number|
-          importer.import!(
-            number: number,
-            article: Server.article(newsgroup.name, number)
-          )
+        puts "Importing #{message_ids_to_import.size} posts" if $in_rake
+        message_ids_to_import.each do |message_id|
+          @importer.import!(article: Server.article(message_id))
           print '.' if $in_rake
         end
 

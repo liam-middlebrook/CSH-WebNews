@@ -66,25 +66,24 @@ class PagesController < ApplicationController
   private
 
     def get_activity_feed
-      included_newsgroups = Newsgroup.pluck(:name).reject{ |name| name =~ DEFAULT_NEWSGROUP_FILTER }
-      newest_in_stickies = Post.sticky.order('date DESC').
-        map{ |post| post.all_in_thread.order('date').last }.to_a.uniq(&:thread_id)
-      newest_in_threads = Post.where(newsgroup_name: included_newsgroups).
-        where('date > ?', 1.month.ago).order('date DESC').to_a.uniq(&:thread_id)[0...20]
-      activity_posts = (newest_in_stickies | newest_in_threads).uniq(&:thread_id)
+      newest_in_stickies = Post.sticky.order(date: :desc).
+        map{ |post| post.root.subtree.order(:date).last }
+      newest_in_threads = Post.joins(:postings).
+        where(postings: { newsgroup_id: Newsgroup.default_filtered.ids }).
+        where('date > ?', 1.month.ago).order(date: :desc)
+      activity_posts = (newest_in_stickies | newest_in_threads).uniq(&:root_id)[0..20]
 
       @activity = activity_posts.map do |post|
-        thread_parent = post.thread_parent
-        unread_count = thread_parent.unread_count_in_thread_for_user(@current_user)
+        unread_count = post.root.unread_count_in_thread_for_user(@current_user)
         {
-          thread_parent: thread_parent,
+          thread_parent: post.root,
           newest_post: post,
-          cross_posted: post.crossposted?(true),
-          next_unread: @current_user.unread_posts.where(thread_id: post.thread_id).order('date').first,
-          post_count: thread_parent.post_count_in_thread,
+          cross_posted: post.crossposted?,
+          next_unread: @current_user.unread_posts.merge(post.root.subtree).order(:date).first,
+          post_count: post.root.subtree.count,
           unread_count: unread_count,
-          personal_class: thread_parent.personal_class_for_user(@current_user),
-          unread_class: (unread_count > 0 ? thread_parent.unread_personal_class_for_user(@current_user) : nil)
+          personal_class: post.root.personal_class_for_user(@current_user),
+          unread_class: (unread_count > 0 ? post.root.unread_personal_class_for_user(@current_user) : nil)
         }
       end
     end

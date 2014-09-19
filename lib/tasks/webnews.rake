@@ -25,6 +25,19 @@ namespace :webnews do
     end
   end
 
+  desc 'Reload all posts in all newsgroups (warning: slow!)'
+  task reload: :environment do
+    puts "Reloading all #{Post.count} posts..."
+    importer = NNTP::PostImporter.new(quiet: true)
+
+    Flag.with_news_sync_lock do
+      Post.order(:date).find_each.with_index do |post, index|
+        importer.import!(article: NNTP::Server.article(post.message_id), post: post)
+        puts "#{index} done" if index % 1000 == 0 && index > 0
+      end
+    end
+  end
+
   desc 'Mark all posts as read for users considered "inactive"'
   task clean_unread: :environment do
     with_notifier{ User.clean_unread! }

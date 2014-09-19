@@ -105,9 +105,12 @@ window.draft_save_timer = false
 
 @set_check_timeout = (delay = check_new_interval) ->
   window.check_new_timeout = setTimeout (->
-    window.active_check_new = $.getScript '/check_new?location=' + encodeURIComponent(location.hash) +
-      '&newsgroup=' + encodeURIComponent($('#groups_list .selected').attr('data-name')) +
-      '&number=' + encodeURIComponent($('#posts_list .selected').attr('data-number'))
+    current_newsgroup = $('#groups_list .selected').attr('data-name')
+    current_number = $('#posts_list .selected').attr('data-number')
+    check_new_path = '/check_new?location=' + encodeURIComponent(location.hash)
+    check_new_path += '&newsgroup=' + encodeURIComponent(current_newsgroup) if current_newsgroup?
+    check_new_path += '&number=' + encodeURIComponent(current_number) if current_number?
+    window.active_check_new = $.getScript check_new_path
   ), delay
 
 @clear_check_timeout = ->

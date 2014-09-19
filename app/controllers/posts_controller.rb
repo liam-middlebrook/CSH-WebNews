@@ -12,7 +12,7 @@ class PostsController < ApplicationController
 
     if @post
       thread_selected = @post
-      thread_selected = @post.thread_parent if not @flat_mode
+      thread_selected = @post.root_in(@newsgroup) if not @flat_mode
       @from_older = (params[:include_older] or not @api_access) ? thread_selected.date : nil
       @from_newer = (params[:include_newer] or not @api_access) ? thread_selected.date : nil
     end
@@ -29,27 +29,17 @@ class PostsController < ApplicationController
     end
 
     if @from_older
-      date_condition = (params[:older_inclusive] ? 'date <= ?' : 'date < ?')
-      if @flat_mode
-        @posts_older = @newsgroup.posts.where(date_condition, @from_older).order('date DESC').limit(@limit)
-      else
-        @posts_older = @newsgroup.posts.
-          where("parent_id = ? and #{date_condition}", '', @from_older).
-          order('date DESC').limit(@limit)
-      end
+      @posts_older = @newsgroup.posts.
+        where(params[:older_inclusive] ? 'date <= ?' : 'date < ?', @from_older).
+        order(date: :desc).limit(@limit)
+      @posts_older = @posts_older.top_level unless @flat_mode
     end
 
     if @from_newer
-      date_condition = (params[:newer_inclusive] ? 'date >= ?' : 'date > ?')
-      if @flat_mode
-        @posts_newer = @newsgroup.posts.where(date_condition, @from_newer).order('date').limit(@limit)
-      else
-        from_newer_post = @newsgroup.posts.where(date: @from_newer).first
-        @from_newer = from_newer_post.thread_parent.date if from_newer_post
-        @posts_newer = @newsgroup.posts.
-          where("parent_id = ? and #{date_condition}", '', @from_newer).
-          order('date').limit(@limit)
-      end
+      @posts_newer = @newsgroup.posts.
+        where(params[:newer_inclusive] ? 'date >= ?' : 'date > ?', @from_newer).
+        order(:date).limit(@limit)
+      @posts_newer = @posts_newer.top_level unless @flat_mode
     end
 
     if @posts_older
@@ -66,9 +56,17 @@ class PostsController < ApplicationController
 
     if not @flat_mode
       flatten = (@current_user.thread_mode == :hybrid)
-      @posts_selected = thread_selected.thread_tree_for_user(@current_user, flatten, @api_access) if thread_selected
+      if thread_selected
+        @posts_selected = thread_selected.newsgroup_thread_tree(
+          newsgroup: @newsgroup, user: @current_user, flatten: flatten, as_json: @api_access
+        )
+      end
       [@posts_older, @posts_newer].each do |posts|
-        posts.map!{ |post| post.thread_tree_for_user(@current_user, flatten, @api_access) } if posts
+        if posts
+          posts.map!{ |post| post.newsgroup_thread_tree(
+            newsgroup: @newsgroup, user: @current_user, flatten: flatten, as_json: @api_access
+          )}
+        end
       end
     else
       @posts_selected = { post: thread_selected } if thread_selected
@@ -108,8 +106,9 @@ class PostsController < ApplicationController
       values << @from_older
     end
     if not @newsgroup
-      conditions << 'newsgroup_name in (?)'
-      values << Newsgroup.pluck(:name).reject{ |name| name =~ DEFAULT_NEWSGROUP_FILTER }
+      # FIXME: This results in e.g. starred posts in csh.test being invisible
+      conditions << 'newsgroup_id IN (?)'
+      values << Newsgroup.default_filtered.ids
     end
     if params[:unread] and params[:personal_class]
       min_level = PERSONAL_CODES[params[:personal_class].to_sym]
@@ -136,12 +135,12 @@ class PostsController < ApplicationController
       @starred_only = true
     end
 
-    scope = Post.all
+    scope = Post.joins(:postings)
     scope = scope.sticky if params[:sticky]
-    scope = scope.thread_parents if params[:original]
+    scope = scope.roots if params[:original]
     scope = scope.starred_by_user(@current_user) if params[:starred]
     scope = scope.unread_for_user(@current_user) if params[:unread]
-    scope = scope.where(newsgroup_name: @newsgroup.name) if @newsgroup
+    scope = scope.where(postings: { newsgroup_id: @newsgroup.id }) if @newsgroup
     scope = scope.where(conditions.join(' and '), *values).order('date DESC').limit(@limit)
 
     @posts_older = scope.to_a
@@ -203,7 +202,7 @@ class PostsController < ApplicationController
   end
 
   def new
-    @new_post = Post.new(newsgroup: @newsgroup)
+    @new_post = Post.new
     if @post
       @new_post.subject = 'Re: ' + @post.subject.sub(/^Re: ?/, '')
       @new_post.body = @post.quoted_body(params[:quote_start].to_i, params[:quote_length].to_i)
@@ -272,7 +271,7 @@ class PostsController < ApplicationController
     reply_newsgroup = reply_post = nil
     if params[:reply_newsgroup]
       reply_newsgroup = Newsgroup.find_by_name(params[:reply_newsgroup])
-      reply_post = Post.where(newsgroup_name: params[:reply_newsgroup], number: params[:reply_number]).first
+      reply_post = reply_newsgroup.postings.find_by(number: params[:reply_number]).try(:post)
       if reply_post.nil?
         generic_error :not_found, 'post_not_found', "Can't reply to nonexistent post number '#{params[:reply_number]}' in newsgroup '#{params[:reply_newsgroup]}'" and return
       end
@@ -282,7 +281,7 @@ class PostsController < ApplicationController
 
     post_string = NNTP::NewPostMessage.new(
       user: @current_user,
-      newsgroup_names: post_newsgroups.map(&:name),
+      newsgroups: post_newsgroups,
       subject: subject,
       body: body.to_s,
       parent_post: reply_post,
@@ -294,7 +293,7 @@ class PostsController < ApplicationController
     new_message_id = nil
     begin
       Net::NNTP.start(NEWS_SERVER) do |nntp|
-        new_message_id = nntp.post(post_string)[1][/<.*?>/]
+        new_message_id = nntp.post(post_string)[1][/<(.*?)>/, 1]
       end
     rescue
       generic_error :internal_server_error, 'nntp_post_error', 'NNTP server error: ' + $!.message
@@ -368,7 +367,7 @@ class PostsController < ApplicationController
     end
 
     begin
-      NNTP::NewsgroupImporter.new.sync!(@post.all_newsgroups + Newsgroup.cancel)
+      NNTP::NewsgroupImporter.new.sync!(@post.newsgroups + Newsgroup.cancel)
     rescue
       @sync_error = "Your cancel was accepted by the news server and does not need to be resubmitted, but an error occurred while resyncing the newsgroups: #{$!.message}"
       log_exception($!)
@@ -407,12 +406,12 @@ class PostsController < ApplicationController
     else
       if @post
         if params[:in_thread]
-          @current_user.unread_post_entries.where(post_id: Post.where(thread_id: @post.thread_id)).destroy_all
+          @current_user.unread_post_entries.where(post_id: @post.root.subtree_ids).destroy_all
         else
           @post.mark_read_for_user(@current_user)
         end
       elsif @newsgroup
-        @current_user.unread_post_entries.where(newsgroup_id: @newsgroup.id).destroy_all
+        @newsgroup.unread_post_entries.where(user_id: @current_user.id).destroy_all
       elsif params[:all_posts]
         @current_user.unread_post_entries.destroy_all
       else
@@ -505,7 +504,7 @@ class PostsController < ApplicationController
         if @post.nil?
           # API case handled by get_post
           form_error "The post you are trying to sticky doesn't exist" and return
-        elsif @post != @post.thread_parent
+        elsif !@post.root?
           generic_error :bad_request, 'post_not_stickable',
             "Only the initial post in a thread can be made sticky" and return
         end
@@ -549,14 +548,10 @@ class PostsController < ApplicationController
 
     def update_sticky_attributes
       if @sticky_until
-        @post.in_all_newsgroups.each do |post|
-          post.update_attributes(sticky_user: @current_user, sticky_until: @sticky_until)
-        end
+        @post.update_attributes(sticky_user: @current_user, sticky_until: @sticky_until)
       else
         if not @post.sticky_until.nil?
-          @post.in_all_newsgroups.each do |post|
-            post.update_attributes(sticky_user: @current_user, sticky_until: Time.now - 1.second)
-          end
+          @post.update_attributes(sticky_user: @current_user, sticky_until: Time.now - 1.second)
         end
       end
     end

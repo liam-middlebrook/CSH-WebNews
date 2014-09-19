@@ -6,13 +6,15 @@ class Mailer < ActionMailer::Base
 
     author_action = if post.personal_class_for_user(user) == :mine_reply
       "replied to your post \"#{post.parent.subject}\""
-    elsif post.thread_parent == post
-      "started a new thread \"#{post.subject}\""
+    elsif post.root?
+      "posted \"#{post.subject}\""
     else
-      "posted in thread \"#{post.thread_parent.subject}\""
+      "posted in thread \"#{post.root.subject}\""
     end
 
-    mail(to: user.email, subject: "[#{post.newsgroup_name}] #{post.author_name} #{author_action}")
+    # FIXME: This should really be the name of the subscribed newsgroup that
+    # actually triggered the notification
+    mail(to: user.email, subject: "[#{post.primary_newsgroup.name}] #{post.author_name} #{author_action}")
   end
 
   def posts_digest(user, start_at, end_at, target_digest_type)

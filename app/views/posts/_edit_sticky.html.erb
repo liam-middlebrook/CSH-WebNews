@@ -2,7 +2,7 @@
   <h2><%= icon('thumb-tack') %> Sticky thread</h2>
 
   <%= form_for @post,
-      url: update_post_sticky_path(newsgroup_name: @post.newsgroup_name, number: @post.number),
+      url: update_post_sticky_path(newsgroup_name: @post.primary_newsgroup.name, number: @post.primary_posting.number),
       html: { method: 'put'}, remote: true do |f| %>
 
     <%= render partial: 'sticky_fields', locals: { post: @post } %>

@@ -7,6 +7,6 @@ $('a.resume_draft').hide()
 close_dialog()
 alert('<%= j @sync_error %>')
 <% else %>
-location.hash = '#!<%= post_path(@post.newsgroup_name, @post.number) %>'
+location.hash = '#!<%= post_path(@post.primary_newsgroup.name, @post.primary_posting.number) %>'
 close_dialog()
 <% end %>

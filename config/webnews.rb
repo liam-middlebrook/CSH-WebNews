@@ -23,8 +23,9 @@ SHORT_DATE_FORMAT = '%-m/%-d %-I:%M%P'
 DATE_ONLY_FORMAT = '%-m/%-d/%Y'
 MONTH_ONLY_FORMAT = '%B %Y'
 
-# Newsgroups matching this regex are excluded from the activity feed and "all newsgroups" search
-DEFAULT_NEWSGROUP_FILTER = /^control|(^|\.)test/
+# Newsgroups whose names match this SIMILAR TO pattern are excluded from the
+# activity feed and "all newsgroups" search
+DEFAULT_NEWSGROUP_FILTER = 'control%|%.?test'
 
 # Default and maximum values for the 'limit' parameter to Posts#index
 INDEX_DEF_LIMIT_1 = 8  # Default limit when the request is only in one direction (older or newer)

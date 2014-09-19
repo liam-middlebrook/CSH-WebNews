@@ -1,57 +1,63 @@
 module NNTP
   class PostImporter
-    def initialize(newsgroup:, quiet: false)
-      @newsgroup, @quiet = newsgroup, quiet
+    def initialize(quiet: false)
+      @quiet = quiet
     end
 
-    def import!(number:, article:)
-      post = create_post_from_article(number, article)
-      process_subscriptions(post) unless @quiet
+    def import!(article:, post: Post.new)
+      post_exists = post.persisted?
+
+      Post.transaction do
+        update_post_from_article(article, post)
+        process_subscriptions(post) unless @quiet || post_exists
+      end
+
       post
     end
 
     private
 
-    def create_post_from_article(number, article)
+    def update_post_from_article(article, post)
       mail = Mail.new(article)
 
-      headers = mail.header.to_s
-      if mail.multipart?
-        headers << "X-WebNews-Text-Part-Headers-Follow: true\n"
-        headers << mail.text_part.header.to_s
+      date = date_from_message(mail)
+      headers, body = headers_and_body_from_message(mail)
+      postings = initialize_postings_for_message(mail)
+      followup_newsgroup = if mail.header['Followup-To'].present?
+        Newsgroup.find_by(name: mail.header['Followup-To'].to_s)
       end
 
-      date = DATE_HEADERS.map{ |h| mail.header[h] }.compact.first.to_s.to_datetime
-      threading_data = guess_threading_for_message(mail, date)
-
-      message = mail.multipart? ? mail.text_part : mail
-      message = FlowedFormat.decode_message(message)
-
-      Post.create!(
-        newsgroup: @newsgroup,
-        number: number,
-        subject: utf8_encode(mail.subject),
-        author: utf8_encode(mail.header['From'].to_s),
+      post.assign_attributes(
+        subject: header_from_message(mail, 'Subject'),
+        author: header_from_message(mail, 'From'),
         date: date,
-        message_id: "<#{mail.message_id}>",
-        parent_id: threading_data[:parent_id],
-        thread_id: threading_data[:thread_id],
+        message_id: mail.message_id,
         stripped: mail.has_attachments?,
         headers: headers,
-        body: utf8_encode(message.body.to_s)
+        body: body,
+        postings: postings,
+        followup_newsgroup: followup_newsgroup
       )
+      threading = guess_threading_for_post(post)
+      post.assign_attributes(
+        parent: threading.parent,
+        dethreaded: !threading.is_correct
+      )
+      post.save!
     end
 
     def process_subscriptions(post)
       User.active.each do |user|
         if not post.authored_by?(user)
           personal_level = PERSONAL_CODES[post.personal_class_for_user(user)]
-          subscription = user.subscriptions.for(@newsgroup) || user.default_subscription
-          unread_level = subscription.unread_level || user.default_subscription.unread_level
-          email_level = subscription.email_level || user.default_subscription.email_level
+          subscriptions = user.subscriptions.for(post.newsgroups)
+          unread_level = subscriptions.where.not(unread_level: nil).minimum(:unread_level)
+          unread_level ||= user.default_subscription.unread_level
+          email_level = subscriptions.where.not(email_level: nil).minimum(:email_level)
+          email_level ||= user.default_subscription.email_level
 
           if personal_level >= unread_level
-            UnreadPostEntry.create!(user: user, newsgroup: @newsgroup, post: post, personal_level: personal_level)
+            UnreadPostEntry.create!(user: user, post: post, personal_level: personal_level)
           end
 
           if personal_level >= email_level
@@ -61,44 +67,83 @@ module NNTP
       end
     end
 
-    def guess_threading_for_message(mail, date)
-      guess_threading_from_references(mail.references) ||
-        guess_threading_from_subject_and_date(mail.subject, date) ||
-        { parent_id: '', thread_id: "<#{mail.message_id}>" }
+    def guess_threading_for_post(post)
+      guess_threading_from_references(post) ||
+        guess_threading_from_subject(post) ||
+        Threading.new(nil, true)
     end
 
-    def guess_threading_from_references(references)
-      if references.present?
-        references = Array(references).map{ |id| "<#{id}>" }
-        possible_parent_id = references[-1]
-        possible_thread_id = references[0]
-        possible_parent = @newsgroup.posts.find_by(message_id: possible_parent_id)
+    def guess_threading_from_references(post)
+      references = Array(Mail.new(post.headers).references)
 
-        if possible_parent.present?
-          { parent_id: possible_parent.message_id, thread_id: possible_parent.thread_id }
-        elsif Post.where(message_id: possible_parent_id).exists?
-          # OK to create a new thread for this post
-        elsif @newsgroup.posts.where(message_id: possible_thread_id).exists?
-          { parent_id: possible_thread_id, thread_id: possible_thread_id }
+      if references.present?
+        parent_from_references = Post.find_by(message_id: references[-1])
+        root_from_references = Post.find_by(message_id: references[0])
+
+        if parent_from_references.present?
+          Threading.new(parent_from_references, true)
+        elsif root_from_references.present?
+          Threading.new(root_from_references)
         end
       end
     end
 
-    def guess_threading_from_subject_and_date(subject, date)
-      if subject =~ /Re:/i
-        possible_thread_parent = @newsgroup.posts.thread_parents
-          .where('date < ? AND date > ?', date, date - 3.months)
+    def guess_threading_from_subject(post)
+      if post.subject =~ /Re:/i
+        guessed_root = Post.roots.joins(:postings)
+          .where(postings: { newsgroup_id: post.newsgroup_ids })
+          .where('date < ? AND date > ?', post.date, post.date - 3.months)
           .where(
             'subject = ? OR subject = ? OR subject = ?',
-            subject, subject.sub(/^Re: ?/i, ''), subject.sub(/^Re: ?(\[.+\] )?/i, '')
+            post.subject,
+            post.subject.sub(/^Re: ?/i, ''),
+            post.subject.sub(/^Re: ?(\[.+\] )?/i, '')
           )
           .order(:date).first
 
-        if possible_thread_parent.present?
-          possible_thread_id = possible_thread_parent.message_id
-          { parent_id: possible_thread_id, thread_id: possible_thread_id }
+        if guessed_root.present?
+          Threading.new(guessed_root)
         end
       end
+    end
+
+    def initialize_postings_for_message(mail)
+      followup_newsgroup_name = mail.header['Followup-To'].to_s
+      xrefs = mail.header['Xref'].to_s.split[1..-1].map{ |xref| xref.split(':') }
+
+      xrefs.map do |(newsgroup_name, number)|
+        newsgroup_id = Newsgroup.where(name: newsgroup_name).ids.first
+        unless newsgroup_id.nil?
+          Posting.new(newsgroup_id: newsgroup_id, number: number)
+        end
+      end.compact
+    end
+
+    def header_from_message(mail, header)
+      # Mail gem likes to pretend that incorrectly-encoded headers don't exist,
+      # so if we still want to salvage something we have to do it ourselves
+      utf8_encode(mail.header[header].to_s).presence ||
+        utf8_encode(mail.header.raw_source).match(/^#{header}: (.*)$/)[1].chomp
+    end
+
+    def date_from_message(mail)
+      DATE_HEADERS.map{ |h| mail.header[h] }.compact.first.to_s.to_datetime
+    end
+
+    def headers_and_body_from_message(mail)
+      target_part = mail
+      headers = mail.header.raw_source
+
+      if mail.multipart?
+        target_part = mail.text_part.presence || mail.parts.first
+        headers << "X-WebNews-Part-Headers-Follow: true\n"
+        headers << target_part.header.raw_source
+      end
+
+      [
+        utf8_encode(headers),
+        utf8_encode(FlowedFormat.decode_message(target_part).decoded)
+      ]
     end
 
     def utf8_encode(text)
@@ -106,5 +151,6 @@ module NNTP
     end
 
     DATE_HEADERS = ['Injection-Date', 'NNTP-Posting-Date', 'Date']
+    Threading = Struct.new(:parent, :is_correct)
   end
 end

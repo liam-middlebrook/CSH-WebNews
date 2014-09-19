@@ -20,7 +20,9 @@ module ApplicationHelper
   end
 
   def post_hash_url(post)
-    root_url + '#!' + post_path(post.newsgroup_name, post.number)
+    root_url + '#!' + post_path(
+      post.primary_newsgroup.name, post.primary_posting.number
+    )
   end
 
   def abbrev_newsgroup(newsgroup_name)
@@ -58,7 +60,10 @@ module ApplicationHelper
 
   def next_unread_href
     if @next_unread_post
-      '#!' + post_path(@next_unread_post.newsgroup_name, @next_unread_post.number)
+      '#!' + post_path(
+        @next_unread_post.primary_newsgroup.name,
+        @next_unread_post.primary_posting.number
+      )
     else
       '#'
     end

@@ -1,9 +1,9 @@
 module NNTP
   class NewPostMessage < BasicMessage
-    attr_accessor :body, :newsgroup_names, :parent_post, :subject
+    attr_accessor :body, :newsgroups, :parent_post, :subject
 
     validates! :subject, presence: true
-    validates! :newsgroup_names, length: { minimum: 1 }
+    validates! :newsgroups, length: { minimum: 1 }
 
     private
 
@@ -12,9 +12,9 @@ module NNTP
       mail.subject, mail.body = subject, body
       mail = FlowedFormat.encode_message(mail)
 
-      mail.header['Newsgroups'] = newsgroup_names.join(',')
-      if newsgroup_names.size > 1
-        mail.header['Followup-To'] = newsgroup_names.first
+      mail.header['Newsgroups'] = newsgroups.map(&:name).join(',')
+      if newsgroups.size > 1
+        mail.header['Followup-To'] = newsgroups.first.name
       end
 
       if parent_post.present?

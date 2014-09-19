@@ -1,7 +1,13 @@
 class Newsgroup < ActiveRecord::Base
-  has_many :unread_post_entries, dependent: :destroy
-  has_many :posts, foreign_key: :newsgroup_name, primary_key: :name, dependent: :destroy
-  has_many :subscriptions, foreign_key: :newsgroup_name, primary_key: :name, dependent: :destroy
+  with_options dependent: :destroy do |assoc|
+    assoc.has_many :postings
+    assoc.has_many :posts, through: :postings
+    assoc.has_many :subscriptions, foreign_key: :newsgroup_name, primary_key: :name
+  end
+
+  has_many :unread_post_entries, through: :posts
+
+  validates! :name, uniqueness: true
 
   default_scope -> { order(:name) }
 
@@ -32,6 +38,10 @@ class Newsgroup < ActiveRecord::Base
 
   def self.where_posting_allowed
     where(status: 'y')
+  end
+
+  def self.default_filtered
+    where("newsgroups.name NOT SIMILAR TO '#{DEFAULT_NEWSGROUP_FILTER}'")
   end
 
   def unread_for_user(user)
