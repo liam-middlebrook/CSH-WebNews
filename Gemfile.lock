@@ -29,6 +29,9 @@ GEM
       tzinfo (~> 1.1)
     ancestry (2.1.0)
       activerecord (>= 3.0.0)
+    annotate (2.6.5)
+      activerecord (>= 2.3.0)
+      rake (>= 0.8.7)
     arel (5.0.1.20140414130214)
     binding_of_caller (0.7.2)
       debug_inspector (>= 0.0.1)
@@ -151,6 +154,7 @@ PLATFORMS
 
 DEPENDENCIES
   ancestry
+  annotate
   chronic
   coffee-rails
   dotenv-rails

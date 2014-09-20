@@ -22,6 +22,7 @@ gem 'coffee-rails'
 gem 'uglifier'
 
 group :development do
+  gem 'annotate'
   gem 'pry-rails'
   gem 'pry-stack_explorer'
   gem 'pry-byebug'

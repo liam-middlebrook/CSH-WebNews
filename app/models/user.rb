@@ -1,3 +1,22 @@
+# == Schema Information
+#
+# Table name: users
+#
+#  id          :integer          not null, primary key
+#  username    :text
+#  real_name   :text
+#  preferences :text
+#  created_at  :datetime
+#  updated_at  :datetime
+#  api_key     :text
+#  api_data    :text
+#
+# Indexes
+#
+#  index_users_on_api_key   (api_key)
+#  index_users_on_username  (username) UNIQUE
+#
+
 class User < ActiveRecord::Base
   has_many :unread_post_entries, dependent: :destroy
   has_many :starred_post_entries, dependent: :destroy
@@ -10,6 +29,9 @@ class User < ActiveRecord::Base
 
   accepts_nested_attributes_for :default_subscription
   accepts_nested_attributes_for :subscriptions, allow_destroy: true, reject_if: :all_blank
+
+  validates! :username, :real_name, presence: true
+  validates! :username, :api_key, uniqueness: true
 
   before_save :ensure_subscriptions
 

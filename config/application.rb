@@ -25,5 +25,9 @@ module Webnews
     # The default locale is :en and all translations from config/locales/*.rb,yml are auto loaded.
     # config.i18n.load_path += Dir[Rails.root.join('my', 'locales', '*.{rb,yml}').to_s]
     # config.i18n.default_locale = :de
+
+    # TODO: Go back to schema.rb if this issue is ever addressed
+    # https://github.com/dockyard/postgres_ext/issues/139
+    config.active_record.schema_format = :sql
   end
 end

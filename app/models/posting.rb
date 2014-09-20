@@ -1,3 +1,20 @@
+# == Schema Information
+#
+# Table name: postings
+#
+#  id           :integer          not null, primary key
+#  newsgroup_id :integer
+#  post_id      :integer
+#  number       :integer
+#  top_level    :boolean
+#
+# Indexes
+#
+#  index_postings_on_newsgroup_id              (newsgroup_id)
+#  index_postings_on_newsgroup_id_and_post_id  (newsgroup_id,post_id) UNIQUE
+#  index_postings_on_post_id                   (post_id)
+#
+
 class Posting < ActiveRecord::Base
   belongs_to :newsgroup
   belongs_to :post

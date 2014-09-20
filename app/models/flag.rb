@@ -1,3 +1,13 @@
+# == Schema Information
+#
+# Table name: flags
+#
+#  id         :integer          not null, primary key
+#  data       :text
+#  created_at :datetime
+#  updated_at :datetime
+#
+
 class Flag < ActiveRecord::Base
   serialize :data, JSON
 

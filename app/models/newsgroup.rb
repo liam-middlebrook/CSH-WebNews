@@ -1,3 +1,18 @@
+# == Schema Information
+#
+# Table name: newsgroups
+#
+#  id         :integer          not null, primary key
+#  name       :text
+#  status     :text
+#  created_at :datetime
+#  updated_at :datetime
+#
+# Indexes
+#
+#  index_newsgroups_on_name  (name) UNIQUE
+#
+
 class Newsgroup < ActiveRecord::Base
   with_options dependent: :destroy do |assoc|
     assoc.has_many :postings

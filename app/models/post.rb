@@ -1,3 +1,31 @@
+# == Schema Information
+#
+# Table name: posts
+#
+#  id                    :integer          not null, primary key
+#  subject               :text
+#  author                :text
+#  date                  :datetime
+#  message_id            :text
+#  stripped              :boolean
+#  sticky_user_id        :integer
+#  sticky_until          :datetime
+#  headers               :text
+#  body                  :text
+#  dethreaded            :boolean
+#  followup_newsgroup_id :integer
+#  ancestry              :text
+#
+# Indexes
+#
+#  index_posts_on_ancestry               (ancestry)
+#  index_posts_on_date                   (date)
+#  index_posts_on_followup_newsgroup_id  (followup_newsgroup_id)
+#  index_posts_on_message_id             (message_id) UNIQUE
+#  index_posts_on_sticky_until           (sticky_until)
+#  index_posts_on_sticky_user_id         (sticky_user_id)
+#
+
 class Post < ActiveRecord::Base
   belongs_to :sticky_user, class_name: User
 

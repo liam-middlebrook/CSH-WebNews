@@ -1,3 +1,23 @@
+# == Schema Information
+#
+# Table name: subscriptions
+#
+#  id             :integer          not null, primary key
+#  user_id        :integer
+#  newsgroup_name :text
+#  unread_level   :integer
+#  email_level    :integer
+#  digest_type    :text
+#  created_at     :datetime
+#  updated_at     :datetime
+#
+# Indexes
+#
+#  index_subscriptions_on_newsgroup_name              (newsgroup_name)
+#  index_subscriptions_on_newsgroup_name_and_user_id  (newsgroup_name,user_id) UNIQUE
+#  index_subscriptions_on_user_id                     (user_id)
+#
+
 class Subscription < ActiveRecord::Base
   DIGEST_TYPES = %w(none daily weekly monthly)
 
