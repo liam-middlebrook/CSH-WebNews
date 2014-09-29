@@ -8,12 +8,9 @@
 #  preferences :text
 #  created_at  :datetime
 #  updated_at  :datetime
-#  api_key     :text
-#  api_data    :text
 #
 # Indexes
 #
-#  index_users_on_api_key   (api_key)
 #  index_users_on_username  (username) UNIQUE
 #
 
@@ -26,17 +23,17 @@ class User < ActiveRecord::Base
     class_name: Subscription, autosave: true, dependent: :destroy
   has_many :subscriptions, -> { where.not(newsgroup_name: nil) },
     autosave: true, dependent: :destroy
+  has_many :oauth_applications, class_name: Doorkeeper::Application, as: :owner
 
   accepts_nested_attributes_for :default_subscription
   accepts_nested_attributes_for :subscriptions, allow_destroy: true, reject_if: :all_blank
 
   validates! :username, :real_name, presence: true
-  validates! :username, :api_key, uniqueness: true
+  validates! :username, uniqueness: true
 
   before_save :ensure_subscriptions
 
   serialize :preferences, Hash
-  serialize :api_data, Hash
 
   def self.active
     where('updated_at >= ?', 3.months.ago)
@@ -56,10 +53,6 @@ class User < ActiveRecord::Base
 
   def admin?
     DEVELOPMENT_MODE or unix_groups.include?('rtp') or unix_groups.include?('eboard')
-  end
-
-  def api_enabled?
-    !api_key.nil?
   end
 
   def email

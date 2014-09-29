@@ -1,5 +1,14 @@
 Rails.application.routes.draw do
+  use_doorkeeper
+
+  namespace :api do
+    resource :user, only: :show
+  end
+
+  ####################
+
   root to: 'pages#home'
+
   get '/authenticate', to: 'pages#authenticate'
 
   get '/home',      to: 'pages#home'
