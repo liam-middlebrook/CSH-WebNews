@@ -11,7 +11,7 @@ RSpec.describe 'Newsgroups index' do
     create(:unread_post_entry, user: oauth_user, post: second_post, personal_level: 1)
     create(:unread_post_entry, user: oauth_user, post: third_post, personal_level: 2)
 
-    get api_newsgroups_path
+    get newsgroups_path
 
     expect(response).to be_successful
     expect(response_json.keys).to eq [:newsgroups]

@@ -1,6 +1,6 @@
-class API::BaseController < ActionController::Base
+class BaseController < ActionController::Base
   respond_to :json
-  before_action :require_accept_type, :require_content_type
+  before_action :require_accept_type, :require_content_type, :require_no_maintenance
   doorkeeper_for :all
   serialization_scope :current_user
 
@@ -21,6 +21,13 @@ class API::BaseController < ActionController::Base
   def require_content_type
     if request.content_type != 'application/json'
       head :unsupported_media_type
+    end
+  end
+
+  def require_no_maintenance
+    if Flag.maintenance_mode?
+      headers['X-Maintenance-Reason'] = Flag.maintenance_reason
+      head :service_unavailable
     end
   end
 end

@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe 'User show' do
   it 'retrieves info about the current user' do
-    get api_user_path
+    get user_path
 
     expect(response).to be_successful
     expect(response_json).to eq({
