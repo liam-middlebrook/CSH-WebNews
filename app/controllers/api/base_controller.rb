@@ -2,6 +2,7 @@ class API::BaseController < ActionController::Base
   respond_to :json
   before_action :require_accept_type, :require_content_type
   doorkeeper_for :all
+  serialization_scope :current_user
 
   private
 

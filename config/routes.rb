@@ -2,6 +2,7 @@ Rails.application.routes.draw do
   use_doorkeeper
 
   namespace :api do
+    resources :newsgroups, only: :index
     resource :user, only: :show
   end
 
