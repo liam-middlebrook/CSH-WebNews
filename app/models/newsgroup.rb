@@ -24,21 +24,6 @@ class Newsgroup < ActiveRecord::Base
 
   validates! :name, uniqueness: true
 
-  default_scope -> { order(:name) }
-
-  def as_json(options = {})
-    if options[:for_user]
-      unread = unread_for_user(options[:for_user])
-      super(except: :id).merge(
-        unread_count: unread[:count],
-        unread_class: unread[:personal_class],
-        newest_date: posts.order(:date).last.try(:date)
-      )
-    else
-      super(except: :id)
-    end
-  end
-
   def self.cancel
     find_by!(name: 'control.cancel')
   end
@@ -57,13 +42,5 @@ class Newsgroup < ActiveRecord::Base
 
   def self.default_filtered
     where("newsgroups.name NOT SIMILAR TO '#{DEFAULT_NEWSGROUP_FILTER}'")
-  end
-
-  def unread_for_user(user)
-    personal_class = nil
-    count = unread_post_entries.where(user_id: user.id).count
-    max_level = unread_post_entries.where(user_id: user.id).maximum(:personal_level)
-    personal_class = PERSONAL_CLASSES[max_level] if max_level
-    return { count: count, personal_class: personal_class }
   end
 end

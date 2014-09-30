@@ -27,16 +27,6 @@ RSpec.describe 'Newsgroups index' do
       oldest_post_at: first_post.date.iso8601
     })
     expect(response_json[:newsgroups][1]).to eq({
-      id: third_group.id,
-      name: 'test.three',
-      status: 'y',
-      updated_at: third_group.updated_at.iso8601,
-      unread_count: 1,
-      unread_personal_level: 1,
-      newest_post_at: second_post.date.iso8601,
-      oldest_post_at: second_post.date.iso8601
-    })
-    expect(response_json[:newsgroups][2]).to eq({
       id: second_group.id,
       name: 'test.two',
       status: 'n',
@@ -45,6 +35,16 @@ RSpec.describe 'Newsgroups index' do
       unread_personal_level: nil,
       newest_post_at: nil,
       oldest_post_at: nil
+    })
+    expect(response_json[:newsgroups][2]).to eq({
+      id: third_group.id,
+      name: 'test.three',
+      status: 'y',
+      updated_at: third_group.updated_at.iso8601,
+      unread_count: 1,
+      unread_personal_level: 1,
+      newest_post_at: second_post.date.iso8601,
+      oldest_post_at: second_post.date.iso8601
     })
   end
 end
