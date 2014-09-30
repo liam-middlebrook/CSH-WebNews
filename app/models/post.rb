@@ -43,7 +43,7 @@ class Post < ActiveRecord::Base
   has_ancestry orphan_strategy: :adopt
   before_destroy :mark_children_dethreaded
 
-  validates! :author, :date, :message_id, :subject, presence: true
+  validates! :author, :date, :headers, :message_id, :subject, presence: true
   validates! :message_id, uniqueness: true
   validates! :postings, length: { minimum: 1 }
 

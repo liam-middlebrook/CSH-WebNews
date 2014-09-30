@@ -20,6 +20,7 @@ FactoryGirl.define do
     subject { Faker::Lorem.sentence }
     author { "\"#{Faker::Name.name}\" <#{Faker::Internet.email}>" }
     message_id { "#{Faker::Lorem.characters(12)}@#{Faker::Internet.domain_name}" }
+    headers File.read(Rails.root.join('spec', 'support', 'dummy_headers.txt'))
 
     ignore do
       newsgroups { [create(:newsgroup)] }

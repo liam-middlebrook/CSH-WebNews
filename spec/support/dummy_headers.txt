@@ -1,0 +1,16 @@
+Path: news.example.com!.POSTED!not-for-mail
+From: Test User <tester@example.com>
+Newsgroups: ex.test
+Subject: test post please ignore
+Date: Tue, 16 Sep 2014 22:57:16 -0400
+Organization: Example Newsgroups
+Message-ID: <5418f88c8a872@news.example.com.mail>
+NNTP-Posting-Host: 192.168.1.87
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Trace: news.example.com 1410922636 4089 129.21.49.180 (17 Sep 2014 02:57:16 GMT)
+X-Complaints-To: usenet@example.com
+NNTP-Posting-Date: Wed, 17 Sep 2014 02:57:16 +0000 (UTC)
+User-Agent: CSH-WebNews
+Xref: news.example.com ex.test:1647
