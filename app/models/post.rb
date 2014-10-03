@@ -47,42 +47,6 @@ class Post < ActiveRecord::Base
   validates! :message_id, uniqueness: true
   validates! :postings, length: { minimum: 1 }
 
-  def as_json(options = {})
-    if options[:minimal]
-      json = { number: number }
-    else
-      only = [:number, :subject, :date, :sticky_until]
-      only += [:body] if options[:with_all]
-      only += [:headers] if options[:with_headers]
-      json = super(
-        only: only,
-        include: { sticky_user: { only: [:username, :real_name] } },
-        methods: [:author_name, :author_email]
-      )
-      if options[:with_all]
-        json[:stripped] = stripped
-        json[:parent] = parent.as_json(minimal: true)
-        json[:thread_parent] = root.as_json(minimal: true) unless root?
-        json[:reparented] = dethreaded? && !orphaned?
-        json[:orphaned] = orphaned? && !original_parent
-        json[:followup_to] = followup_newsgroup.name if followup_newsgroup
-        json[:cross_posts] = nil # FIXME: Remove when new API created
-      end
-    end
-
-    json[:newsgroup] = primary_newsgroup.name
-
-    if options[:with_user]
-      json.merge!(
-        starred: starred_by_user?(options[:with_user]),
-        unread_class: unread_class_for_user(options[:with_user]),
-        personal_class: personal_class_for_user(options[:with_user])
-      )
-    end
-
-    return json
-  end
-
   def self.top_level
     includes(:postings).where(postings: { top_level: true })
   end
@@ -195,7 +159,7 @@ class Post < ActiveRecord::Base
     end
     tree.merge(as_json ? {} : {
       unread: self.unread_for_user?(user),
-      personal_class: self.personal_class_for_user(user)
+      personal_level: self.personal_level_for_user(user)
     })
   end
 
@@ -213,7 +177,7 @@ class Post < ActiveRecord::Base
   end
 
   def starred_by_user?(user)
-    starred_users.include?(user)
+    user.starred_post_entries.exists?(post_id: id)
   end
 
   def self.unread_for_user(user)
@@ -247,11 +211,11 @@ class Post < ActiveRecord::Base
     end
   end
 
-  def mark_unread_for_user(user, user_created)
+  def mark_unread_for_user(user, user_created = false)
     UnreadPostEntry.create!(
       user: user,
       post: self,
-      personal_level: PERSONAL_CODES[personal_class_for_user(user)],
+      personal_level: personal_level_for_user(user),
       user_created: user_created
     )
   end
@@ -261,11 +225,12 @@ class Post < ActiveRecord::Base
     root.subtree.any?{ |post| post.unread_for_user?(user) }
   end
 
-  def personal_class_for_user(user, check_thread = true)
+  def personal_level_for_user(user)
     case
-      when authored_by?(user) then :mine
-      when parent && parent.authored_by?(user) then :mine_reply
-      when check_thread && root.user_in_thread?(user) then :mine_in_thread
+      when authored_by?(user) then PERSONAL_CODES[:mine]
+      when parent_id.present? && parent.authored_by?(user) then PERSONAL_CODES[:mine_reply]
+      when root_id.present? && root.user_in_thread?(user) then PERSONAL_CODES[:mine_in_thread]
+      else 0
     end
   end
 

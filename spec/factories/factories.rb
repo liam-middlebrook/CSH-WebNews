@@ -21,6 +21,7 @@ FactoryGirl.define do
     author { "\"#{Faker::Name.name}\" <#{Faker::Internet.email}>" }
     message_id { "#{Faker::Lorem.characters(12)}@#{Faker::Internet.domain_name}" }
     headers File.read(Rails.root.join('spec', 'support', 'dummy_headers.txt'))
+    body { Faker::Lorem.paragraphs(2).join("\n\n") }
 
     ignore do
       newsgroups { [create(:newsgroup)] }
@@ -37,6 +38,11 @@ FactoryGirl.define do
     newsgroup
     post
     sequence(:number)
+  end
+
+  factory :starred_post_entry do
+    post
+    user
   end
 
   factory :unread_post_entry do

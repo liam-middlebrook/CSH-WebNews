@@ -49,7 +49,7 @@ module NNTP
     def process_subscriptions(post)
       User.active.each do |user|
         if not post.authored_by?(user)
-          personal_level = PERSONAL_CODES[post.personal_class_for_user(user)]
+          personal_level = post.personal_level_for_user(user)
           subscriptions = user.subscriptions.for(post.newsgroups)
           unread_level = subscriptions.where.not(unread_level: nil).minimum(:unread_level)
           unread_level ||= user.default_subscription.unread_level
