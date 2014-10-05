@@ -23,12 +23,11 @@ FactoryGirl.define do
     headers File.read(Rails.root.join('spec', 'support', 'dummy_headers.txt'))
     body { Faker::Lorem.paragraphs(2).join("\n\n") }
 
-    ignore do
-      newsgroups { [create(:newsgroup)] }
-    end
+    ignore { newsgroups [] }
 
     after(:build) do |post, evaluator|
-      evaluator.newsgroups.each do |newsgroup|
+      newsgroups = evaluator.newsgroups.presence || post.parent.try(:newsgroups) || [create(:newsgroup)]
+      newsgroups.each do |newsgroup|
         post.postings << build(:posting, post: post, newsgroup: newsgroup)
       end
     end

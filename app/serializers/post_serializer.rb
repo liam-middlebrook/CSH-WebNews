@@ -1,6 +1,7 @@
 class PostSerializer < ActiveModel::Serializer
   has_many :postings
-  attributes :author,
+  attributes :id,
+    :author,
     :body,
     :created_at,
     :followup_newsgroup_id,
@@ -53,8 +54,8 @@ class PostSerializer < ActiveModel::Serializer
 
   def stickiness
     {
-      username: object.sticky_user.username,
-      display_name: object.sticky_user.real_name,
+      username: object.sticky_user.try(:username),
+      display_name: object.sticky_user.try(:real_name),
       expires_at: object.sticky_until
     }
   end
