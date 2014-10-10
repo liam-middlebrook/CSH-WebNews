@@ -14,13 +14,13 @@ RSpec.describe 'Post show' do
       sticky_user: sticky_user,
       sticky_until: 1.week.from_now,
       stripped: true,
-      dethreaded: false
+      dethreaded: false,
+      unread_for: oauth_user,
+      starred_by: oauth_user
     )
     first_posting = post.postings.first
     second_posting = create(:posting, post: post)
     post.update!(followup_newsgroup_id: second_posting.newsgroup_id)
-    post.mark_unread_for_user(oauth_user)
-    create(:starred_post_entry, post: post, user: oauth_user)
 
     get post_path(post)
 
@@ -74,7 +74,7 @@ RSpec.describe 'Post show' do
       third_nested_reply = create(:post, parent: second_reply, date: 2.hours.ago)
     ]
 
-    get post_path(first_reply, thread: true)
+    get post_path(first_reply, as_thread: true)
 
     expect(response).to be_successful
     expect(response_json.keys).to eq [:post, :descendants]

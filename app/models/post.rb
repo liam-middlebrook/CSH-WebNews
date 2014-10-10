@@ -47,8 +47,12 @@ class Post < ActiveRecord::Base
   validates! :message_id, uniqueness: true
   validates! :postings, length: { minimum: 1 }
 
-  def self.top_level
+  def self.with_top_level_postings
     includes(:postings).where(postings: { top_level: true })
+  end
+
+  def self.with_postings_in_newsgroups(newsgroup_ids)
+    includes(:postings).where(postings: { newsgroup_id: newsgroup_ids })
   end
 
   def root_in(newsgroup)
@@ -122,7 +126,7 @@ class Post < ActiveRecord::Base
   end
 
   def self.sticky
-    where('sticky_until is not null and sticky_until > ?', Time.now)
+    where.not(sticky_until: nil).where('posts.sticky_until > ?', Time.now)
   end
 
   def sticky?

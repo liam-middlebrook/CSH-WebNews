@@ -4,6 +4,7 @@ gem 'rails', '4.1.5'
 
 gem 'pg'
 
+gem 'active_attr'
 gem 'active_model_serializers'
 gem 'ancestry'
 gem 'chronic'
