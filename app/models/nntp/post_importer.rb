@@ -29,7 +29,9 @@ module NNTP
 
       post.assign_attributes(
         subject: header_from_message(mail, 'Subject'),
-        author: header_from_message(mail, 'From'),
+        author_raw: header_from_message(mail, 'From'),
+        author_name: author_name_from_message(mail),
+        author_email: author_email_from_message(mail),
         date: date,
         message_id: mail.message_id,
         stripped: mail.has_attachments?,
@@ -124,6 +126,14 @@ module NNTP
       # so if we still want to salvage something we have to do it ourselves
       utf8_encode(mail.header[header].to_s).presence ||
         utf8_encode(mail.header.raw_source).match(/^#{header}: (.*)$/)[1].chomp
+    end
+
+    def author_name_from_message(mail)
+      utf8_encode(mail.header['From'].addrs.first.display_name) rescue nil
+    end
+
+    def author_email_from_message(mail)
+      utf8_encode(mail.header['From'].addrs.first.address) rescue nil
     end
 
     def date_from_message(mail)

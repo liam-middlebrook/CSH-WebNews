@@ -30,18 +30,11 @@ class PostSerializer < ActiveModel::Serializer
   end
 
   def author
-    from_header = Mail.new(object.headers).header['From']
-
-    begin
-      address_object = from_header.addrs.first
-      {
-        name: address_object.display_name,
-        email: address_object.address,
-        raw: from_header.to_s
-      }
-    rescue
-      { name: nil, email: nil, raw: from_header.to_s }
-    end
+    {
+      name: object.author_name,
+      email: object.author_email,
+      raw: object.author_raw
+    }
   end
 
   def is_starred

@@ -4,7 +4,7 @@
 #
 #  id                    :integer          not null, primary key
 #  subject               :text
-#  author                :text
+#  author_raw            :text
 #  date                  :datetime
 #  message_id            :text
 #  stripped              :boolean
@@ -15,6 +15,8 @@
 #  dethreaded            :boolean
 #  followup_newsgroup_id :integer
 #  ancestry              :text
+#  author_email          :text
+#  author_name           :text
 #
 # Indexes
 #
@@ -43,7 +45,7 @@ class Post < ActiveRecord::Base
   has_ancestry orphan_strategy: :adopt
   before_destroy :mark_children_dethreaded
 
-  validates! :author, :date, :headers, :message_id, :subject, presence: true
+  validates! :author_raw, :date, :headers, :message_id, :subject, presence: true
   validates! :message_id, uniqueness: true
   validates! :postings, length: { minimum: 1 }
 
@@ -65,19 +67,6 @@ class Post < ActiveRecord::Base
 
   def primary_newsgroup
     followup_newsgroup_id? ? followup_newsgroup : newsgroups.first
-  end
-
-  def author_name
-    candidate = author[/(.*)<.*>/, 1]
-    if candidate
-      candidate.gsub(/(\A|[^\\])"/, '\\1').gsub('\\"', '"').rstrip
-    else
-      author[/.* \((.*)\)/, 1] || author
-    end
-  end
-
-  def author_email
-    author[/.*<(.*)>/, 1] || author[/(.*) \(.*\)/, 1] || author[/\S+@\S+\.\S+/]
   end
 
   def author_username

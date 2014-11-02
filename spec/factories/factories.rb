@@ -18,7 +18,9 @@ FactoryGirl.define do
   factory :post do
     date { DateTime.now }
     subject { Faker::Lorem.sentence }
-    author { "\"#{Faker::Name.name}\" <#{Faker::Internet.email}>" }
+    author_name { Faker::Name.name }
+    author_email { Faker::Internet.email }
+    author_raw { "\"#{author_name}\" <#{author_email}>" }
     message_id { "#{Faker::Lorem.characters(12)}@#{Faker::Internet.domain_name}" }
     headers File.read(Rails.root.join('spec', 'support', 'dummy_headers.txt'))
     body { Faker::Lorem.paragraphs(2).join("\n\n") }

@@ -3,6 +3,7 @@
 --
 
 SET statement_timeout = 0;
+SET lock_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SET check_function_bodies = false;
@@ -263,7 +264,7 @@ ALTER SEQUENCE postings_id_seq OWNED BY postings.id;
 CREATE TABLE posts (
     id integer NOT NULL,
     subject text,
-    author text,
+    author_raw text,
     date timestamp without time zone,
     message_id text,
     stripped boolean,
@@ -273,7 +274,9 @@ CREATE TABLE posts (
     body text,
     dethreaded boolean,
     followup_newsgroup_id integer,
-    ancestry text
+    ancestry text,
+    author_email text,
+    author_name text
 );
 
 
@@ -861,4 +864,6 @@ INSERT INTO schema_migrations (version) VALUES ('20140924193704');
 INSERT INTO schema_migrations (version) VALUES ('20140924194142');
 
 INSERT INTO schema_migrations (version) VALUES ('20140925020003');
+
+INSERT INTO schema_migrations (version) VALUES ('20141102200542');
 

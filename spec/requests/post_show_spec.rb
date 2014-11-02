@@ -6,11 +6,11 @@ RSpec.describe 'Post show' do
     root = create(:post)
     parent = create(:post,
       parent: root,
-      author: "#{oauth_user.real_name} <#{oauth_user.username}>"
+      author_name: oauth_user.real_name,
+      author_email: oauth_user.email
     )
     post = create(:post,
       parent: parent,
-      author: 'Test User <tester@example.com>',
       sticky_user: sticky_user,
       sticky_until: 1.week.from_now,
       stripped: true,
@@ -34,9 +34,9 @@ RSpec.describe 'Post show' do
       headers: post.headers,
       body: post.body,
       author: {
-        name: 'Test User',
-        email: 'tester@example.com',
-        raw: 'Test User <tester@example.com>'
+        name: post.author_name,
+        email: post.author_email,
+        raw: post.author_raw
       },
       stickiness: {
         username: sticky_user.username,
