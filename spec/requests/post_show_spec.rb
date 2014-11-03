@@ -12,9 +12,9 @@ RSpec.describe 'Post show' do
     post = create(:post,
       parent: parent,
       sticky_user: sticky_user,
-      sticky_until: 1.week.from_now,
-      stripped: true,
-      dethreaded: false,
+      sticky_expires_at: 1.week.from_now,
+      had_attachments: true,
+      is_dethreaded: false,
       unread_for: oauth_user,
       starred_by: oauth_user
     )
@@ -28,7 +28,7 @@ RSpec.describe 'Post show' do
     expect(response_json.keys).to eq [:post]
     expect(response_json[:post]).to eq({
       id: post.id,
-      created_at: post.date.iso8601,
+      created_at: post.created_at.iso8601,
       subject: post.subject,
       message_id: post.message_id,
       headers: post.headers,
@@ -41,7 +41,7 @@ RSpec.describe 'Post show' do
       stickiness: {
         username: sticky_user.username,
         display_name: sticky_user.real_name,
-        expires_at: post.sticky_until.iso8601
+        expires_at: post.sticky_expires_at.iso8601
       },
       followup_newsgroup_id: post.followup_newsgroup_id,
       postings: [
@@ -67,11 +67,11 @@ RSpec.describe 'Post show' do
   it 'retrieves info about the thread containing a single post' do
     root = create(:post)
     descendants = [
-      first_reply = create(:post, parent: root, date: 7.hours.ago),
-      second_reply = create(:post, parent: root, date: 3.hours.ago),
-      second_nested_reply = create(:post, parent: first_reply, date: 1.hour.ago),
-      first_nested_reply = create(:post, parent: first_reply, date: 4.hours.ago),
-      third_nested_reply = create(:post, parent: second_reply, date: 2.hours.ago)
+      first_reply = create(:post, parent: root, created_at: 7.hours.ago),
+      second_reply = create(:post, parent: root, created_at: 3.hours.ago),
+      second_nested_reply = create(:post, parent: first_reply, created_at: 1.hour.ago),
+      first_nested_reply = create(:post, parent: first_reply, created_at: 4.hours.ago),
+      third_nested_reply = create(:post, parent: second_reply, created_at: 2.hours.ago)
     ]
 
     get post_path(first_reply, as_thread: true)
@@ -79,7 +79,7 @@ RSpec.describe 'Post show' do
     expect(response).to be_successful
     expect(response_json.keys).to eq [:post, :descendants]
     expect(response_json[:post][:id]).to eq root.id
-    expect(response_json[:post][:descendant_ids]).to eq descendants.sort_by(&:date).map(&:id)
+    expect(response_json[:post][:descendant_ids]).to eq descendants.sort_by(&:created_at).map(&:id)
     expect(response_json[:post][:child_ids]).to eq [first_reply.id, second_reply.id]
     expect(response_json[:descendants][0][:child_ids]).to eq [first_nested_reply.id, second_nested_reply.id]
     expect(response_json[:descendants][2][:child_ids]).to eq [third_nested_reply.id]

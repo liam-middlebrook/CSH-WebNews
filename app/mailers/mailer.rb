@@ -25,7 +25,7 @@ class Mailer < ActionMailer::Base
       digest_type = subscription.digest_type.presence || user.default_subscription.digest_type
 
       if digest_type == target_digest_type
-        @posts << newsgroup.posts.where("date >= ? AND date <= ?", start_at, end_at).order(:date)
+        @posts << newsgroup.posts.where("created_at >= ? AND created_at <= ?", start_at, end_at).order(:created_at)
       end
     end
 

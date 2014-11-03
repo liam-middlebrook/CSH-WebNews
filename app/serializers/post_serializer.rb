@@ -17,18 +17,6 @@ class PostSerializer < ActiveModel::Serializer
     :subject,
     :unread_class
 
-  def created_at
-    object.date
-  end
-
-  def is_dethreaded
-    object.dethreaded
-  end
-
-  def had_attachments
-    object.stripped
-  end
-
   def author
     {
       name: object.author_name,
@@ -49,7 +37,7 @@ class PostSerializer < ActiveModel::Serializer
     {
       username: object.sticky_user.try(:username),
       display_name: object.sticky_user.try(:real_name),
-      expires_at: object.sticky_until
+      expires_at: object.sticky_expires_at
     }
   end
 

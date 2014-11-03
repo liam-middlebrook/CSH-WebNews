@@ -5,14 +5,14 @@
 #  id                    :integer          not null, primary key
 #  subject               :text
 #  author_raw            :text
-#  date                  :datetime
+#  created_at            :datetime
 #  message_id            :text
-#  stripped              :boolean
+#  had_attachments       :boolean
 #  sticky_user_id        :integer
-#  sticky_until          :datetime
+#  sticky_expires_at     :datetime
 #  headers               :text
 #  body                  :text
-#  dethreaded            :boolean
+#  is_dethreaded         :boolean
 #  followup_newsgroup_id :integer
 #  ancestry              :text
 #  author_email          :text
@@ -21,10 +21,10 @@
 # Indexes
 #
 #  index_posts_on_ancestry               (ancestry)
-#  index_posts_on_date                   (date)
+#  index_posts_on_created_at             (created_at)
 #  index_posts_on_followup_newsgroup_id  (followup_newsgroup_id)
 #  index_posts_on_message_id             (message_id) UNIQUE
-#  index_posts_on_sticky_until           (sticky_until)
+#  index_posts_on_sticky_expires_at      (sticky_expires_at)
 #  index_posts_on_sticky_user_id         (sticky_user_id)
 #
 
@@ -45,7 +45,7 @@ class Post < ActiveRecord::Base
   has_ancestry orphan_strategy: :adopt
   before_destroy :mark_children_dethreaded
 
-  validates! :author_raw, :date, :headers, :message_id, :subject, presence: true
+  validates! :author_raw, :headers, :message_id, :subject, presence: true
   validates! :message_id, uniqueness: true
   validates! :postings, length: { minimum: 1 }
 
@@ -115,11 +115,7 @@ class Post < ActiveRecord::Base
   end
 
   def self.sticky
-    where.not(sticky_until: nil).where('posts.sticky_until > ?', Time.now)
-  end
-
-  def sticky?
-    !sticky_until.nil? and sticky_until > Time.now
+    where.not(sticky_expires_at: nil).where('posts.sticky_expires_at > ?', Time.now)
   end
 
   def crossposted?
@@ -127,7 +123,7 @@ class Post < ActiveRecord::Base
   end
 
   def orphaned?
-    dethreaded? && root?
+    is_dethreaded && root?
   end
 
   def exists_in_followup_newsgroup?
@@ -142,12 +138,12 @@ class Post < ActiveRecord::Base
     tree = { post: (as_json ? self.as_json(with_user: user) : self) }
     tree[:children] = if flatten
       if root
-        descendants.order(:date).map{ |p| p.newsgroup_thread_tree(root: false, newsgroup: newsgroup, user: user, flatten: flatten, as_json: as_json) }
+        descendants.order(:created_at).map{ |p| p.newsgroup_thread_tree(root: false, newsgroup: newsgroup, user: user, flatten: flatten, as_json: as_json) }
       else
         []
       end
     else
-      children.order(:date).joins(:postings).where(postings: { newsgroup_id: newsgroup.id }).
+      children.order(:created_at).joins(:postings).where(postings: { newsgroup_id: newsgroup.id }).
         map{ |p| p.newsgroup_thread_tree(newsgroup: newsgroup, user: user, flatten: flatten, as_json: as_json) }
     end
     tree.merge(as_json ? {} : {
@@ -234,6 +230,6 @@ class Post < ActiveRecord::Base
   private
 
   def mark_children_dethreaded
-    children.update_all(dethreaded: true)
+    children.update_all(is_dethreaded: true)
   end
 end

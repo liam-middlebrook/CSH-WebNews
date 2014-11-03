@@ -16,7 +16,6 @@ FactoryGirl.define do
   end
 
   factory :post do
-    date { DateTime.now }
     subject { Faker::Lorem.sentence }
     author_name { Faker::Name.name }
     author_email { Faker::Internet.email }

@@ -3,11 +3,11 @@ class NewsgroupSerializer < ActiveModel::Serializer
     :unread_count, :unread_personal_level, :newest_post_at, :oldest_post_at
 
   def newest_post_at
-    object.posts.maximum(:date)
+    object.posts.maximum(:created_at)
   end
 
   def oldest_post_at
-    object.posts.minimum(:date)
+    object.posts.minimum(:created_at)
   end
 
   def unread_count

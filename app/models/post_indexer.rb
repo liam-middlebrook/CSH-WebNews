@@ -74,7 +74,7 @@ class PostIndexer
   end
 
   def unpaged_matched_posts
-    scope = Post.order(date: (reverse_order ? :asc : :desc))
+    scope = Post.order(created_at: (reverse_order ? :asc : :desc))
 
     if parsed_newsgroup_ids.any?
       scope = scope.with_postings_in_newsgroups(parsed_newsgroup_ids)
@@ -87,8 +87,8 @@ class PostIndexer
     scope = scope.unread_for_user(user) if only_unread
     scope = scope.starred_by_user(user) if only_starred
     scope = scope.where(keywords_sql) if parsed_keywords.any?
-    scope = scope.where('posts.date >= ?', parsed_since) if parsed_since.present?
-    scope = scope.where('posts.date <= ?', parsed_until) if parsed_until.present?
+    scope = scope.where('posts.created_at >= ?', parsed_since) if parsed_since.present?
+    scope = scope.where('posts.created_at <= ?', parsed_until) if parsed_until.present?
     scope
   end
 

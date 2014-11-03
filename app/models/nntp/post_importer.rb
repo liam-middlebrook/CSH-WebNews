@@ -20,7 +20,7 @@ module NNTP
     def update_post_from_article(article, post)
       mail = Mail.new(article)
 
-      date = date_from_message(mail)
+      created_at = date_from_message(mail)
       headers, body = headers_and_body_from_message(mail)
       postings = initialize_postings_for_message(mail)
       followup_newsgroup = if mail.header['Followup-To'].present?
@@ -32,9 +32,9 @@ module NNTP
         author_raw: header_from_message(mail, 'From'),
         author_name: author_name_from_message(mail),
         author_email: author_email_from_message(mail),
-        date: date,
+        created_at: created_at,
         message_id: mail.message_id,
-        stripped: mail.has_attachments?,
+        had_attachments: mail.has_attachments?,
         headers: headers,
         body: body,
         postings: postings,
@@ -43,7 +43,7 @@ module NNTP
       threading = guess_threading_for_post(post)
       post.assign_attributes(
         parent: threading.parent,
-        dethreaded: !threading.is_correct
+        is_dethreaded: !threading.is_correct
       )
       post.save!
     end
@@ -94,14 +94,18 @@ module NNTP
       if post.subject =~ /Re:/i
         guessed_root = Post.roots.joins(:postings)
           .where(postings: { newsgroup_id: post.newsgroup_ids })
-          .where('date < ? AND date > ?', post.date, post.date - 3.months)
+          .where(
+            'created_at < ? AND created_at > ?',
+            post.created_at,
+            post.created_at - 3.months
+          )
           .where(
             'subject = ? OR subject = ? OR subject = ?',
             post.subject,
             post.subject.sub(/^Re: ?/i, ''),
             post.subject.sub(/^Re: ?(\[.+\] )?/i, '')
           )
-          .order(:date).first
+          .order(:created_at).first
 
         if guessed_root.present?
           Threading.new(guessed_root)

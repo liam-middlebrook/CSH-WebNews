@@ -31,7 +31,7 @@ namespace :webnews do
     importer = NNTP::PostImporter.new(quiet: true)
 
     Flag.with_news_sync_lock do
-      Post.order(:date).find_each.with_index do |post, index|
+      Post.order(:created_at).find_each.with_index do |post, index|
         importer.import!(article: NNTP::Server.article(post.message_id), post: post)
         puts "#{index} done" if index % 1000 == 0 && index > 0
       end

@@ -1,5 +1,5 @@
 [<%= @post.primary_newsgroup.name %>] <%= @post.subject %>
-<%= author_line(@post) %> -- <%= @post.date.strftime(DATE_FORMAT) %>
+<%= author_line(@post) %> -- <%= @post.created_at.strftime(DATE_FORMAT) %>
 
 <%= post_hash_url(@post) %>
 

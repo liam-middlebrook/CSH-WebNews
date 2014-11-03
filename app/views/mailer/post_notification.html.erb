@@ -11,7 +11,7 @@
       </span>
       <br>
       <span style="font-size: 14px">
-        <b><%= author_line(@post) %></b> &mdash; <%= @post.date.strftime(DATE_FORMAT) %>
+        <b><%= author_line(@post) %></b> &mdash; <%= @post.created_at.strftime(DATE_FORMAT) %>
       </span>
     </td>
   </tr>

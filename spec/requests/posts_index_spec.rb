@@ -3,14 +3,14 @@ require 'rails_helper'
 RSpec.describe 'Post index' do
   it 'retrieves info about posts matching given criteria' do
     target_posts = [
-      create(:post, unread_for: oauth_user, date: 20.hours.ago),
-      create(:post, unread_for: oauth_user, date: 30.hours.ago)
+      create(:post, unread_for: oauth_user, created_at: 20.hours.ago),
+      create(:post, unread_for: oauth_user, created_at: 30.hours.ago)
     ]
     other_posts = [
-      create(:post, unread_for: oauth_user, date: 40.hours.ago),
-      create(:post, date: 10.hours.ago),
-      create(:post, unread_for: oauth_user, date: 4.days.ago),
-      create(:post, date: 5.days.ago)
+      create(:post, unread_for: oauth_user, created_at: 40.hours.ago),
+      create(:post, created_at: 10.hours.ago),
+      create(:post, unread_for: oauth_user, created_at: 4.days.ago),
+      create(:post, created_at: 5.days.ago)
     ]
 
     get posts_path(only_unread: true, since: 3.days.ago, limit: 2)
@@ -28,9 +28,9 @@ RSpec.describe 'Post index' do
     target_roots = create_list(:post, 2, newsgroups: [target_newsgroup])
     first_root_reply = create(:post, parent: target_roots.first)
     target_posts = [
-      create(:post, parent: first_root_reply, body: 'sweet googly foogly', date: 1.day.ago),
-      create(:post, parent: target_roots.last, body: 'much googly toogly', date: 2.days.ago),
-      create(:post, parent: target_roots.first, body: 'very doogly googly', date: 3.days.ago)
+      create(:post, parent: first_root_reply, body: 'sweet googly foogly', created_at: 1.day.ago),
+      create(:post, parent: target_roots.last, body: 'much googly toogly', created_at: 2.days.ago),
+      create(:post, parent: target_roots.first, body: 'very doogly googly', created_at: 3.days.ago)
     ]
     create(:post, newsgroups: [target_newsgroup], body: 'such googly moogly')
     last_root_reply = create(:post, parent: target_roots.last, body: 'many moogly googly')

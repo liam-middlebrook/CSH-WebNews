@@ -265,14 +265,14 @@ CREATE TABLE posts (
     id integer NOT NULL,
     subject text,
     author_raw text,
-    date timestamp without time zone,
+    created_at timestamp without time zone,
     message_id text,
-    stripped boolean,
+    had_attachments boolean,
     sticky_user_id integer,
-    sticky_until timestamp without time zone,
+    sticky_expires_at timestamp without time zone,
     headers text,
     body text,
-    dethreaded boolean,
+    is_dethreaded boolean,
     followup_newsgroup_id integer,
     ancestry text,
     author_email text,
@@ -682,10 +682,10 @@ CREATE INDEX index_posts_on_ancestry ON posts USING btree (ancestry text_pattern
 
 
 --
--- Name: index_posts_on_date; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_posts_on_created_at; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE INDEX index_posts_on_date ON posts USING btree (date);
+CREATE INDEX index_posts_on_created_at ON posts USING btree (created_at);
 
 
 --
@@ -703,10 +703,10 @@ CREATE UNIQUE INDEX index_posts_on_message_id ON posts USING btree (message_id);
 
 
 --
--- Name: index_posts_on_sticky_until; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_posts_on_sticky_expires_at; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE INDEX index_posts_on_sticky_until ON posts USING btree (sticky_until);
+CREATE INDEX index_posts_on_sticky_expires_at ON posts USING btree (sticky_expires_at);
 
 
 --
@@ -866,4 +866,6 @@ INSERT INTO schema_migrations (version) VALUES ('20140924194142');
 INSERT INTO schema_migrations (version) VALUES ('20140925020003');
 
 INSERT INTO schema_migrations (version) VALUES ('20141102200542');
+
+INSERT INTO schema_migrations (version) VALUES ('20141103024016');
 
