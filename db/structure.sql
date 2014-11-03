@@ -682,6 +682,27 @@ CREATE INDEX index_posts_on_ancestry ON posts USING btree (ancestry text_pattern
 
 
 --
+-- Name: index_posts_on_author_email; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_posts_on_author_email ON posts USING btree (author_email text_pattern_ops);
+
+
+--
+-- Name: index_posts_on_author_name; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_posts_on_author_name ON posts USING btree (author_name text_pattern_ops);
+
+
+--
+-- Name: index_posts_on_author_raw; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_posts_on_author_raw ON posts USING btree (author_raw text_pattern_ops);
+
+
+--
 -- Name: index_posts_on_created_at; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -868,4 +889,6 @@ INSERT INTO schema_migrations (version) VALUES ('20140925020003');
 INSERT INTO schema_migrations (version) VALUES ('20141102200542');
 
 INSERT INTO schema_migrations (version) VALUES ('20141103024016');
+
+INSERT INTO schema_migrations (version) VALUES ('20141103200117');
 

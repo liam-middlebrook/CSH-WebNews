@@ -6,8 +6,7 @@ class PostIndexer
   MAX_LIMIT = 20
 
   attribute :as_threads, type: Boolean, default: false
-  # TODO: Implement once authors is split out in the database
-  #attribute :authors, type: String, default: ''
+  attribute :authors, type: String, default: ''
   attribute :keywords, type: String, default: ''
   attribute :keywords_match_subject, type: Boolean, default: true
   attribute :keywords_match_body, type: Boolean, default: true
@@ -87,6 +86,7 @@ class PostIndexer
     scope = scope.unread_for_user(user) if only_unread
     scope = scope.starred_by_user(user) if only_starred
     scope = scope.where(keywords_sql) if parsed_keywords.any?
+    scope = scope.where(authors_sql) if parsed_authors.any?
     scope = scope.where('posts.created_at >= ?', parsed_since) if parsed_since.present?
     scope = scope.where('posts.created_at <= ?', parsed_until) if parsed_until.present?
     scope
@@ -124,6 +124,37 @@ class PostIndexer
         (sanitize_conditions('posts.subject ILIKE ?', "%#{keyword}%") if keywords_match_subject)
       ].compact.join(' OR ')
     end.map{ |condition| "(#{condition})" }
+  end
+
+  def parsed_authors
+    @parsed_authors ||= authors.split(',').map(&:strip)
+  end
+
+  def inexact_authors
+    @inexact_authors ||= parsed_authors.reject{ |a| a[0] == '+' }
+  end
+
+  def exact_authors
+    @exact_authors ||= parsed_authors.select{ |a| a[0] == '+' }.map{ |a| a[1..-1] }
+  end
+
+  def authors_sql
+    [
+      inexact_author_conditions.presence,
+      exact_author_conditions.presence
+    ].compact.join(' OR ')
+  end
+
+  def inexact_author_conditions
+    inexact_authors.map do |author|
+      sanitize_conditions('posts.author_raw ILIKE ?', "%#{author}%")
+    end.join(' OR ')
+  end
+
+  def exact_author_conditions
+    exact_authors.map do |author|
+      sanitize_conditions('posts.author_name = ? OR posts.author_email = ?', author, author)
+    end.join(' OR ')
   end
 
   def sanitize_conditions(*args)

@@ -21,6 +21,9 @@
 # Indexes
 #
 #  index_posts_on_ancestry               (ancestry)
+#  index_posts_on_author_email           (author_email)
+#  index_posts_on_author_name            (author_name)
+#  index_posts_on_author_raw             (author_raw)
 #  index_posts_on_created_at             (created_at)
 #  index_posts_on_followup_newsgroup_id  (followup_newsgroup_id)
 #  index_posts_on_message_id             (message_id) UNIQUE
