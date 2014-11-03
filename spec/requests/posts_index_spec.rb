@@ -53,4 +53,13 @@ RSpec.describe 'Post index' do
       results: 3, total: 3, matched_ids: target_posts.map(&:id)
     })
   end
+
+  it 'returns error information when given invalid parameters' do
+    get posts_path(limit: 0)
+
+    expect(response.status).to be 422
+    expect(response_json).to eq({
+      errors: { limit: ['must be greater than or equal to 1'] }
+    })
+  end
 end

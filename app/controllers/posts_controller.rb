@@ -1,7 +1,12 @@
 class PostsController < BaseController
   def index
     indexer = PostIndexer.new(indexer_params.merge(user: current_user))
-    respond_with indexer.results, meta: indexer.meta, each_serializer: serializer
+
+    if indexer.valid?
+      respond_with indexer.results, meta: indexer.meta, each_serializer: serializer
+    else
+      respond_with({ errors: indexer.errors }, status: :unprocessable_entity)
+    end
   end
 
   def show
