@@ -41,7 +41,7 @@ FactoryGirl.define do
       end
 
       if evaluator.starred_by.present?
-        post.starred_post_entries << build(:starred_post_entry, post: post, user: evaluator.starred_by)
+        post.stars << build(:star, post: post, user: evaluator.starred_by)
       end
     end
   end
@@ -52,7 +52,7 @@ FactoryGirl.define do
     sequence(:number)
   end
 
-  factory :starred_post_entry do
+  factory :star do
     post
     user
   end

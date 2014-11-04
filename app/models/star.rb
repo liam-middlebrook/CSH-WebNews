@@ -1,6 +1,6 @@
 # == Schema Information
 #
-# Table name: starred_post_entries
+# Table name: stars
 #
 #  id         :integer          not null, primary key
 #  user_id    :integer
@@ -9,12 +9,12 @@
 #
 # Indexes
 #
-#  index_starred_post_entries_on_post_id              (post_id)
-#  index_starred_post_entries_on_user_id              (user_id)
-#  index_starred_post_entries_on_user_id_and_post_id  (user_id,post_id) UNIQUE
+#  index_stars_on_post_id              (post_id)
+#  index_stars_on_user_id              (user_id)
+#  index_stars_on_user_id_and_post_id  (user_id,post_id) UNIQUE
 #
 
-class StarredPostEntry < ActiveRecord::Base
+class Star < ActiveRecord::Base
   belongs_to :user
   belongs_to :post
 

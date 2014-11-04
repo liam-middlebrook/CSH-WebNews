@@ -37,13 +37,13 @@ class Post < ActiveRecord::Base
   with_options dependent: :destroy do |assoc|
     assoc.has_many :postings
     assoc.has_many :unread_post_entries
-    assoc.has_many :starred_post_entries
+    assoc.has_many :stars
   end
 
   has_many :newsgroups, through: :postings
   belongs_to :followup_newsgroup, class_name: Newsgroup
   has_many :unread_users, through: :unread_post_entries, source: :user
-  has_many :starred_users, through: :starred_post_entries, source: :user
+  has_many :starred_users, through: :stars, source: :user
 
   has_ancestry orphan_strategy: :adopt
   before_destroy :mark_children_dethreaded
@@ -165,11 +165,11 @@ class Post < ActiveRecord::Base
   end
 
   def self.starred_by_user(user)
-    joins(:starred_post_entries).where(starred_post_entries: { user_id: user.id })
+    joins(:stars).where(stars: { user_id: user.id })
   end
 
   def starred_by_user?(user)
-    user.starred_post_entries.exists?(post_id: id)
+    user.stars.exists?(post_id: id)
   end
 
   def self.unread_for_user(user)

@@ -309,10 +309,10 @@ CREATE TABLE schema_migrations (
 
 
 --
--- Name: starred_post_entries; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: stars; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE starred_post_entries (
+CREATE TABLE stars (
     id integer NOT NULL,
     user_id integer,
     post_id integer,
@@ -321,10 +321,10 @@ CREATE TABLE starred_post_entries (
 
 
 --
--- Name: starred_post_entries_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: stars_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE starred_post_entries_id_seq
+CREATE SEQUENCE stars_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -333,10 +333,10 @@ CREATE SEQUENCE starred_post_entries_id_seq
 
 
 --
--- Name: starred_post_entries_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- Name: stars_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE starred_post_entries_id_seq OWNED BY starred_post_entries.id;
+ALTER SEQUENCE stars_id_seq OWNED BY stars.id;
 
 
 --
@@ -492,7 +492,7 @@ ALTER TABLE ONLY posts ALTER COLUMN id SET DEFAULT nextval('posts_id_seq'::regcl
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY starred_post_entries ALTER COLUMN id SET DEFAULT nextval('starred_post_entries_id_seq'::regclass);
+ALTER TABLE ONLY stars ALTER COLUMN id SET DEFAULT nextval('stars_id_seq'::regclass);
 
 
 --
@@ -576,7 +576,7 @@ ALTER TABLE ONLY posts
 -- Name: starred_post_entries_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
 
-ALTER TABLE ONLY starred_post_entries
+ALTER TABLE ONLY stars
     ADD CONSTRAINT starred_post_entries_pkey PRIMARY KEY (id);
 
 
@@ -738,24 +738,24 @@ CREATE INDEX index_posts_on_sticky_user_id ON posts USING btree (sticky_user_id)
 
 
 --
--- Name: index_starred_post_entries_on_post_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_stars_on_post_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE INDEX index_starred_post_entries_on_post_id ON starred_post_entries USING btree (post_id);
-
-
---
--- Name: index_starred_post_entries_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_starred_post_entries_on_user_id ON starred_post_entries USING btree (user_id);
+CREATE INDEX index_stars_on_post_id ON stars USING btree (post_id);
 
 
 --
--- Name: index_starred_post_entries_on_user_id_and_post_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_stars_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE UNIQUE INDEX index_starred_post_entries_on_user_id_and_post_id ON starred_post_entries USING btree (user_id, post_id);
+CREATE INDEX index_stars_on_user_id ON stars USING btree (user_id);
+
+
+--
+-- Name: index_stars_on_user_id_and_post_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE UNIQUE INDEX index_stars_on_user_id_and_post_id ON stars USING btree (user_id, post_id);
 
 
 --
@@ -891,4 +891,6 @@ INSERT INTO schema_migrations (version) VALUES ('20141102200542');
 INSERT INTO schema_migrations (version) VALUES ('20141103024016');
 
 INSERT INTO schema_migrations (version) VALUES ('20141103200117');
+
+INSERT INTO schema_migrations (version) VALUES ('20141104224837');
 
