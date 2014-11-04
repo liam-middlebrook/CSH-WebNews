@@ -3,7 +3,9 @@ Rails.application.routes.draw do
   use_doorkeeper
 
   resources :newsgroups, only: :index
-  resources :posts, only: [:index, :show, :create, :destroy]
+  resources :posts, only: [:index, :show, :create, :destroy] do
+    resource :star, only: [:create, :destroy]
+  end
   resource :user, only: :show
 
   # root to: 'pages#home'

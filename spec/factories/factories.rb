@@ -41,7 +41,7 @@ FactoryGirl.define do
       end
 
       if evaluator.starred_by.present?
-        post.starred_post_entries << build(:starred_post_entry, post: post, user: evaluator.unread_for)
+        post.starred_post_entries << build(:starred_post_entry, post: post, user: evaluator.starred_by)
       end
     end
   end
