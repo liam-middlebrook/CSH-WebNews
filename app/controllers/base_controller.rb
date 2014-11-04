@@ -4,6 +4,20 @@ class BaseController < ActionController::Base
   doorkeeper_for :all
   serialization_scope :current_user
 
+  rescue_from StandardError do |error|
+    head :internal_server_error
+    ExceptionNotifier.notify_exception(error)
+  end
+
+  rescue_from ActiveRecord::RecordNotFound do
+    head :not_found
+  end
+
+  rescue_from ActiveRecord::RecordNotUnique do |error|
+    head :conflict
+    ExceptionNotifier.notify_exception(error)
+  end
+
   private
 
   def current_application

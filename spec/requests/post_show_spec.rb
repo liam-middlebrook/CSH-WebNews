@@ -85,4 +85,10 @@ RSpec.describe 'Post show' do
     expect(response_json[:descendants][2][:child_ids]).to eq [third_nested_reply.id]
     [1, 3, 4].each{ |num| expect(response_json[:descendants][num][:child_ids]).to eq [] }
   end
+
+  it 'returns an appropriate status code when given a nonexistent post ID' do
+    get post_path(1)
+
+    expect(response.status).to be 404
+  end
 end
