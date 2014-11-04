@@ -38,7 +38,7 @@ class PostIndexer
   validate :until_must_be_after_since
 
   def meta
-    return nil unless valid?
+    return unless valid?
     {
       results: matched_posts.count,
       total: unpaged_matched_posts.count,
@@ -47,7 +47,7 @@ class PostIndexer
   end
 
   def results
-    return nil unless valid?
+    return unless valid?
 
     if as_threads && !only_roots
       ancestor_ids = matched_posts.pluck(:ancestry)
@@ -194,7 +194,7 @@ class PostIndexer
 
   def newsgroups_must_exist
     if newsgroup_ids.present? && Newsgroup.where(id: parsed_newsgroup_ids).size != parsed_newsgroup_ids.size
-      errors.add(:newsgroup_ids, 'specifies nonexistent newsgroups')
+      errors.add(:newsgroup_ids, 'specifies one or more nonexistent newsgroups')
     end
   end
 

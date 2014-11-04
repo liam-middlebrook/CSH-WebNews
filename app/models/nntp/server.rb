@@ -21,6 +21,10 @@ module NNTP
       nntp.article("<#{message_id.sub('%', '%%')}>")[1].join("\n")
     end
 
+    def post(message)
+      nntp.post(message)[1][/<(.*?)>/, 1] # Errors should be handled by caller
+    end
+
     private
 
     def nntp

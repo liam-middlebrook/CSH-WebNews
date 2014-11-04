@@ -1,32 +1,51 @@
 module NNTP
   class BasicMessage
-    include ActiveModel::Model
+    include ActiveAttr::Model
+    include ActiveModel::ForbiddenAttributesProtection
 
-    attr_accessor :api_user_agent, :api_posting_host, :posting_host, :user
+    attr_reader :was_accepted
 
-    validates! :posting_host, :user, presence: true
+    attribute :posting_host, type: String, default: ''
+    attribute :user_agent, type: String
+    attribute :user, type: Object
 
-    def to_s
-      to_mail.to_s
+    validates! :user, presence: true
+    validates :user_agent, presence: true
+
+    def send!
+      return if was_accepted
+      return unless valid?
+
+      message_id = begin
+        Server.post(to_mail.to_s)
+      rescue Net::NNTPError
+        errors.add(:nntp, $!.message)
+        nil
+      end
+
+      if message_id.present?
+        @was_accepted = true
+
+        begin
+          NNTP::NewsgroupImporter.new.sync!(newsgroups)
+        rescue
+          ExceptionNotifier.notify_exception($!)
+        end
+
+        Post.find_by(message_id: message_id)
+      end
     end
 
     private
 
     def to_mail
-      valid?
-
       mail = Mail.new(from: from_line)
 
-      mail.header['X-WebNews-Posting-Host'] = posting_host
-      if api_posting_host.present?
-        mail.header['X-WebNews-API-Posting-Host'] = api_posting_host
-      end
+      mail.header['User-Agent'] = 'CSH WebNews'
+      mail.header['X-WebNews-User-Agent'] = user_agent
 
-      if api_user_agent.present?
-        mail.header['User-Agent'] = 'CSH-WebNews-API'
-        mail.header['X-WebNews-API-Agent'] = api_user_agent
-      else
-        mail.header['User-Agent'] = 'CSH-WebNews'
+      if posting_host.present?
+        mail.header['X-WebNews-Posting-Host'] = posting_host
       end
 
       mail

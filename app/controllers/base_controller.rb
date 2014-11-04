@@ -6,8 +6,16 @@ class BaseController < ActionController::Base
 
   private
 
+  def current_application
+    @current_application ||= doorkeeper_token.application
+  end
+
   def current_user
     @current_user ||= User.find(doorkeeper_token.resource_owner_id)
+  end
+
+  def remote_host
+    Resolv.getname(request.remote_ip) rescue request.remote_ip
   end
 
   def require_accept_type
