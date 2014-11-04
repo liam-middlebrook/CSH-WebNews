@@ -14,18 +14,11 @@ class PostsController < BaseController
   end
 
   def create
-    message = NNTP::NewPostMessage.new(new_post_params)
-    post = message.send!
+    respond_with_message NNTP::NewPostMessage.new(new_post_params)
+  end
 
-    if post.present?
-      respond_with post
-    else
-      if message.was_accepted
-        head :accepted # The server probably moderated or spam-filtered it
-      else
-        respond_with message
-      end
-    end
+  def destroy
+    respond_with_message NNTP::CancelMessage.new(cancel_params)
   end
 
   private
@@ -38,6 +31,26 @@ class PostsController < BaseController
     { posting_host: remote_host }
       .merge(params.permit(NNTP::NewPostMessage.attribute_names))
       .merge(user: current_user, user_agent: current_application.name)
+  end
+
+  def cancel_params
+    { posting_host: remote_host }
+      .merge(params.permit(NNTP::CancelMessage.attribute_names))
+      .merge(post: post, user: current_user, user_agent: current_application.name)
+  end
+
+  def respond_with_message(message)
+    new_post = message.send!
+
+    if new_post.present?
+      respond_with new_post, location: new_post
+    else
+      if message.was_accepted
+        head :accepted # The server probably moderated or spam-filtered it
+      else
+        respond_with message
+      end
+    end
   end
 
   def post

@@ -1,6 +1,12 @@
 module NNTP
   class CancelMessage < BasicMessage
-    attr_accessor :post, :reason
+    attribute :post, type: Object
+    attribute :reason, type: String, default: ''
+
+    validates! :post, presence: true
+    validate :newsgroups_must_allow_posting
+    validate :post_must_have_no_children
+    validate :user_must_be_author_or_admin
 
     private
 
@@ -13,6 +19,10 @@ module NNTP
       mail = FlowedFormat.encode_message(mail)
 
       mail
+    end
+
+    def newsgroups
+      @newsgroups ||= post.newsgroups + [Newsgroup.cancel]
     end
 
     def post_message
@@ -31,6 +41,24 @@ module NNTP
       end
 
       body_lines.join("\n")
+    end
+
+    def newsgroups_must_allow_posting
+      if post.newsgroups.size != post.newsgroups.where_posting_allowed.size
+        errors.add(:post, 'is posted to one or more read-only newsgroups')
+      end
+    end
+
+    def post_must_have_no_children
+      if post.children.any?
+        errors.add(:post, 'has one or more replies')
+      end
+    end
+
+    def user_must_be_author_or_admin
+      if !post.authored_by?(user) && !user.admin?
+        errors.add(:post, 'is from another user and requires admin privileges to cancel')
+      end
     end
 
     INCLUDE_HEADERS = ['From', 'Subject', 'Date', 'Newsgroups', 'Message-ID']

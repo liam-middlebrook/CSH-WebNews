@@ -57,5 +57,9 @@ module NNTP
       address.address = user.email
       address.to_s
     end
+
+    def newsgroups
+      raise 'must be implemented in subclass'
+    end
   end
 end

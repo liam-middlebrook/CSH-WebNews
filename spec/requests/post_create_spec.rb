@@ -11,7 +11,7 @@ RSpec.describe 'Post create' do
       Message-ID: dummy@post.here
       Newsgroups: #{newsgroups.map(&:name).join(',')}
       Followup-To: #{newsgroups.first.name}
-      Xref: #{newsgroups.first.name}:119 #{newsgroups.last.name}:151
+      Xref: news.example #{newsgroups.first.name}:19 #{newsgroups.last.name}:51
 
       here is my post everypeople
     ARTICLE

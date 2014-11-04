@@ -156,7 +156,7 @@ class Post < ActiveRecord::Base
   end
 
   def authored_by?(user)
-    author_name == user.real_name or author_email == user.email
+    author_email == user.email
   end
 
   def user_in_thread?(user)
