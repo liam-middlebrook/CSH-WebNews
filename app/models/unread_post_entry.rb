@@ -21,4 +21,17 @@ class UnreadPostEntry < ActiveRecord::Base
 
   validates! :user, :post, presence: true
   validates! :user_id, uniqueness: { scope: :post_id }
+
+  after_initialize :assign_personal_level
+  before_save :assign_personal_level
+
+  private
+
+  def assign_personal_level
+    # FIXME: Post or user could be changed after initialization, and personal
+    # level would not update to match. In practice this never happens though.
+    if personal_level.nil? && post.present? && user.present?
+      self.personal_level = post.personal_level_for_user(user)
+    end
+  end
 end

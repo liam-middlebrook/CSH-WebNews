@@ -51,15 +51,17 @@ module NNTP
     def process_subscriptions(post)
       User.active.each do |user|
         if not post.authored_by?(user)
-          personal_level = post.personal_level_for_user(user)
           subscriptions = user.subscriptions.for(post.newsgroups)
           unread_level = subscriptions.where.not(unread_level: nil).minimum(:unread_level)
           unread_level ||= user.default_subscription.unread_level
           email_level = subscriptions.where.not(email_level: nil).minimum(:email_level)
           email_level ||= user.default_subscription.email_level
 
+          potential_unread = UnreadPostEntry.new(user: user, post: post)
+          personal_level = potential_unread.personal_level
+
           if personal_level >= unread_level
-            UnreadPostEntry.create!(user: user, post: post, personal_level: personal_level)
+            potential_unread.save!
           end
 
           if personal_level >= email_level
