@@ -60,10 +60,6 @@ class Post < ActiveRecord::Base
     includes(:postings).where(postings: { newsgroup_id: newsgroup_ids })
   end
 
-  def root_in(newsgroup)
-    path.includes(:postings).where(postings: { newsgroup_id: newsgroup.id }).first
-  end
-
   def primary_posting
     followup_newsgroup_id? ? postings.find_by(newsgroup_id: followup_newsgroup_id) : postings.first
   end
@@ -137,24 +133,6 @@ class Post < ActiveRecord::Base
     user.unread_post_entries.where(post_id: root.subtree_ids).count
   end
 
-  def newsgroup_thread_tree(newsgroup:, user:, flatten: false, as_json: false, root: true)
-    tree = { post: (as_json ? self.as_json(with_user: user) : self) }
-    tree[:children] = if flatten
-      if root
-        descendants.order(:created_at).map{ |p| p.newsgroup_thread_tree(root: false, newsgroup: newsgroup, user: user, flatten: flatten, as_json: as_json) }
-      else
-        []
-      end
-    else
-      children.order(:created_at).joins(:postings).where(postings: { newsgroup_id: newsgroup.id }).
-        map{ |p| p.newsgroup_thread_tree(newsgroup: newsgroup, user: user, flatten: flatten, as_json: as_json) }
-    end
-    tree.merge(as_json ? {} : {
-      unread: self.unread_for_user?(user),
-      personal_level: self.personal_level_for_user(user)
-    })
-  end
-
   def authored_by?(user)
     author_email == user.email
   end
@@ -193,30 +171,6 @@ class Post < ActiveRecord::Base
     end
   end
 
-  def mark_read_for_user(user)
-    entry = unread_post_entries.find_by(user_id: user.id)
-    if entry.present?
-      entry.destroy!
-      true
-    else
-      false
-    end
-  end
-
-  def mark_unread_for_user(user, user_created = false)
-    UnreadPostEntry.create!(
-      user: user,
-      post: self,
-      personal_level: personal_level_for_user(user),
-      user_created: user_created
-    )
-  end
-
-  def thread_unread_for_user?(user)
-    return true if unread_for_user?(user)
-    root.subtree.any?{ |post| post.unread_for_user?(user) }
-  end
-
   def personal_level_for_user(user)
     case
       when authored_by?(user) then PERSONAL_CODES[:mine]
@@ -224,10 +178,6 @@ class Post < ActiveRecord::Base
       when root_id.present? && root.user_in_thread?(user) then PERSONAL_CODES[:mine_in_thread]
       else 0
     end
-  end
-
-  def unread_personal_class_for_user(user)
-    PERSONAL_CLASSES[user.unread_posts.merge(root.subtree).maximum(:personal_level).to_i]
   end
 
   private
