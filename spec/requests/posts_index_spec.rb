@@ -62,4 +62,16 @@ RSpec.describe 'Post index' do
       errors: { limit: ['must be greater than or equal to 1'] }
     })
   end
+
+  it 'can retrieve only the meta information for the query' do
+    target_posts = create_list(:post, 3, unread_for: oauth_user)
+    create_list(:post, 2)
+
+    get posts_path(limit: 1, only_unread: true, as_meta: true)
+
+    expect(response_json.keys).to eq [:meta]
+    expect(response_json[:meta]).to eq({
+      results: 1, total: 3, matched_ids: [target_posts.last.id]
+    })
+  end
 end

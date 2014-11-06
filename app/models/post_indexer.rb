@@ -5,6 +5,7 @@ class PostIndexer
   DEF_LIMIT = 10
   MAX_LIMIT = 20
 
+  attribute :as_meta, type: Boolean, default: false
   attribute :as_threads, type: Boolean, default: false
   attribute :authors, type: String, default: ''
   attribute :keywords, type: String, default: ''

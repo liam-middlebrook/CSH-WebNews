@@ -1,12 +1,6 @@
 class PostsController < BaseController
   def index
-    indexer = PostIndexer.new(indexer_params)
-
-    if indexer.valid?
-      respond_with indexer.results, meta: indexer.meta, each_serializer: serializer
-    else
-      respond_with({ errors: indexer.errors }, status: :unprocessable_entity)
-    end
+    respond_with_indexer PostIndexer.new(indexer_params)
   end
 
   def show
@@ -37,6 +31,18 @@ class PostsController < BaseController
     { posting_host: remote_host }
       .merge(params.permit(NNTP::CancelMessage.attribute_names))
       .merge(post: post, user: current_user, user_agent: current_application.name)
+  end
+
+  def respond_with_indexer(indexer)
+    if indexer.valid?
+      if indexer.as_meta
+        respond_with meta: indexer.meta
+      else
+        respond_with indexer.results, meta: indexer.meta, each_serializer: serializer
+      end
+    else
+      respond_with({ errors: indexer.errors }, status: :unprocessable_entity)
+    end
   end
 
   def respond_with_message(message)
