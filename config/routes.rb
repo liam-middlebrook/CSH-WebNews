@@ -7,6 +7,7 @@ Rails.application.routes.draw do
     resource :star, only: [:create, :destroy]
     resource :sticky, only: :update
   end
+  resource :unreads, only: [:create, :destroy]
   resource :user, only: :show
 
   # root to: 'pages#home'
