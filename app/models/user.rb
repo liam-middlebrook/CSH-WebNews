@@ -64,7 +64,7 @@ class User < ActiveRecord::Base
   end
 
   def time_zone
-    preferences[:time_zone] || 'Eastern Time (US & Canada)'
+    preferences[:time_zone] || DEFAULT_TIME_ZONE
   end
 
   def thread_mode

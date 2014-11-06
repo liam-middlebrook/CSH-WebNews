@@ -2,12 +2,15 @@ class NewsgroupSerializer < ActiveModel::Serializer
   attributes :id, :name, :status, :updated_at,
     :unread_count, :unread_personal_level, :newest_post_at, :oldest_post_at
 
+  # FIXME: Remove `in_time_zone` if the below PR ever gets merged
+  # https://github.com/rails/rails/pull/13711
+
   def newest_post_at
-    object.posts.maximum(:created_at)
+    object.posts.maximum(:created_at).try(:in_time_zone)
   end
 
   def oldest_post_at
-    object.posts.minimum(:created_at)
+    object.posts.minimum(:created_at).try(:in_time_zone)
   end
 
   def unread_count

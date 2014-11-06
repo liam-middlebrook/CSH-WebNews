@@ -17,6 +17,9 @@ WIKI_USER_URL = WIKI_URL + 'User:'
 ENV_USERNAME = 'WEBAUTH_USER'
 ENV_REALNAME = 'WEBAUTH_LDAP_CN'
 
+# Default time zone for new users, from `rake time:zones:all`
+DEFAULT_TIME_ZONE = 'Eastern Time (US & Canada)'
+
 # Date formats (SHORT is used in the dashboard feeds)
 DATE_FORMAT = '%-m/%-d/%Y %-I:%M%P'
 SHORT_DATE_FORMAT = '%-m/%-d %-I:%M%P'

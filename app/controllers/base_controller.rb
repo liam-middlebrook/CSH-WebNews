@@ -1,6 +1,9 @@
 class BaseController < ActionController::Base
   respond_to :json
-  before_action :require_accept_type, :require_content_type, :require_no_maintenance
+  before_action :require_accept_type,
+    :require_content_type,
+    :require_no_maintenance,
+    :respect_user_time_zone
   doorkeeper_for :all
   serialization_scope :current_user
 
@@ -51,5 +54,12 @@ class BaseController < ActionController::Base
       headers['X-Maintenance-Reason'] = Flag.maintenance_reason
       head :service_unavailable
     end
+  end
+
+  def respect_user_time_zone
+    # FIXME: Not thread-safe. Should be Time.use_zone, but that doesn't work
+    # with Chronic, see https://github.com/mojombo/chronic/pull/214 and related
+    Time.zone = current_user.time_zone
+    Chronic.time_class = Time.zone
   end
 end
