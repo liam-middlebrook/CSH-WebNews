@@ -13,7 +13,7 @@ class PostSerializer < ActiveModel::Serializer
     :parent_id,
     :personal_level,
     :root_id,
-    :stickiness,
+    :sticky,
     :subject,
     :unread_class
 
@@ -33,7 +33,7 @@ class PostSerializer < ActiveModel::Serializer
     object.personal_level_for_user(scope)
   end
 
-  def stickiness
+  def sticky
     {
       username: object.sticky_user.try(:username),
       display_name: object.sticky_user.try(:real_name),

@@ -5,6 +5,7 @@ Rails.application.routes.draw do
   resources :newsgroups, only: :index
   resources :posts, only: [:index, :show, :create, :destroy] do
     resource :star, only: [:create, :destroy]
+    resource :sticky, only: :update
   end
   resource :user, only: :show
 

@@ -12,7 +12,7 @@ module NNTP
     validates! :user, presence: true
     validates :user_agent, presence: true
 
-    def send!
+    def transmit
       return if was_accepted
       return unless valid?
 

@@ -40,7 +40,7 @@ class PostsController < BaseController
   end
 
   def respond_with_message(message)
-    new_post = message.send!
+    new_post = message.transmit
 
     if new_post.present?
       respond_with new_post, location: new_post

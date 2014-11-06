@@ -38,7 +38,7 @@ RSpec.describe 'Post show' do
         email: post.author_email,
         raw: post.author_raw
       },
-      stickiness: {
+      sticky: {
         username: sticky_user.username,
         display_name: sticky_user.real_name,
         expires_at: post.sticky_expires_at.iso8601
