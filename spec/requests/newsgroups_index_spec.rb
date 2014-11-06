@@ -10,11 +10,13 @@ RSpec.describe 'Newsgroups index' do
     third_post = create(:post, created_at: 9.days.ago, newsgroups: [first_group])
     create(:unread_post_entry, user: oauth_user, post: second_post, personal_level: 1)
     create(:unread_post_entry, user: oauth_user, post: third_post, personal_level: 2)
+    allow(Flag).to receive(:last_full_news_sync_at).and_return(2.minutes.ago)
 
     get newsgroups_path
 
     expect(response).to be_successful
-    expect(response_json.keys).to eq [:newsgroups]
+    expect(response_json.keys).to match_array [:meta, :newsgroups]
+    expect(response_json[:meta]).to eq({ last_sync_at: 2.minutes.ago.iso8601 })
     expect(response_json[:newsgroups].size).to be 3
     expect(response_json[:newsgroups][0]).to eq({
       id: first_group.id,
