@@ -1,6 +1,13 @@
 class NewsgroupSerializer < ActiveModel::Serializer
-  attributes :id, :name, :status, :updated_at,
+  attributes :id, :name, :updated_at, :posting_allowed,
     :unread_count, :unread_personal_level, :newest_post_at, :oldest_post_at
+
+  # FIXME: Next version of AMS should auto-strip the question mark
+  # https://github.com/rails-api/active_model_serializers/pull/662
+
+  def posting_allowed
+    object.posting_allowed?
+  end
 
   # FIXME: Remove `in_time_zone` if the below PR ever gets merged
   # https://github.com/rails/rails/pull/13711

@@ -21,7 +21,7 @@ RSpec.describe 'Newsgroups index' do
     expect(response_json[:newsgroups][0]).to eq({
       id: first_group.id,
       name: 'test.one',
-      status: 'y',
+      posting_allowed: true,
       updated_at: first_group.updated_at.iso8601,
       unread_count: 2,
       unread_personal_level: 2,
@@ -31,7 +31,7 @@ RSpec.describe 'Newsgroups index' do
     expect(response_json[:newsgroups][1]).to eq({
       id: second_group.id,
       name: 'test.two',
-      status: 'n',
+      posting_allowed: false,
       updated_at: second_group.updated_at.iso8601,
       unread_count: 0,
       unread_personal_level: nil,
@@ -41,7 +41,7 @@ RSpec.describe 'Newsgroups index' do
     expect(response_json[:newsgroups][2]).to eq({
       id: third_group.id,
       name: 'test.three',
-      status: 'y',
+      posting_allowed: true,
       updated_at: third_group.updated_at.iso8601,
       unread_count: 1,
       unread_personal_level: 1,
