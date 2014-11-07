@@ -1,10 +1,10 @@
 class BaseController < ActionController::Base
   respond_to :json
+  doorkeeper_for :all
   before_action :require_accept_type,
     :require_content_type,
     :require_no_maintenance,
     :respect_user_time_zone
-  doorkeeper_for :all
   serialization_scope :current_user
 
   rescue_from StandardError do |error|
