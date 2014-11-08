@@ -9,8 +9,7 @@ module NNTP
     attribute :user_agent, type: String
     attribute :user, type: Object
 
-    validates! :user, presence: true
-    validates :user_agent, presence: true
+    validates! :user, :user_agent, presence: true
 
     def transmit
       return if was_accepted
