@@ -70,7 +70,7 @@ Doorkeeper.configure do
   #
   # If not specified, Doorkeeper enables all the four grant flows.
   #
-  # grant_flows %w(authorization_code implicit password client_credentials)
+  grant_flows %w(authorization_code implicit client_credentials)
 
   # Under some circumstances you might want to have applications auto-approved,
   # so that the user skips the authorization step.
@@ -80,7 +80,7 @@ Doorkeeper.configure do
   # end
 
   # WWW-Authenticate Realm (default "Doorkeeper").
-  # realm "Doorkeeper"
+  realm "CSH WebNews"
 
   # Allow dynamic query parameters (disabled by default)
   # Some applications require dynamic query parameters on their request_uri
