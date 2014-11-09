@@ -1,3 +1,9 @@
+# Patch to allow resource_owner_authenticator to access authentication logic
+# TODO: Remove this if Doorkeeper gains support for customizing controller inheritance
+class Doorkeeper::ApplicationController < Doorkeeper::ApplicationController.superclass
+  include Authentication
+end
+
 Doorkeeper.configure do
   # Change the ORM that doorkeeper will use.
   # Currently supported options are :active_record, :mongoid2, :mongoid3, :mongo_mapper
@@ -5,7 +11,7 @@ Doorkeeper.configure do
 
   # This block will be called to check whether the resource owner is authenticated or not.
   resource_owner_authenticator do
-    User.find_by!(username: request.env[ENV_USERNAME])
+    authenticate_user!
   end
 
   # If you want to restrict access to the web interface for adding oauth authorized applications, you need to declare the block below.
@@ -27,7 +33,7 @@ Doorkeeper.configure do
   # reuse_access_token
 
   # Issue access tokens with refresh token (disabled by default)
-  # use_refresh_token
+  use_refresh_token
 
   # Provide support for an owner to be assigned to each registered application (disabled by default)
   # Optional parameter :confirmation => true (default false) if you want to enforce ownership of
