@@ -9,13 +9,21 @@ class PostSticker
   validates! :post, :user, presence: true
   validates :expires_at,
     presence: { message: 'must be a valid datetime' },
-    date: { after: proc{ Time.now }, allow_blank: true, message: 'must be in the future' }
+    date: {
+      after_or_equal_to: proc{ Time.now },
+      allow_blank: true,
+      message: "can't be in the past"
+    }
   validate :post_must_be_root
   validate :user_must_be_admin
 
   def stick
     return unless valid?
     post.update!(sticky_user: user, sticky_expires_at: expires_at)
+  end
+
+  def expires_at=(value)
+    super Chronic.parse(value, guess: :begin)
   end
 
   private
