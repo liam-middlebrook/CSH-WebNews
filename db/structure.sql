@@ -234,7 +234,7 @@ CREATE TABLE postings (
     newsgroup_id integer,
     post_id integer,
     number integer,
-    top_level boolean
+    top_level boolean DEFAULT false
 );
 
 
@@ -267,12 +267,12 @@ CREATE TABLE posts (
     author_raw text,
     created_at timestamp without time zone,
     message_id text,
-    had_attachments boolean,
+    had_attachments boolean DEFAULT false,
     sticky_user_id integer,
     sticky_expires_at timestamp without time zone,
     headers text,
     body text,
-    is_dethreaded boolean,
+    is_dethreaded boolean DEFAULT false,
     followup_newsgroup_id integer,
     ancestry text,
     author_email text,
@@ -383,7 +383,7 @@ CREATE TABLE unread_post_entries (
     user_id integer,
     post_id integer,
     personal_level integer,
-    user_created boolean
+    user_created boolean DEFAULT false
 );
 
 
@@ -893,4 +893,6 @@ INSERT INTO schema_migrations (version) VALUES ('20141103024016');
 INSERT INTO schema_migrations (version) VALUES ('20141103200117');
 
 INSERT INTO schema_migrations (version) VALUES ('20141104224837');
+
+INSERT INTO schema_migrations (version) VALUES ('20141116020417');
 
