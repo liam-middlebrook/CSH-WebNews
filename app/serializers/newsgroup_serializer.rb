@@ -1,5 +1,5 @@
 class NewsgroupSerializer < ActiveModel::Serializer
-  attributes :id, :name, :updated_at, :posting_allowed,
+  attributes :id, :name, :posting_allowed,
     :unread_count, :unread_personal_level, :newest_post_at, :oldest_post_at
 
   # FIXME: Next version of AMS should auto-strip the question mark
