@@ -1,5 +1,5 @@
 class UserSerializer < ActiveModel::Serializer
-  attributes :username, :display_name, :created_at, :is_admin, :thread_mode
+  attributes :username, :display_name, :created_at, :is_admin
 
   def display_name
     object.real_name
