@@ -16,7 +16,7 @@ RSpec.describe 'Newsgroups index' do
 
     expect(response).to be_successful
     expect(response_json.keys).to match_array [:meta, :newsgroups]
-    expect(response_json[:meta]).to eq({ last_sync_at: 2.minutes.ago.iso8601 })
+    expect(response_json[:meta]).to eq({ last_sync_at: Flag.last_full_news_sync_at.iso8601 })
     expect(response_json[:newsgroups].size).to be 3
     expect(response_json[:newsgroups][0]).to eq({
       id: first_group.id,

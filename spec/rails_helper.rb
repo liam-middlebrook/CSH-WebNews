@@ -13,4 +13,10 @@ RSpec.configure do |config|
 
   config.include NNTPHelper
   config.include OauthHelper
+
+  config.before(:suite) do
+    # Set time zone so things like 2.minutes.ago in a spec are using the same
+    # zone as the server will be returning times in (assuming a default user)
+    Time.zone = DEFAULT_TIME_ZONE
+  end
 end
