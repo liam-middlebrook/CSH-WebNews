@@ -17,8 +17,8 @@ module Authentication
 
   def update_or_create_user!
     user = User.find_or_initialize_by(username: authenticated_username)
-    user.real_name = request.env[ENV_REALNAME]
-    user.save!
+    user.update!(real_name: request.env[ENV_REALNAME])
+    user
   end
 
   def user_authenticated?
