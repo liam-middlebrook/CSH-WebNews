@@ -28,7 +28,11 @@ module NNTP
     private
 
     def nntp
-      @nntp ||= Net::NNTP.start(NEWS_SERVER)
+      # Hack to get around nntp-lib trying to authenticate twice in `start`
+      # TODO: Figure out why only `original` auth works, it's rather insecure
+      @nntp ||= Net::NNTP.start(ENV['NEWS_HOST']).tap do |nntp|
+        nntp.send(:authenticate, ENV['NEWS_USERNAME'], ENV['NEWS_PASSWORD'], :original)
+      end
     end
 
     NewsgroupLine = Struct.new(:name, :high, :low, :status)

@@ -1,11 +1,7 @@
 # The name of the web server (for constructing URLs in emails)
 SERVER_NAME = "webnews#{'-dev' unless Rails.env.production?}.csh.rit.edu"
 
-# The news server name, or 'localhost' if using SSH tunneling
-NEWS_SERVER = 'news.csh.rit.edu'
-
 # The local top-level domain for users of this installation
-# Cross-origin requests without API authentication will be allowed from this domain
 LOCAL_DOMAIN = 'csh.rit.edu'
 
 # URL prefixes for the Profile and Wiki links
