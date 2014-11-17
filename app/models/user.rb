@@ -2,12 +2,12 @@
 #
 # Table name: users
 #
-#  id          :integer          not null, primary key
-#  username    :text
-#  real_name   :text
-#  preferences :text
-#  created_at  :datetime
-#  updated_at  :datetime
+#  id           :integer          not null, primary key
+#  username     :text
+#  display_name :text
+#  preferences  :text
+#  created_at   :datetime
+#  updated_at   :datetime
 #
 # Indexes
 #
@@ -28,7 +28,7 @@ class User < ActiveRecord::Base
   accepts_nested_attributes_for :default_subscription
   accepts_nested_attributes_for :subscriptions, allow_destroy: true, reject_if: :all_blank
 
-  validates! :username, :real_name, presence: true
+  validates! :username, :display_name, presence: true
   validates! :username, uniqueness: true
 
   before_save :ensure_subscriptions

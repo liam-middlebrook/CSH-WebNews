@@ -52,7 +52,7 @@ module NNTP
 
     def from_line
       address = Mail::Address.new
-      address.display_name = user.real_name
+      address.display_name = user.display_name
       address.address = user.email
       address.to_s
     end

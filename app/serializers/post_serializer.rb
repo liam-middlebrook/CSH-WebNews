@@ -36,7 +36,7 @@ class PostSerializer < ActiveModel::Serializer
   def sticky
     {
       username: object.sticky_user.try(:username),
-      display_name: object.sticky_user.try(:real_name),
+      display_name: object.sticky_user.try(:display_name),
       expires_at: object.sticky_expires_at
     }
   end

@@ -66,6 +66,6 @@ FactoryGirl.define do
 
   factory :user do
     username { Faker::Internet.user_name + rand(1000).to_s }
-    real_name { Faker::Name.name }
+    display_name { Faker::Name.name }
   end
 end

@@ -9,9 +9,9 @@ PROFILES_URL = 'https://profiles.csh.rit.edu/user/'
 WIKI_URL = 'https://wiki.csh.rit.edu/wiki/'
 WIKI_USER_URL = WIKI_URL + 'User:'
 
-# Server variables that provide the user's username and real name
+# Server variables that provide the user's username and display name
 ENV_USERNAME = 'WEBAUTH_USER'
-ENV_REALNAME = 'WEBAUTH_LDAP_CN'
+ENV_DISPLAY_NAME = 'WEBAUTH_LDAP_CN'
 
 # Default time zone for new users, from `rake time:zones:all`
 DEFAULT_TIME_ZONE = 'Eastern Time (US & Canada)'

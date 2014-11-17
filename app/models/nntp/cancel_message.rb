@@ -30,7 +30,7 @@ module NNTP
     end
 
     def body
-      body_lines = ["This message was canceled by #{user.real_name}:", '']
+      body_lines = ["This message was canceled by #{user.display_name}:", '']
 
       body_lines += INCLUDE_HEADERS.map do |header|
         "  #{header}: #{post_message.header[header]}"

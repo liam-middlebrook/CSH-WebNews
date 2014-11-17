@@ -6,7 +6,7 @@ RSpec.describe 'Post show' do
     root = create(:post)
     parent = create(:post,
       parent: root,
-      author_name: oauth_user.real_name,
+      author_name: oauth_user.display_name,
       author_email: oauth_user.email
     )
     post = create(:post,
@@ -40,7 +40,7 @@ RSpec.describe 'Post show' do
       },
       sticky: {
         username: sticky_user.username,
-        display_name: sticky_user.real_name,
+        display_name: sticky_user.display_name,
         expires_at: post.sticky_expires_at.iso8601
       },
       followup_newsgroup_id: post.followup_newsgroup_id,

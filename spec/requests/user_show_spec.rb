@@ -8,7 +8,7 @@ RSpec.describe 'User show' do
     expect(response_json).to eq({
       user: {
         username: oauth_user.username,
-        display_name: oauth_user.real_name,
+        display_name: oauth_user.display_name,
         created_at: oauth_user.created_at.iso8601,
         is_admin: oauth_user.admin?
       }

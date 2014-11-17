@@ -7,7 +7,7 @@ RSpec.describe 'Post create' do
     allow_nntp_server.to receive(:message_ids).and_return(['dummy@post.here'])
     allow_nntp_server.to receive(:article).and_return(<<-ARTICLE.strip_heredoc
       Subject: test post
-      From: #{oauth_user.real_name} <#{oauth_user.email}>
+      From: #{oauth_user.display_name} <#{oauth_user.email}>
       Message-ID: dummy@post.here
       Newsgroups: #{newsgroups.map(&:name).join(',')}
       Followup-To: #{newsgroups.first.name}

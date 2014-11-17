@@ -12,7 +12,7 @@ RSpec.describe 'Sticky update' do
     get post_path(post)
     expect(response_json[:post][:sticky]).to eq({
       username: oauth_user.username,
-      display_name: oauth_user.real_name,
+      display_name: oauth_user.display_name,
       expires_at: date.iso8601
     })
   end

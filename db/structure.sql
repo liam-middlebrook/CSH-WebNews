@@ -413,7 +413,7 @@ ALTER SEQUENCE unread_post_entries_id_seq OWNED BY unread_post_entries.id;
 CREATE TABLE users (
     id integer NOT NULL,
     username text,
-    real_name text,
+    display_name text,
     preferences text,
     created_at timestamp without time zone,
     updated_at timestamp without time zone
@@ -895,4 +895,6 @@ INSERT INTO schema_migrations (version) VALUES ('20141103200117');
 INSERT INTO schema_migrations (version) VALUES ('20141104224837');
 
 INSERT INTO schema_migrations (version) VALUES ('20141116020417');
+
+INSERT INTO schema_migrations (version) VALUES ('20141117040509');
 
