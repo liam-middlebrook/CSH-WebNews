@@ -24,7 +24,7 @@ FactoryGirl.define do
     headers File.read(Rails.root.join('spec', 'support', 'dummy_headers.txt'))
     body { Faker::Lorem.paragraphs(2).join("\n\n") }
 
-    ignore do
+    transient do
       newsgroups []
       unread_for nil
       starred_by nil

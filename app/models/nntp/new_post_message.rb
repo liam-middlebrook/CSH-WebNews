@@ -24,15 +24,7 @@ module NNTP
       end
 
       if parent.present?
-        # FIXME: Mail 2.6 allows assigning an array of message_ids directly,
-        # but Rails 4.1 locks Mail at 2.5 so we have to do this little dance
-        # to coax the property into existence
-        mail.header['References'] = '<x@x>'
-        mail.header['References'].message_ids.delete_at(0)
-        mail.header['References'].message_ids.concat(
-          (parent_message.header['References'].message_ids rescue []) +
-          [parent_message.message_id]
-        )
+        mail.references = [parent_message.references, parent_message.message_id].flatten
       end
 
       mail
