@@ -29,5 +29,13 @@ module Webnews
     # TODO: Go back to schema.rb if this issue is ever addressed
     # https://github.com/dockyard/postgres_ext/issues/139
     config.active_record.schema_format = :sql
+
+    # Allow cross-origin requests to non-OAuth endpoints from secure local sites
+    config.middleware.insert_before 0, 'Rack::Cors' do
+      allow do
+        origins /^https:\/\/[^\/]*\.#{LOCAL_DOMAIN}$/
+        resource /^(?!\/oauth)/, headers: :any, methods: [:get, :post, :put, :patch, :delete, :options]
+      end
+    end
   end
 end

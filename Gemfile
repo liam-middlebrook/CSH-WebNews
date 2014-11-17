@@ -12,6 +12,7 @@ gem 'date_validator'
 gem 'doorkeeper'
 gem 'dotenv-rails'
 gem 'exception_notification'
+gem 'rack-cors', require: 'rack/cors'
 gem 'thoughtafter-nntp', require: 'nntp'
 gem 'whenever'
 
