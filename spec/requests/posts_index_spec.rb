@@ -51,11 +51,11 @@ RSpec.describe 'Post index' do
   end
 
   it 'returns error information when given invalid parameters' do
-    get posts_path(limit: 0)
+    get posts_path(limit: -1)
 
     expect(response.status).to be 422
     expect(response_json).to eq({
-      errors: { limit: ['must be greater than or equal to 1'] }
+      errors: { limit: ['must be greater than or equal to 0'] }
     })
   end
 
