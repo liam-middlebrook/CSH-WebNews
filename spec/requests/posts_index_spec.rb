@@ -18,9 +18,7 @@ RSpec.describe 'Post index' do
     expect(response).to be_successful
     expect(response_json.keys).to match_array [:posts, :meta]
     expect(response_json[:posts].map{ |post| post[:id] }).to eq target_posts.map(&:id)
-    expect(response_json[:meta]).to eq({
-      results: 2, total: 3, matched_ids: target_posts.map(&:id)
-    })
+    expect(response_json[:meta]).to eq({ total: 3, matched_ids: target_posts.map(&:id) })
   end
 
   it 'retrieves info about threads containing posts matching given criteria' do
@@ -49,9 +47,7 @@ RSpec.describe 'Post index' do
     expect(response_json[:descendants].map{ |post| post[:id] }).to match_array(
       target_posts.map(&:id) + [first_root_reply.id, last_root_reply.id]
     )
-    expect(response_json[:meta]).to eq({
-      results: 3, total: 3, matched_ids: target_posts.map(&:id)
-    })
+    expect(response_json[:meta]).to eq({ total: 3, matched_ids: target_posts.map(&:id) })
   end
 
   it 'returns error information when given invalid parameters' do
@@ -70,8 +66,6 @@ RSpec.describe 'Post index' do
     get posts_path(limit: 1, only_unread: true, as_meta: true)
 
     expect(response_json.keys).to eq [:meta]
-    expect(response_json[:meta]).to eq({
-      results: 1, total: 3, matched_ids: [target_posts.last.id]
-    })
+    expect(response_json[:meta]).to eq({ total: 3, matched_ids: [target_posts.last.id] })
   end
 end

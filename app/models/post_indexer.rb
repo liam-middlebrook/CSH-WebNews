@@ -41,9 +41,8 @@ class PostIndexer
   def meta
     return unless valid?
     {
-      results: matched_posts.count,
-      total: unpaged_matched_posts.count,
-      matched_ids: matched_ids
+      matched_ids: matched_ids,
+      total: unpaged_matched_posts.count
     }
   end
 
