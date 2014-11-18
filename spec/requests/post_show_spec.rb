@@ -44,16 +44,7 @@ RSpec.describe 'Post show' do
         expires_at: post.sticky_expires_at.iso8601
       },
       followup_newsgroup_id: post.followup_newsgroup_id,
-      postings: [
-        {
-          newsgroup_id: first_posting.newsgroup_id,
-          number: first_posting.number
-        },
-        {
-          newsgroup_id: second_posting.newsgroup_id,
-          number: second_posting.number
-        }
-      ],
+      newsgroup_ids: [first_posting.newsgroup_id, second_posting.newsgroup_id],
       parent_id: parent.id,
       root_id: root.id,
       had_attachments: true,

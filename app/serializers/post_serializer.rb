@@ -1,5 +1,4 @@
 class PostSerializer < ActiveModel::Serializer
-  has_many :postings
   attributes :id,
     :author,
     :body,
@@ -10,6 +9,7 @@ class PostSerializer < ActiveModel::Serializer
     :is_starred,
     :had_attachments,
     :message_id,
+    :newsgroup_ids,
     :parent_id,
     :personal_level,
     :root_id,
@@ -23,6 +23,10 @@ class PostSerializer < ActiveModel::Serializer
       email: object.author_email,
       raw: object.author_raw
     }
+  end
+
+  def newsgroup_ids
+    object.postings.pluck(:newsgroup_id)
   end
 
   def is_starred
