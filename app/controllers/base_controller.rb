@@ -12,6 +12,10 @@ class BaseController < ActionController::Base
     ExceptionNotifier.notify_exception(error)
   end
 
+  rescue_from ActionController::ParameterMissing do
+    head :bad_request
+  end
+
   rescue_from ActiveRecord::RecordNotFound do
     head :not_found
   end

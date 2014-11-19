@@ -1,5 +1,5 @@
 class UnreadsController < BaseController
-  before_action :ensure_post_ids, :ensure_posts_exist
+  before_action :ensure_posts_exist
 
   def create
     post_ids.each do |post_id|
@@ -18,11 +18,7 @@ class UnreadsController < BaseController
   private
 
   def post_ids
-    params[:post_ids].split(',')
-  end
-
-  def ensure_post_ids
-    head :bad_request if params[:post_ids].blank?
+    params.require(:post_ids).split(',')
   end
 
   def ensure_posts_exist

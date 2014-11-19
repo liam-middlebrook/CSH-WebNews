@@ -8,7 +8,7 @@ class StickiesController < BaseController
   private
 
   def sticker_params
-    params.permit(:expires_at).merge(user: current_user, post: post)
+    params.permit(PostSticker.attribute_names).merge(user: current_user, post: post)
   end
 
   def post
