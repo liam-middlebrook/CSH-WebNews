@@ -15,6 +15,7 @@ class PostSerializer < ActiveModel::Serializer
     :root_id,
     :sticky,
     :subject,
+    :total_stars,
     :unread_class
 
   def author
@@ -43,6 +44,10 @@ class PostSerializer < ActiveModel::Serializer
       display_name: object.sticky_user.try(:display_name),
       expires_at: object.sticky_expires_at
     }
+  end
+
+  def total_stars
+    object.stars.size
   end
 
   def unread_class

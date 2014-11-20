@@ -20,6 +20,7 @@ RSpec.describe 'Post show' do
     )
     first_posting = post.postings.first
     second_posting = create(:posting, post: post)
+    create_list(:star, 2, post: post)
     post.update!(followup_newsgroup_id: second_posting.newsgroup_id)
 
     get post_path(post)
@@ -51,7 +52,8 @@ RSpec.describe 'Post show' do
       is_dethreaded: false,
       personal_level: PERSONAL_LEVELS[:reply],
       unread_class: 'auto',
-      is_starred: true
+      is_starred: true,
+      total_stars: 3
     })
   end
 
