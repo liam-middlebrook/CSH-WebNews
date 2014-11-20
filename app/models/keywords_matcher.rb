@@ -1,11 +1,12 @@
 class KeywordsMatcher < Matcher
-  MATCH_FIELDS = %w(subject body)
+  DEFAULT_MATCH_FIELDS = %w(subject body)
+  POSSIBLE_MATCH_FIELDS = %w(subject body headers)
 
-  def initialize(keywords_string, match_field = nil)
+  def initialize(keywords_string, match_fields)
     # Ensure balanced quotes in the keywords string for Shellwords parsing
     @keywords_string = keywords_string.to_s
     @keywords_string += '"' if @keywords_string.count('"').odd?
-    @match_field = match_field
+    @match_fields = POSSIBLE_MATCH_FIELDS & (match_fields || DEFAULT_MATCH_FIELDS)
   end
 
   private
@@ -21,7 +22,7 @@ class KeywordsMatcher < Matcher
 
   def keyword_conditions(words)
     words.map do |word|
-      match_fields.map do |field|
+      @match_fields.map do |field|
         sanitize_conditions("posts.#{field} ILIKE ?", "%#{word}%")
       end.compact.join(' OR ')
     end.map{ |condition| "(#{condition})" if condition.present? }
@@ -37,9 +38,5 @@ class KeywordsMatcher < Matcher
 
   def negative_keywords
     @negative_keywords ||= keywords.select{ |kw| kw[0] == '-' }.map{ |kw| kw[1..-1] }
-  end
-
-  def match_fields
-    MATCH_FIELDS.include?(@match_field) ? [@match_field] : MATCH_FIELDS
   end
 end

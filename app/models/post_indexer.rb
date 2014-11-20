@@ -64,6 +64,10 @@ class PostIndexer
     [super, maximum_limit].min
   end
 
+  def keywords_match=(value)
+    super value.split(',')
+  end
+
   def newsgroup_ids=(value)
     super value.split(',').map(&:to_i)
   end
