@@ -13,7 +13,7 @@ RSpec.describe 'Post index' do
       create(:post, created_at: 5.days.ago)
     ]
 
-    get posts_path(only_unread: true, since: 3.days.ago, limit: 2)
+    get posts_path(min_unread_level: 0, since: 3.days.ago, limit: 2)
 
     expect(response).to be_successful
     expect(response_json.keys).to match_array [:posts, :meta]
@@ -63,7 +63,7 @@ RSpec.describe 'Post index' do
     target_posts = create_list(:post, 3, unread_for: oauth_user)
     create_list(:post, 2)
 
-    get posts_path(limit: 1, only_unread: true, as_meta: true)
+    get posts_path(limit: 1, min_unread_level: 0, as_meta: true)
 
     expect(response_json.keys).to eq [:meta]
     expect(response_json[:meta]).to eq({ total: 3, matched_ids: [target_posts.last.id] })

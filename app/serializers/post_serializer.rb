@@ -30,11 +30,11 @@ class PostSerializer < ActiveModel::Serializer
   end
 
   def is_starred
-    object.starred_by_user?(scope)
+    object.starred_by?(scope)
   end
 
   def personal_level
-    object.personal_level_for_user(scope)
+    object.personal_level_for(scope)
   end
 
   def sticky
@@ -46,6 +46,6 @@ class PostSerializer < ActiveModel::Serializer
   end
 
   def unread_class
-    object.unread_class_for_user(scope)
+    object.unread_class_for(scope)
   end
 end

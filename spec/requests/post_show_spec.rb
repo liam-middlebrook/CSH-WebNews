@@ -49,7 +49,7 @@ RSpec.describe 'Post show' do
       root_id: root.id,
       had_attachments: true,
       is_dethreaded: false,
-      personal_level: PERSONAL_CODES[:mine_reply],
+      personal_level: PERSONAL_LEVELS[:reply],
       unread_class: 'auto',
       is_starred: true
     })

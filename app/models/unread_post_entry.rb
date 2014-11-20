@@ -31,7 +31,7 @@ class UnreadPostEntry < ActiveRecord::Base
     # FIXME: Post or user could be changed after initialization, and personal
     # level would not update to match. In practice this never happens though.
     if personal_level.nil? && post.present? && user.present?
-      self.personal_level = post.personal_level_for_user(user)
+      self.personal_level = post.personal_level_for(user)
     end
   end
 end

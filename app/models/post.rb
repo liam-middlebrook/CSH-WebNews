@@ -113,6 +113,14 @@ class Post < ActiveRecord::Base
       rstrip
   end
 
+  def self.since(datetime)
+    where('posts.created_at >= ?', datetime)
+  end
+
+  def self.until(datetime)
+    where('posts.created_at <= ?', datetime)
+  end
+
   def self.sticky
     where.not(sticky_expires_at: nil).where('posts.sticky_expires_at > ?', Time.now)
   end
@@ -129,10 +137,6 @@ class Post < ActiveRecord::Base
     postings.exists?(newsgroup_id: followup_newsgroup_id)
   end
 
-  def unread_count_in_thread_for_user(user)
-    user.unread_post_entries.where(post_id: root.subtree_ids).count
-  end
-
   def authored_by?(user)
     author_email == user.email
   end
@@ -142,25 +146,28 @@ class Post < ActiveRecord::Base
     root.subtree.any?{ |post| post.authored_by?(user) }
   end
 
-  def self.starred_by_user(user)
+  def self.starred_by(user)
     joins(:stars).where(stars: { user_id: user.id })
   end
 
-  def starred_by_user?(user)
+  def starred_by?(user)
     user.stars.exists?(post_id: id)
   end
 
-  def self.unread_for_user(user)
-    joins(:unread_post_entries).where(unread_post_entries: { user_id: user.id })
+  def self.unread_for(user, min_personal_level: 0)
+    joins(:unread_post_entries).where(unread_post_entries: {
+      user_id: user.id,
+      personal_level: (min_personal_level..(PERSONAL_LEVELS.size - 1)).to_a
+    })
   end
 
-  def unread_for_user?(user)
-    !unread_class_for_user(user).nil?
+  def unread_for?(user)
+    !unread_class_for(user).nil?
   end
 
-  def unread_class_for_user(user)
+  def unread_class_for(user)
     entry = user.unread_post_entries.find_by_post_id(self)
-    if entry
+    if entry.present?
       if entry.user_created
         :manual
       else
@@ -171,11 +178,11 @@ class Post < ActiveRecord::Base
     end
   end
 
-  def personal_level_for_user(user)
+  def personal_level_for(user)
     case
-      when authored_by?(user) then PERSONAL_CODES[:mine]
-      when parent_id.present? && parent.authored_by?(user) then PERSONAL_CODES[:mine_reply]
-      when root_id.present? && root.user_in_thread?(user) then PERSONAL_CODES[:mine_in_thread]
+      when authored_by?(user) then PERSONAL_LEVELS[:mine]
+      when parent_id.present? && parent.authored_by?(user) then PERSONAL_LEVELS[:reply]
+      when root_id.present? && root.user_in_thread?(user) then PERSONAL_LEVELS[:in_thread]
       else 0
     end
   end

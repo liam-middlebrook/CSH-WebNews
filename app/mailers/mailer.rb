@@ -4,7 +4,7 @@ class Mailer < ActionMailer::Base
   def post_notification(post, user)
     @post = post
 
-    author_action = if post.personal_level_for_user(user) == PERSONAL_CODES[:mine_reply]
+    author_action = if post.personal_level_for(user) == PERSONAL_LEVELS[:reply]
       "replied to your post \"#{post.parent.subject}\""
     elsif post.root?
       "posted \"#{post.subject}\""

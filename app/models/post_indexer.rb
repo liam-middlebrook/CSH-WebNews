@@ -2,8 +2,8 @@ class PostIndexer
   include ActiveAttr::Model
   include ActiveModel::ForbiddenAttributesProtection
 
-  MAX_IDS_PER_QUERY = 50
-  MAX_POSTS_PER_QUERY = 20
+  MAX_IDS_PER_QUERY = 60
+  MAX_POSTS_PER_QUERY = 15
 
   attribute :as_meta, type: Boolean, default: false
   attribute :as_threads, type: Boolean, default: false
@@ -12,25 +12,24 @@ class PostIndexer
   attribute :keywords_match_subject, type: Boolean, default: true
   attribute :keywords_match_body, type: Boolean, default: true
   attribute :limit, type: Integer, default: ->{ maximum_limit }
-  # TODO: Implement this once there's a good way of getting it from the database
-  #attribute :minimum_personal_level, type: Integer, default: 0
+  attribute :min_unread_level, type: Integer
   attribute :newsgroup_ids, type: Object, default: []
   attribute :offset, type: Integer, default: 0
   attribute :only_roots, type: Boolean, default: false
   attribute :only_starred, type: Boolean, default: false
   attribute :only_sticky, type: Boolean, default: false
-  attribute :only_unread, type: Boolean, default: false
   attribute :reverse_order, type: Boolean, default: false
   attribute :since, type: DateTime
   attribute :until, type: DateTime
   attribute :user, type: Object
 
   validates! :user, presence: true
-  validates :limit, numericality: { greater_than_or_equal_to: 0 }
-  validates :offset, numericality: { greater_than_or_equal_to: 0 }
-  # validates :minimum_personal_level, numericality: {
-  #   greater_than_or_equal_to: 0, less_than: PERSONAL_CODES.size
-  # }
+  validates :limit, :offset, numericality: { greater_than_or_equal_to: 0 }
+  validates :min_unread_level, numericality: {
+    greater_than_or_equal_to: 0,
+    less_than: PERSONAL_LEVELS.size,
+    allow_nil: true
+  }
   validate :newsgroups_must_exist
   validate :until_must_be_after_since
 
@@ -87,7 +86,8 @@ class PostIndexer
   end
 
   def unpaged_matched_posts
-    scope = Post.order(created_at: (reverse_order ? :asc : :desc))
+    scope = Post.order(created_at: :desc)
+    scope = scope.reverse_order if reverse_order
 
     if newsgroup_ids.any?
       scope = scope.with_postings_in_newsgroups(newsgroup_ids)
@@ -96,13 +96,16 @@ class PostIndexer
       scope = scope.roots if only_roots
     end
 
+    if min_unread_level.present?
+      scope = scope.unread_for(user, min_personal_level: min_unread_level)
+    end
+
     scope = scope.sticky if only_sticky
-    scope = scope.unread_for_user(user) if only_unread
-    scope = scope.starred_by_user(user) if only_starred
+    scope = scope.starred_by(user) if only_starred
+    scope = scope.since(since) if since.present?
+    scope = scope.until(self.until) if self.until.present?
     scope = authors_matcher.apply(scope) if authors.present?
     scope = keywords_matcher.apply(scope) if keywords.present?
-    scope = scope.where('posts.created_at >= ?', since) if since.present?
-    scope = scope.where('posts.created_at <= ?', self.until) if self.until.present?
     scope
   end
 

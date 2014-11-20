@@ -8,7 +8,7 @@ RSpec.describe 'Unreads create' do
     post unreads_path, post_ids: target_posts.map(&:id).join(',')
 
     expect(response.status).to be 201
-    get posts_path(only_unread: true)
+    get posts_path(min_unread_level: 0)
     expect(response_json[:meta][:matched_ids]).to match_array target_posts.map(&:id)
     expect(response_json[:posts].first[:unread_class]).to eq 'manual'
   end
@@ -19,7 +19,7 @@ RSpec.describe 'Unreads create' do
     post unreads_path, post_ids: target_post.id.to_s
 
     expect(response.status).to be 201
-    get posts_path(only_unread: true)
+    get posts_path(min_unread_level: 0)
     expect(response_json[:meta][:matched_ids]).to eq [target_post.id]
     expect(response_json[:posts].first[:unread_class]).to eq 'manual'
   end
