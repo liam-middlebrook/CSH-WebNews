@@ -9,7 +9,7 @@ class PostIndexer
   attribute :as_threads, type: Boolean, default: false
   attribute :authors, type: String
   attribute :keywords, type: String
-  attribute :keywords_match, type: String
+  attribute :keywords_match, type: Object, default: KeywordsMatcher::DEFAULT_FIELDS
   attribute :limit, type: Integer, default: ->{ maximum_limit }
   attribute :min_unread_level, type: Integer
   attribute :newsgroup_ids, type: Object, default: []
@@ -29,6 +29,7 @@ class PostIndexer
     less_than: PERSONAL_LEVELS.size,
     allow_nil: true
   }
+  validate :keywords_must_match_valid_fields
   validate :newsgroups_must_exist
   validate :until_must_be_after_since
 
@@ -126,6 +127,12 @@ class PostIndexer
 
   def maximum_limit
     as_meta ? MAX_IDS_PER_QUERY : MAX_POSTS_PER_QUERY
+  end
+
+  def keywords_must_match_valid_fields
+    if !keywords_match.all?{ |field| KeywordsMatcher::VALID_FIELDS.include?(field) }
+      errors.add(:keywords_match, 'contains unrecognized field names')
+    end
   end
 
   def newsgroups_must_exist

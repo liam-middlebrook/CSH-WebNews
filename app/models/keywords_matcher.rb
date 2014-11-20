@@ -1,12 +1,12 @@
 class KeywordsMatcher < Matcher
-  DEFAULT_MATCH_FIELDS = %w(subject body)
-  POSSIBLE_MATCH_FIELDS = %w(subject body headers)
+  VALID_FIELDS = %w(subject body headers)
+  DEFAULT_FIELDS = %w(subject body)
 
-  def initialize(keywords_string, match_fields)
+  def initialize(keywords_string, match_fields = DEFAULT_FIELDS)
     # Ensure balanced quotes in the keywords string for Shellwords parsing
     @keywords_string = keywords_string.to_s
     @keywords_string += '"' if @keywords_string.count('"').odd?
-    @match_fields = POSSIBLE_MATCH_FIELDS & (match_fields || DEFAULT_MATCH_FIELDS)
+    @match_fields = VALID_FIELDS & match_fields
   end
 
   private
