@@ -9,8 +9,7 @@ class PostIndexer
   attribute :as_threads, type: Boolean, default: false
   attribute :authors, type: String
   attribute :keywords, type: String
-  attribute :keywords_match_subject, type: Boolean, default: true
-  attribute :keywords_match_body, type: Boolean, default: true
+  attribute :keywords_match, type: String
   attribute :limit, type: Integer, default: ->{ maximum_limit }
   attribute :min_unread_level, type: Integer
   attribute :newsgroup_ids, type: Object, default: []
@@ -114,7 +113,7 @@ class PostIndexer
   end
 
   def keywords_matcher
-    KeywordsMatcher.new(keywords, keywords_match_subject, keywords_match_body)
+    KeywordsMatcher.new(keywords, keywords_match)
   end
 
   def authors_matcher
