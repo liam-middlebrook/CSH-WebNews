@@ -4,11 +4,13 @@ Rails.application.routes.draw do
     controllers applications: 'oauth/applications'
   end
 
-  resources :newsgroups, only: :index
-  resources :posts, only: [:index, :show, :create, :destroy] do
-    resource :star, only: [:create, :destroy]
-    resource :sticky, only: :update
+  scope format: false, constraints: { id: /[^\/\?]+/ } do
+    resources :newsgroups, only: :index
+    resources :posts, only: [:index, :show, :create, :destroy] do
+      resource :star, only: [:create, :destroy]
+      resource :sticky, only: :update
+    end
+    resource :unreads, only: [:create, :destroy]
+    resource :user, only: :show
   end
-  resource :unreads, only: [:create, :destroy]
-  resource :user, only: :show
 end
