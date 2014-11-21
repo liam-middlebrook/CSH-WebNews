@@ -25,9 +25,6 @@ class User < ActiveRecord::Base
     autosave: true, dependent: :destroy
   has_many :oauth_applications, class_name: Doorkeeper::Application, as: :owner
 
-  accepts_nested_attributes_for :default_subscription
-  accepts_nested_attributes_for :subscriptions, allow_destroy: true, reject_if: :all_blank
-
   validates! :username, :display_name, presence: true
   validates! :username, uniqueness: true
 
@@ -47,29 +44,19 @@ class User < ActiveRecord::Base
     updated_at < 3.months.ago
   end
 
-  def unix_groups
-    @unix_groups ||= `groups #{username}`.split.reject{ |g| g == username } rescue []
-  end
-
   def admin?
-    DEVELOPMENT_MODE or unix_groups.include?('rtp') or unix_groups.include?('eboard')
+    unix_groups.include?('rtp') || unix_groups.include?('eboard')
   end
 
   def email
     "#{username}@#{LOCAL_DOMAIN}"
   end
 
-  def theme
-    preferences[:theme].try(:to_sym) || :classic
-  end
-
   def time_zone
     preferences[:time_zone] || DEFAULT_TIME_ZONE
   end
 
-  def thread_mode
-    preferences[:thread_mode].try(:to_sym) || :normal
-  end
+  private
 
   def ensure_subscriptions
     if !default_subscription.present?
@@ -80,9 +67,7 @@ class User < ActiveRecord::Base
     end
   end
 
-  def self.clean_unread!
-    inactive.each do |user|
-      UnreadPostEntry.where(user_id: user.id).delete_all
-    end
+  def unix_groups
+    @unix_groups ||= `groups #{username}`.split.reject{ |g| g == username } rescue []
   end
 end

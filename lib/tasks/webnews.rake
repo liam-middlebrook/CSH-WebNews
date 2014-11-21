@@ -40,12 +40,12 @@ namespace :webnews do
 
   desc 'Mark all posts as read for users considered "inactive"'
   task clean_unread: :environment do
-    with_notifier{ User.clean_unread! }
+    with_notifier{ UnreadCleaner.clean }
   end
 
   desc 'Email post digests for users with digest subscriptions'
   task send_digests: :environment do
-    with_notifier{ Subscription.send_digests! }
+    with_notifier{ DigestScheduler.send }
   end
 
   namespace :maintenance do
