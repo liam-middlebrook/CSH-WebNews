@@ -33,8 +33,8 @@ module Webnews
     # Allow cross-origin requests to non-OAuth endpoints from secure local sites
     config.middleware.insert_before 0, 'Rack::Cors' do
       allow do
-        origins /^https:\/\/[^\/]*\.#{LOCAL_DOMAIN}$/
-        resource /^(?!\/oauth)/, headers: :any, methods: [:get, :post, :put, :patch, :delete, :options]
+        origins %r(^https://[^/]*\.#{LOCAL_DOMAIN}$)
+        resource %r(^(?!/oauth)), headers: :any, methods: [:get, :post, :put, :patch, :delete, :options]
       end
     end
   end
