@@ -23,7 +23,7 @@ RSpec.describe 'Newsgroups index' do
       name: 'test.one',
       posting_allowed: true,
       unread_count: 2,
-      unread_personal_level: 2,
+      max_unread_level: 2,
       newest_post_at: third_post.created_at.iso8601,
       oldest_post_at: first_post.created_at.iso8601
     })
@@ -32,7 +32,7 @@ RSpec.describe 'Newsgroups index' do
       name: 'test.two',
       posting_allowed: false,
       unread_count: 0,
-      unread_personal_level: nil,
+      max_unread_level: nil,
       newest_post_at: nil,
       oldest_post_at: nil
     })
@@ -41,7 +41,7 @@ RSpec.describe 'Newsgroups index' do
       name: 'test.three',
       posting_allowed: true,
       unread_count: 1,
-      unread_personal_level: 1,
+      max_unread_level: 1,
       newest_post_at: second_post.created_at.iso8601,
       oldest_post_at: second_post.created_at.iso8601
     })

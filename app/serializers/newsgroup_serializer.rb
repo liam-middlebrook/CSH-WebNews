@@ -1,12 +1,9 @@
 class NewsgroupSerializer < ActiveModel::Serializer
   attributes :id, :name, :posting_allowed,
-    :unread_count, :unread_personal_level, :newest_post_at, :oldest_post_at
+    :unread_count, :max_unread_level, :newest_post_at, :oldest_post_at
 
-  # FIXME: Next version of AMS should auto-strip the question mark
-  # https://github.com/rails-api/active_model_serializers/pull/662
-
-  def posting_allowed
-    object.posting_allowed?
+  def max_unread_level
+    scoped_unread_post_entries.maximum(:personal_level)
   end
 
   # FIXME: Remove `in_time_zone` if the below PR ever gets merged
@@ -20,12 +17,15 @@ class NewsgroupSerializer < ActiveModel::Serializer
     object.posts.minimum(:created_at).try(:in_time_zone)
   end
 
-  def unread_count
-    scoped_unread_post_entries.count
+  # FIXME: Next version of AMS should auto-strip the question mark
+  # https://github.com/rails-api/active_model_serializers/pull/662
+
+  def posting_allowed
+    object.posting_allowed?
   end
 
-  def unread_personal_level
-    scoped_unread_post_entries.maximum(:personal_level)
+  def unread_count
+    scoped_unread_post_entries.count
   end
 
   private
