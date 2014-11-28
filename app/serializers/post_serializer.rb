@@ -1,5 +1,6 @@
 class PostSerializer < ActiveModel::Serializer
   attributes :id,
+    :ancestor_ids,
     :author,
     :body,
     :created_at,
@@ -10,9 +11,7 @@ class PostSerializer < ActiveModel::Serializer
     :had_attachments,
     :message_id,
     :newsgroup_ids,
-    :parent_id,
     :personal_level,
-    :root_id,
     :sticky,
     :subject,
     :total_stars,
