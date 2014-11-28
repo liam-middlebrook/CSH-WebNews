@@ -2,11 +2,12 @@
 #
 # Table name: newsgroups
 #
-#  id         :integer          not null, primary key
-#  name       :text
-#  status     :text
-#  created_at :datetime
-#  updated_at :datetime
+#  id          :integer          not null, primary key
+#  name        :text
+#  status      :text
+#  created_at  :datetime
+#  updated_at  :datetime
+#  description :text
 #
 # Indexes
 #
@@ -22,7 +23,7 @@ class Newsgroup < ActiveRecord::Base
 
   has_many :unread_post_entries, through: :posts
 
-  validates! :name, uniqueness: true
+  validates! :name, presence: true, uniqueness: true
 
   def self.cancel
     find_by!(name: 'control.cancel')

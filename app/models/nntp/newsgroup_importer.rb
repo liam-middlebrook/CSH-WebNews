@@ -26,8 +26,10 @@ module NNTP
         end
 
         remote_newsgroups.each do |remote_newsgroup|
-          newsgroup = Newsgroup.where(name: remote_newsgroup.name).first_or_initialize
-          newsgroup.update!(status: remote_newsgroup.status)
+          Newsgroup.where(name: remote_newsgroup.name).first_or_initialize.update!(
+            description: remote_newsgroup.description,
+            status: remote_newsgroup.status
+          )
         end
 
         sync!

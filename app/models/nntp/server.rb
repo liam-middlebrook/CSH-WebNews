@@ -7,7 +7,13 @@ module NNTP
     end
 
     def newsgroups
-      nntp.list[1].map(&:split).map{ |fields| NewsgroupLine.new(*fields) }
+      nntp.list[1].map(&:split).map do |fields|
+        RemoteNewsgroup.new.tap do |n|
+          n.name = fields[0]
+          n.status = fields[3]
+          n.description = newsgroup_descriptions[n.name]
+        end
+      end
     end
 
     def message_ids(newsgroup_names = [])
@@ -27,6 +33,11 @@ module NNTP
 
     private
 
+    def newsgroup_descriptions
+      @newsgroup_descriptions ||=
+        nntp.list('newsgroups')[1].map{ |line| line.split(/\t+/) }.to_h
+    end
+
     def nntp
       # Hack to get around nntp-lib trying to authenticate twice in `start`
       # TODO: Figure out why only `original` auth works, it's rather insecure
@@ -35,6 +46,6 @@ module NNTP
       end
     end
 
-    NewsgroupLine = Struct.new(:name, :high, :low, :status)
+    RemoteNewsgroup = Struct.new(:name, :description, :status)
   end
 end

@@ -94,7 +94,8 @@ CREATE TABLE newsgroups (
     name text,
     status text,
     created_at timestamp without time zone,
-    updated_at timestamp without time zone
+    updated_at timestamp without time zone,
+    description text
 );
 
 
@@ -897,4 +898,6 @@ INSERT INTO schema_migrations (version) VALUES ('20141104224837');
 INSERT INTO schema_migrations (version) VALUES ('20141116020417');
 
 INSERT INTO schema_migrations (version) VALUES ('20141117040509');
+
+INSERT INTO schema_migrations (version) VALUES ('20141128174859');
 

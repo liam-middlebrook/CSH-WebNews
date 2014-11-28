@@ -1,5 +1,5 @@
 class NewsgroupSerializer < ActiveModel::Serializer
-  attributes :id, :name, :posting_allowed,
+  attributes :id, :name, :description, :posting_allowed,
     :unread_count, :max_unread_level, :newest_post_at, :oldest_post_at
 
   def max_unread_level
