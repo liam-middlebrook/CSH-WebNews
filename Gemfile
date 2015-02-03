@@ -1,6 +1,6 @@
 source 'http://rubygems.org'
 
-gem 'rails', '4.1.8'
+gem 'rails', '4.2.0'
 
 gem 'pg'
 
@@ -13,6 +13,7 @@ gem 'doorkeeper'
 gem 'dotenv-rails'
 gem 'exception_notification'
 gem 'rack-cors', require: 'rack/cors'
+gem 'responders'
 gem 'thoughtafter-nntp', require: 'nntp'
 gem 'whenever'
 

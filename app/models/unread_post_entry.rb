@@ -6,7 +6,7 @@
 #  user_id        :integer
 #  post_id        :integer
 #  personal_level :integer
-#  user_created   :boolean          default(FALSE)
+#  user_created   :boolean          default("false")
 #
 # Indexes
 #

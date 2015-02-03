@@ -65,7 +65,7 @@ module NNTP
           end
 
           if personal_level >= email_level
-            Mailer.post_notification(post, user).deliver
+            Mailer.post_notification(post, user).deliver_now
           end
         end
       end

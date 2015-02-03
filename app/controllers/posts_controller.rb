@@ -74,8 +74,11 @@ class PostsController < BaseController
   end
 
   def threading?
-    ActiveRecord::ConnectionAdapters::Column.value_to_boolean(
-      params[:as_threads].presence || params[:as_thread].presence
-    )
+    threading_value.present? &&
+      !ActiveRecord::ConnectionAdapters::Column::FALSE_VALUES.include?(threading_value)
+  end
+
+  def threading_value
+    params[:as_threads].presence || params[:as_thread].presence
   end
 end

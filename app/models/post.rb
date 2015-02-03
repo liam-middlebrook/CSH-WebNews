@@ -7,12 +7,12 @@
 #  author_raw            :text
 #  created_at            :datetime
 #  message_id            :text
-#  had_attachments       :boolean          default(FALSE)
+#  had_attachments       :boolean          default("false")
 #  sticky_user_id        :integer
 #  sticky_expires_at     :datetime
 #  headers               :text
 #  body                  :text
-#  is_dethreaded         :boolean          default(FALSE)
+#  is_dethreaded         :boolean          default("false")
 #  followup_newsgroup_id :integer
 #  ancestry              :text
 #  author_email          :text

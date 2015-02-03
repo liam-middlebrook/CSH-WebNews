@@ -12,7 +12,7 @@ FactoryGirl.define do
   factory :oauth_application, class: Doorkeeper::Application do
     association :owner, factory: :user
     name { Faker::App.name }
-    redirect_uri { Faker::Internet.url }
+    redirect_uri { "https://#{Faker::Internet.domain_name}/redirect" }
   end
 
   factory :post do
