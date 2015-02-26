@@ -25,7 +25,7 @@ Rails.application.routes.draw do
   get '/search',   to: 'posts#search', as: :search
   get '/search_entry', to: 'posts#search_entry', as: :search_entry
 
-  constraints newsgroup: /[^\/]*/ do
+  constraints newsgroup: /[^\/]+/, number: /\d+/ do
     get '/newsgroups',                to: 'newsgroups#index',      as: :newsgroups
     get '/newsgroups/:newsgroup',     to: 'newsgroups#show',       as: :newsgroup
     get '/:newsgroup/index',          to: 'posts#index',           as: :posts
