@@ -1,6 +1,6 @@
 source 'http://rubygems.org'
 
-gem 'rails', '4.2.0'
+gem 'rails', '4.2.1'
 
 gem 'pg'
 
@@ -17,26 +17,13 @@ gem 'responders'
 gem 'thoughtafter-nntp', require: 'nntp'
 gem 'whenever'
 
-gem 'font-awesome-sass'
-gem 'jquery-rails'
-gem 'mousetrap-rails'
-gem 'nested_form'
-gem 'rails_autolink'
-
-# Asset template engines
-gem 'sass-rails'
-gem 'coffee-rails'
-gem 'uglifier'
-
 group :development do
   gem 'annotate'
 end
 
 group :development, :test do
+  gem 'byebug'
   gem 'pry-rails'
-  gem 'pry-stack_explorer'
-  gem 'pry-byebug'
-  gem 'pry-rescue'
 end
 
 group :test do
