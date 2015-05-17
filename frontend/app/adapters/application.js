@@ -1,8 +1,9 @@
 import DS from 'ember-data';
 import $ from 'jquery';
 
-export default DS.RESTAdapter.extend({
+export default DS.ActiveModelAdapter.extend({
   headers: {
-    "X-CSRF-Token": $('meta[name="csrf-token"]').attr('content')
+    'Accept': 'application/vnd.csh.webnews.v1+json',
+    'X-CSRF-Token': $('meta[name="csrf-token"]').attr('content')
   }
 });
