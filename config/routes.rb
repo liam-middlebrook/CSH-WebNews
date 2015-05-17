@@ -1,5 +1,5 @@
 Rails.application.routes.draw do
-  root to: 'client#show'
+  root to: 'frontend#show'
   use_doorkeeper do
     controllers applications: 'oauth/applications'
   end
