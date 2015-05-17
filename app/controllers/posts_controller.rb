@@ -24,13 +24,13 @@ class PostsController < BaseController
   def new_post_params
     { posting_host: remote_host }
       .merge(params.permit(NNTP::NewPostMessage.attribute_names))
-      .merge(user: current_user, user_agent: current_application.name)
+      .merge(user: current_user, user_agent: current_application_name)
   end
 
   def cancel_params
     { posting_host: remote_host }
       .merge(params.permit(NNTP::CancelMessage.attribute_names))
-      .merge(post: post, user: current_user, user_agent: current_application.name)
+      .merge(post: post, user: current_user, user_agent: current_application_name)
   end
 
   def respond_with_indexer(indexer)

@@ -1,7 +1,7 @@
 class BaseController < ActionController::Base
   respond_to :json
-  before_action :doorkeeper_authorize!,
-    :require_accept_type,
+  before_action :doorkeeper_authorize!, unless: :local_request?
+  before_action :require_accept_type,
     :require_content_type,
     :require_no_maintenance,
     :respect_user_time_zone,
@@ -28,15 +28,26 @@ class BaseController < ActionController::Base
 
   private
 
-  def current_application
-    @current_application ||= doorkeeper_token.application
+  def current_application_name
+    if doorkeeper_token.present?
+      doorkeeper_token.application.name
+    else
+      'CSH WebNews'
+    end
   end
 
   def current_user
-    @current_user ||= (
+    @current_user ||= local_user ||
       User.find_by(id: doorkeeper_token.resource_owner_id) ||
       doorkeeper_token.application.owner # for Client Credentials grants
-    )
+  end
+
+  def local_request?
+    request.env[ENV_USERNAME].present? && request.headers['Origin'].blank?
+  end
+
+  def local_user
+    User.find_by(username: request.env[ENV_USERNAME]) if local_request?
   end
 
   def remote_host
@@ -52,7 +63,7 @@ class BaseController < ActionController::Base
   end
 
   def require_content_type
-    if request.content_type != 'application/json'
+    if !request.get? && request.content_type != 'application/json'
       head :unsupported_media_type
     end
   end
