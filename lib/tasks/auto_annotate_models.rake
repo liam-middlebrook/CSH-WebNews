@@ -14,6 +14,7 @@ if Rails.env.development?
       'exclude_tests'        => "false",
       'exclude_fixtures'     => "false",
       'exclude_factories'    => "false",
+      'exclude_serializers'  => "true",
       'ignore_model_sub_dir' => "true",
       'skip_on_db_migrate'   => "false",
       'format_bare'          => "true",

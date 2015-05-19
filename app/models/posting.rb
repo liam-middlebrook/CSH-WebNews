@@ -6,7 +6,7 @@
 #  newsgroup_id :integer
 #  post_id      :integer
 #  number       :integer
-#  top_level    :boolean          default("false")
+#  top_level    :boolean          default(FALSE)
 #
 # Indexes
 #
