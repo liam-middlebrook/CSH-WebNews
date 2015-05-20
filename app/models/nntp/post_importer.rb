@@ -158,7 +158,7 @@ module NNTP
 
       [
         utf8_encode(headers),
-        utf8_encode(FlowedFormat.decode_message(target_part).decoded)
+        utf8_encode(FlowedFormat.decode_message(target_part))
       ]
     end
 

@@ -3,13 +3,14 @@
 
 module NNTP
   module FlowedFormat
+    # TODO: This does not actually perform a message-object-to-message-object
+    # decoding, it instead returns a string that is the decoded message body,
+    # whether or not it was flowed. Implementing the former is blocked on this:
+    # https://github.com/mikel/mail/issues/793
     def self.decode_message(message)
       if message.content_type_parameters.to_h['format'] == 'flowed'
-        message = message.dup
-        message.content_type_parameters.delete('format')
-
         new_body_lines = []
-        message.body.to_s.each_line do |line|
+        message.decoded.each_line do |line|
           line.chomp!
           quotes = line[/^>+/]
           line.sub!(/^>+/, '')
@@ -25,10 +26,10 @@ module NNTP
           end
         end
 
-        message.body = new_body_lines.join("\n")
+        new_body_lines.join("\n")
+      else
+        message.decoded
       end
-
-      message
     end
 
     def self.encode_message(message)
