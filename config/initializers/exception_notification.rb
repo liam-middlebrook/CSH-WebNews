@@ -1,7 +1,7 @@
 require 'exception_notification/rails'
 
 ExceptionNotification.configure do |config|
-  config.ignore_if{ not Rails.env.production? }
+  config.ignore_if{ not Rails.env.production? and not Rails.env.staging? }
 
   config.add_notifier :email, {
     email_prefix: "Error:",

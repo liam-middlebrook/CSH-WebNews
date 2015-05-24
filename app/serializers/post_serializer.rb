@@ -27,9 +27,9 @@ class PostSerializer < ActiveModel::Serializer
 
   def body
     # Convert legacy web client URLs into RFC5538 'news' URIs
-    object.body.gsub(%r(https://#{SERVER_NAME}/#!/(\S+)/index)) do
+    object.body.gsub(%r(#{LEGACY_URL_BASE}/#!/(\S+)/index)) do
       'news:' + $1
-    end.gsub(%r(https://#{SERVER_NAME}/#!/(\S+)/(\d+))) do |match|
+    end.gsub(%r(#{LEGACY_URL_BASE}/#!/(\S+)/(\d+))) do |match|
       posting = Newsgroup.find_by(name: $1).try(:postings).try(:find_by, number: $2)
       if posting.nil?
         match
