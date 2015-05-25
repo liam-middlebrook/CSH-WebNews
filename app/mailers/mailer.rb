@@ -21,7 +21,7 @@ class Mailer < ActionMailer::Base
     @posts = []
 
     Newsgroup.find_each do |newsgroup|
-      subscription = user.subscriptions.for(newsgroup) || user.default_subscription
+      subscription = user.subscriptions.for(newsgroup).first || user.default_subscription
       digest_type = subscription.digest_type.presence || user.default_subscription.digest_type
 
       if digest_type == target_digest_type
