@@ -37,6 +37,7 @@ RSpec.describe 'Post show' do
       author: {
         name: post.author_name,
         email: post.author_email,
+        avatar_url: PostSerializer.new(post).author[:avatar_url],
         raw: post.author_raw
       },
       sticky: {

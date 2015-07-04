@@ -9,6 +9,7 @@ RSpec.describe 'User show' do
       user: {
         username: oauth_user.username,
         display_name: oauth_user.display_name,
+        avatar_url: UserSerializer.new(oauth_user).avatar_url,
         created_at: oauth_user.created_at.iso8601,
         is_admin: oauth_user.admin?
       }

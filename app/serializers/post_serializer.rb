@@ -1,4 +1,5 @@
 class PostSerializer < ActiveModel::Serializer
+  include Avatar
   attributes :id,
     :ancestor_ids,
     :author,
@@ -21,6 +22,7 @@ class PostSerializer < ActiveModel::Serializer
     {
       name: object.author_name,
       email: object.author_email,
+      avatar_url: avatar_url_for(object.author_email),
       raw: object.author_raw
     }
   end
