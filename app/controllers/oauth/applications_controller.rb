@@ -1,4 +1,6 @@
 class Oauth::ApplicationsController < Doorkeeper::ApplicationsController
+  respond_to :html
+
   def index
     @applications = current_resource_owner.oauth_applications
   end
