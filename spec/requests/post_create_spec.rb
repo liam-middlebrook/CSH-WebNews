@@ -43,6 +43,18 @@ RSpec.describe 'Post create' do
     })
   end
 
+  it 'returns error information when NNTP transmission fails' do
+    allow_nntp_server.to receive(:post).and_raise(Net::NNTPFatalError, 'ouchy!')
+
+    post(posts_path, {
+      subject: 'test post',
+      newsgroup_ids: create(:newsgroup, status: 'y').id
+    })
+
+    expect(response.status).to be 422
+    expect(response_json).to eq({ errors: { nntp: ['ouchy!'] } })
+  end
+
   it 'returns an appropriate status when the post is accepted but not synced' do
     allow_nntp_server.to receive(:post).and_return('dummy@post.here')
     allow_nntp_server.to receive(:message_ids).and_return([])
