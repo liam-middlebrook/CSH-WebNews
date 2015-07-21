@@ -1,6 +1,7 @@
 module NNTP
   class NewsgroupImporter
     def initialize(quiet: false)
+      @server = Server.new
       @importer = PostImporter.new(quiet: quiet)
     end
 
@@ -11,7 +12,7 @@ module NNTP
         puts 'OK' if $in_rake
 
         local_names = Newsgroup.pluck(:name)
-        remote_newsgroups = Server.newsgroups
+        remote_newsgroups = @server.newsgroups
         remote_names = remote_newsgroups.map(&:name)
         names_to_destroy = local_names - remote_names
         names_to_create = remote_names - local_names
@@ -43,7 +44,7 @@ module NNTP
         else
           Post.pluck(:message_id)
         end
-        remote_message_ids = Server.message_ids(newsgroups.map(&:name))
+        remote_message_ids = @server.message_ids(newsgroups.map(&:name))
         message_ids_to_destroy = local_message_ids - remote_message_ids
         message_ids_to_import = remote_message_ids - local_message_ids
 
@@ -54,7 +55,7 @@ module NNTP
 
         puts "Importing #{message_ids_to_import.size} posts" if $in_rake
         message_ids_to_import.each do |message_id|
-          @importer.import!(article: Server.article(message_id))
+          @importer.import!(article: @server.article(message_id))
           print '.' if $in_rake
         end
 

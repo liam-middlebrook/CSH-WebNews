@@ -16,7 +16,7 @@ module NNTP
       return unless valid?
 
       message_id = begin
-        Server.post(to_mail.to_s)
+        Server.new.post(to_mail.to_s)
       rescue Net::NNTPError
         errors.add(:nntp, $!.message)
         nil

@@ -28,11 +28,12 @@ namespace :webnews do
   desc 'Reload all posts in all newsgroups (warning: slow!)'
   task reload: :environment do
     puts "Reloading all #{Post.count} posts..."
+    server = NNTP::Server.new
     importer = NNTP::PostImporter.new(quiet: true)
 
     Flag.with_news_sync_lock do
       Post.order(:created_at).find_each.with_index do |post, index|
-        importer.import!(article: NNTP::Server.article(post.message_id), post: post)
+        importer.import!(article: server.article(post.message_id), post: post)
         puts "#{index} done" if index % 1000 == 0 && index > 0
       end
     end

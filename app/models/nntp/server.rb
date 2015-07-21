@@ -1,11 +1,5 @@
 module NNTP
   class Server
-    include Singleton
-
-    def self.method_missing(method_name, *arguments)
-      self.instance.send(method_name, *arguments)
-    end
-
     def newsgroups
       nntp.list[1].map(&:split).map do |fields|
         RemoteNewsgroup.new.tap do |n|
