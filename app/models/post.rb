@@ -12,7 +12,7 @@
 #  headers               :text
 #  body                  :text
 #  is_dethreaded         :boolean          default(FALSE)
-#  followup_newsgroup_id :integer
+#  followup_newsgroup_id :text
 #  ancestry              :text
 #  author_email          :text
 #  author_name           :text

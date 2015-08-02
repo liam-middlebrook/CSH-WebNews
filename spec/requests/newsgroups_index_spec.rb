@@ -2,9 +2,9 @@ require 'rails_helper'
 
 RSpec.describe 'Newsgroups index' do
   it 'retrieves info about all newsgroups' do
-    first_group = create(:newsgroup, name: 'test.one', description: 'test1', status: 'y', updated_at: 2.minutes.ago)
-    second_group = create(:newsgroup, name: 'test.two', description: 'test2', status: 'n', updated_at: 1.minute.ago)
-    third_group = create(:newsgroup, name: 'test.three', description: 'test3', status: 'y', updated_at: 3.minutes.ago)
+    first_group = create(:newsgroup, id: 'test.one', description: 'test1', status: 'y', updated_at: 2.minutes.ago)
+    second_group = create(:newsgroup, id: 'test.two', description: 'test2', status: 'n', updated_at: 1.minute.ago)
+    third_group = create(:newsgroup, id: 'test.three', description: 'test3', status: 'y', updated_at: 3.minutes.ago)
     first_post = create(:post, created_at: 5.years.ago, newsgroups: [first_group])
     second_post = create(:post, created_at: 2.months.ago, newsgroups: [first_group, third_group])
     third_post = create(:post, created_at: 9.days.ago, newsgroups: [first_group])
@@ -19,8 +19,7 @@ RSpec.describe 'Newsgroups index' do
     expect(response_json[:meta]).to eq({ last_sync_at: Flag.last_full_news_sync_at.iso8601 })
     expect(response_json[:newsgroups].size).to be 3
     expect(response_json[:newsgroups][0]).to eq({
-      id: first_group.id,
-      name: 'test.one',
+      id: 'test.one',
       description: 'test1',
       posting_allowed: true,
       unread_count: 2,
@@ -29,8 +28,7 @@ RSpec.describe 'Newsgroups index' do
       oldest_post_at: first_post.created_at.iso8601
     })
     expect(response_json[:newsgroups][1]).to eq({
-      id: second_group.id,
-      name: 'test.two',
+      id: 'test.two',
       description: 'test2',
       posting_allowed: false,
       unread_count: 0,
@@ -39,8 +37,7 @@ RSpec.describe 'Newsgroups index' do
       oldest_post_at: nil
     })
     expect(response_json[:newsgroups][2]).to eq({
-      id: third_group.id,
-      name: 'test.three',
+      id: 'test.three',
       description: 'test3',
       posting_allowed: true,
       unread_count: 1,

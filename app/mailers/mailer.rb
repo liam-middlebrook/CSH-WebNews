@@ -14,7 +14,7 @@ class Mailer < ActionMailer::Base
 
     # FIXME: This should really be the name of the subscribed newsgroup that
     # actually triggered the notification
-    mail(to: user.email, subject: "[#{post.primary_newsgroup.name}] #{post.author_name} #{author_action}")
+    mail(to: user.email, subject: "[#{post.primary_newsgroup.id}] #{post.author_name} #{author_action}")
   end
 
   def posts_digest(user, start_at, end_at, target_digest_type)

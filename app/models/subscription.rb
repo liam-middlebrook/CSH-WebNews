@@ -32,6 +32,6 @@ class Subscription < ActiveRecord::Base
   validates :digest_type, inclusion: { in: DIGEST_TYPES, allow_blank: true }
 
   def self.for(newsgroups)
-    where(newsgroup_name: Array(newsgroups).map(&:name))
+    where(newsgroup_name: Array(newsgroups).map(&:id))
   end
 end

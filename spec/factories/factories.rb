@@ -1,6 +1,6 @@
 FactoryGirl.define do
   factory :newsgroup do
-    name { Faker::Lorem.words.join('.') }
+    id { Faker::Lorem.words.join('.') }
     status { %w(y n).sample }
   end
 

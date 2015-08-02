@@ -11,7 +11,7 @@ module NNTP
       Flag.with_news_sync_lock(full_sync: true) do
         puts 'OK' if $in_rake
 
-        local_names = Newsgroup.pluck(:name)
+        local_names = Newsgroup.ids
         remote_newsgroups = @server.newsgroups
         remote_names = remote_newsgroups.map(&:name)
         names_to_destroy = local_names - remote_names
@@ -19,7 +19,7 @@ module NNTP
 
         if names_to_destroy.any?
           puts "Deleting newsgroups: #{names_to_destroy.join(', ')}" if $in_rake
-          Newsgroup.where(name: names_to_destroy).destroy_all
+          Newsgroup.where(id: names_to_destroy).destroy_all
         end
 
         if names_to_create.any?
@@ -27,7 +27,7 @@ module NNTP
         end
 
         remote_newsgroups.each do |remote_newsgroup|
-          Newsgroup.where(name: remote_newsgroup.name).first_or_initialize.update!(
+          Newsgroup.find_or_initialize_by(id: remote_newsgroup.name).update!(
             description: remote_newsgroup.description,
             status: remote_newsgroup.status
           )
@@ -44,7 +44,7 @@ module NNTP
         else
           Post.ids
         end
-        remote_message_ids = @server.message_ids(newsgroups.map(&:name))
+        remote_message_ids = @server.message_ids(newsgroups.map(&:id))
         message_ids_to_destroy = local_message_ids - remote_message_ids
         message_ids_to_import = remote_message_ids - local_message_ids
 

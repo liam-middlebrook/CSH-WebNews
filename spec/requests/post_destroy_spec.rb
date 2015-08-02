@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe 'Post destroy' do
   it 'cancels a post' do
-    cancel = create(:newsgroup, name: 'control.cancel')
+    cancel = create(:newsgroup, id: 'control.cancel')
     newsgroup = create(:newsgroup, status: 'y')
     post = create(:post, newsgroups: [newsgroup], author_email: oauth_user.email)
     allow_nntp_server.to receive(:post).and_return('dummy@cancel.here')
@@ -12,7 +12,7 @@ RSpec.describe 'Post destroy' do
       From: #{oauth_user.display_name} <#{oauth_user.email}>
       Message-ID: dummy@cancel.here
       Control: cancel <#{post.id}>
-      Newsgroups: #{newsgroup.name}
+      Newsgroups: #{newsgroup.id}
       Xref: news.example control.cancel:135
 
       this post done got canceled

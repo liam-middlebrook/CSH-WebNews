@@ -3,7 +3,7 @@
 # Table name: postings
 #
 #  id           :integer          not null, primary key
-#  newsgroup_id :integer
+#  newsgroup_id :text
 #  post_id      :text
 #  number       :integer
 #  top_level    :boolean          default(FALSE)

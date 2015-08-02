@@ -1,5 +1,5 @@
 <% @posts.sort_by(&:created_at).group_by(&:newsgroup).each do |newsgroup, newsgroup_posts| %>
-  <h2><%= newsgroup.name %></h2>
+  <h2><%= newsgroup.id %></h2>
   <% newsgroup_posts.group_by(&:root).each do |root, thread_posts| %>
     <ul style="list-style-type: none; margin-left: 0; padding-left: 0">
       <li>

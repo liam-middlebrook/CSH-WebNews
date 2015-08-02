@@ -90,32 +90,12 @@ ALTER SEQUENCE flags_id_seq OWNED BY flags.id;
 --
 
 CREATE TABLE newsgroups (
-    id integer NOT NULL,
-    name text,
+    id text NOT NULL,
     status text,
     created_at timestamp without time zone,
     updated_at timestamp without time zone,
     description text
 );
-
-
---
--- Name: newsgroups_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE newsgroups_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: newsgroups_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE newsgroups_id_seq OWNED BY newsgroups.id;
 
 
 --
@@ -233,7 +213,7 @@ ALTER SEQUENCE oauth_applications_id_seq OWNED BY oauth_applications.id;
 
 CREATE TABLE postings (
     id integer NOT NULL,
-    newsgroup_id integer,
+    newsgroup_id text,
     post_id text,
     number integer,
     top_level boolean DEFAULT false
@@ -274,7 +254,7 @@ CREATE TABLE posts (
     headers text,
     body text,
     is_dethreaded boolean DEFAULT false,
-    followup_newsgroup_id integer,
+    followup_newsgroup_id text,
     ancestry text,
     author_email text,
     author_name text
@@ -432,13 +412,6 @@ ALTER TABLE ONLY flags ALTER COLUMN id SET DEFAULT nextval('flags_id_seq'::regcl
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY newsgroups ALTER COLUMN id SET DEFAULT nextval('newsgroups_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
 ALTER TABLE ONLY oauth_access_grants ALTER COLUMN id SET DEFAULT nextval('oauth_access_grants_id_seq'::regclass);
 
 
@@ -577,13 +550,6 @@ ALTER TABLE ONLY unread_post_entries
 
 ALTER TABLE ONLY users
     ADD CONSTRAINT users_pkey PRIMARY KEY (id);
-
-
---
--- Name: index_newsgroups_on_name; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE UNIQUE INDEX index_newsgroups_on_name ON newsgroups USING btree (name);
 
 
 --
@@ -783,6 +749,14 @@ CREATE UNIQUE INDEX unique_schema_migrations ON schema_migrations USING btree (v
 
 
 --
+-- Name: fk_rails_00479cb6ab; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY postings
+    ADD CONSTRAINT fk_rails_00479cb6ab FOREIGN KEY (newsgroup_id) REFERENCES newsgroups(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
 -- Name: fk_rails_5a45a99b5e; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -796,6 +770,14 @@ ALTER TABLE ONLY postings
 
 ALTER TABLE ONLY stars
     ADD CONSTRAINT fk_rails_61def2904a FOREIGN KEY (post_id) REFERENCES posts(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: fk_rails_afdb33f423; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY posts
+    ADD CONSTRAINT fk_rails_afdb33f423 FOREIGN KEY (followup_newsgroup_id) REFERENCES newsgroups(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
@@ -895,4 +877,6 @@ INSERT INTO schema_migrations (version) VALUES ('20141128174859');
 INSERT INTO schema_migrations (version) VALUES ('20150203012242');
 
 INSERT INTO schema_migrations (version) VALUES ('20150519000937');
+
+INSERT INTO schema_migrations (version) VALUES ('20150802212832');
 

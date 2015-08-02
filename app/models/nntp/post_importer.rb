@@ -24,7 +24,7 @@ module NNTP
       headers, body = headers_and_body_from_message(mail)
       postings = initialize_postings_for_message(mail)
       followup_newsgroup = if mail.header['Followup-To'].present?
-        Newsgroup.find_by(name: mail.header['Followup-To'].to_s)
+        Newsgroup.find_by(id: mail.header['Followup-To'].to_s)
       end
 
       post.assign_attributes(
@@ -120,9 +120,8 @@ module NNTP
       xrefs = mail.header['Xref'].to_s.split[1..-1].map{ |xref| xref.split(':') }
 
       xrefs.map do |(newsgroup_name, number)|
-        newsgroup_id = Newsgroup.where(name: newsgroup_name).ids.first
-        unless newsgroup_id.nil?
-          Posting.new(newsgroup_id: newsgroup_id, number: number)
+        if Newsgroup.exists?(newsgroup_name)
+          Posting.new(newsgroup_id: newsgroup_name, number: number)
         end
       end.compact
     end

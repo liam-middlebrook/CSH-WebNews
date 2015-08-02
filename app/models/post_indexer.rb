@@ -70,7 +70,7 @@ class PostIndexer
   end
 
   def newsgroup_ids=(value)
-    super value.split(',').map(&:to_i)
+    super value.split(',')
   end
 
   def since=(value)

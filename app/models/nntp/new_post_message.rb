@@ -1,7 +1,7 @@
 module NNTP
   class NewPostMessage < BasicMessage
     attribute :body, type: String, default: ''
-    attribute :followup_newsgroup_id, type: Integer
+    attribute :followup_newsgroup_id, type: String
     attribute :newsgroup_ids, type: String, default: ''
     attribute :parent_id, type: Integer, default: nil
     attribute :subject, type: String
@@ -18,9 +18,9 @@ module NNTP
       mail.subject, mail.body = subject, body
       mail = FlowedFormat.encode_message(mail)
 
-      mail.header['Newsgroups'] = newsgroups.pluck(:name).join(',')
+      mail.header['Newsgroups'] = newsgroup_ids
       if parsed_newsgroup_ids.size > 1
-        mail.header['Followup-To'] = followup_newsgroup.name
+        mail.header['Followup-To'] = followup_newsgroup.id
       end
 
       if parent.present?
@@ -35,7 +35,7 @@ module NNTP
     end
 
     def parsed_newsgroup_ids
-      @parsed_newsgroup_ids ||= newsgroup_ids.split(',').map(&:to_i)
+      @parsed_newsgroup_ids ||= newsgroup_ids.split(',')
     end
 
     def followup_newsgroup

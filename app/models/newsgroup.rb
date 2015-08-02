@@ -2,16 +2,11 @@
 #
 # Table name: newsgroups
 #
-#  id          :integer          not null, primary key
-#  name        :text
+#  id          :text             not null, primary key
 #  status      :text
 #  created_at  :datetime
 #  updated_at  :datetime
 #  description :text
-#
-# Indexes
-#
-#  index_newsgroups_on_name  (name) UNIQUE
 #
 
 class Newsgroup < ActiveRecord::Base
@@ -23,14 +18,12 @@ class Newsgroup < ActiveRecord::Base
 
   has_many :unread_post_entries, through: :posts
 
-  validates! :name, presence: true, uniqueness: true
-
   def self.cancel
-    find_by!(name: 'control.cancel')
+    find('control.cancel')
   end
 
   def control?
-    true if name[/^control\./]
+    true if id[/^control\./]
   end
 
   def posting_allowed?
@@ -42,6 +35,6 @@ class Newsgroup < ActiveRecord::Base
   end
 
   def self.default_filtered
-    where("newsgroups.name NOT SIMILAR TO '#{DEFAULT_NEWSGROUP_FILTER}'")
+    where("newsgroups.id NOT SIMILAR TO '#{DEFAULT_NEWSGROUP_FILTER}'")
   end
 end

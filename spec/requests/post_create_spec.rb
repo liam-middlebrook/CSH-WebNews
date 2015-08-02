@@ -9,9 +9,9 @@ RSpec.describe 'Post create' do
       Subject: test post
       From: #{oauth_user.display_name} <#{oauth_user.email}>
       Message-ID: dummy@post.here
-      Newsgroups: #{newsgroups.map(&:name).join(',')}
-      Followup-To: #{newsgroups.first.name}
-      Xref: news.example #{newsgroups.first.name}:19 #{newsgroups.last.name}:51
+      Newsgroups: #{newsgroups.map(&:id).join(',')}
+      Followup-To: #{newsgroups.first.id}
+      Xref: news.example #{newsgroups.first.id}:19 #{newsgroups.last.id}:51
 
       here is my post everypeople
     ARTICLE
