@@ -31,7 +31,7 @@ module NNTP
           ExceptionNotifier.notify_exception($!)
         end
 
-        Post.find_by(message_id: message_id)
+        Post.find_by(id: message_id)
       end
     end
 

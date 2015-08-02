@@ -28,12 +28,12 @@ module NNTP
       end
 
       post.assign_attributes(
+        id: mail.message_id,
         subject: header_from_message(mail, 'Subject'),
         author_raw: header_from_message(mail, 'From'),
         author_name: author_name_from_message(mail),
         author_email: author_email_from_message(mail),
         created_at: created_at,
-        message_id: mail.message_id,
         had_attachments: mail.has_attachments?,
         headers: headers,
         body: body,
@@ -81,8 +81,8 @@ module NNTP
       references = Array(Mail.new(post.headers).references)
 
       if references.present?
-        parent_from_references = Post.find_by(message_id: references[-1])
-        root_from_references = Post.find_by(message_id: references[0])
+        parent_from_references = Post.find_by(id: references[-1])
+        root_from_references = Post.find_by(id: references[0])
 
         if parent_from_references.present?
           Threading.new(parent_from_references, true)

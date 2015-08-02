@@ -24,7 +24,7 @@ module NNTP
       end
 
       if parent.present?
-        mail.references = [parent_message.references, parent_message.message_id].flatten
+        mail.references = [parent_message.references, parent_message.id].flatten
       end
 
       mail

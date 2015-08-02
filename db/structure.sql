@@ -234,7 +234,7 @@ ALTER SEQUENCE oauth_applications_id_seq OWNED BY oauth_applications.id;
 CREATE TABLE postings (
     id integer NOT NULL,
     newsgroup_id integer,
-    post_id integer,
+    post_id text,
     number integer,
     top_level boolean DEFAULT false
 );
@@ -264,11 +264,10 @@ ALTER SEQUENCE postings_id_seq OWNED BY postings.id;
 --
 
 CREATE TABLE posts (
-    id integer NOT NULL,
+    id text NOT NULL,
     subject text,
     author_raw text,
     created_at timestamp without time zone,
-    message_id text,
     had_attachments boolean DEFAULT false,
     sticky_user_id integer,
     sticky_expires_at timestamp without time zone,
@@ -280,25 +279,6 @@ CREATE TABLE posts (
     author_email text,
     author_name text
 );
-
-
---
--- Name: posts_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE posts_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: posts_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE posts_id_seq OWNED BY posts.id;
 
 
 --
@@ -317,7 +297,7 @@ CREATE TABLE schema_migrations (
 CREATE TABLE stars (
     id integer NOT NULL,
     user_id integer,
-    post_id integer,
+    post_id text,
     created_at timestamp without time zone
 );
 
@@ -383,7 +363,7 @@ ALTER SEQUENCE subscriptions_id_seq OWNED BY subscriptions.id;
 CREATE TABLE unread_post_entries (
     id integer NOT NULL,
     user_id integer,
-    post_id integer,
+    post_id text,
     personal_level integer,
     user_created boolean DEFAULT false
 );
@@ -481,13 +461,6 @@ ALTER TABLE ONLY oauth_applications ALTER COLUMN id SET DEFAULT nextval('oauth_a
 --
 
 ALTER TABLE ONLY postings ALTER COLUMN id SET DEFAULT nextval('postings_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY posts ALTER COLUMN id SET DEFAULT nextval('posts_id_seq'::regclass);
 
 
 --
@@ -719,13 +692,6 @@ CREATE INDEX index_posts_on_followup_newsgroup_id ON posts USING btree (followup
 
 
 --
--- Name: index_posts_on_message_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE UNIQUE INDEX index_posts_on_message_id ON posts USING btree (message_id);
-
-
---
 -- Name: index_posts_on_sticky_expires_at; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -817,6 +783,30 @@ CREATE UNIQUE INDEX unique_schema_migrations ON schema_migrations USING btree (v
 
 
 --
+-- Name: fk_rails_5a45a99b5e; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY postings
+    ADD CONSTRAINT fk_rails_5a45a99b5e FOREIGN KEY (post_id) REFERENCES posts(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: fk_rails_61def2904a; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY stars
+    ADD CONSTRAINT fk_rails_61def2904a FOREIGN KEY (post_id) REFERENCES posts(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: fk_rails_e5e103b303; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY unread_post_entries
+    ADD CONSTRAINT fk_rails_e5e103b303 FOREIGN KEY (post_id) REFERENCES posts(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
 -- PostgreSQL database dump complete
 --
 
@@ -903,4 +893,6 @@ INSERT INTO schema_migrations (version) VALUES ('20141117040509');
 INSERT INTO schema_migrations (version) VALUES ('20141128174859');
 
 INSERT INTO schema_migrations (version) VALUES ('20150203012242');
+
+INSERT INTO schema_migrations (version) VALUES ('20150519000937');
 

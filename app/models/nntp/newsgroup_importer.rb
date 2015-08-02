@@ -40,9 +40,9 @@ module NNTP
     def sync!(newsgroups = [])
       Flag.with_news_sync_lock do
         local_message_ids = if newsgroups.any?
-          Posting.where(newsgroup_id: newsgroups.map(&:id)).joins(:post).pluck(:message_id)
+          Posting.where(newsgroup_id: newsgroups.map(&:id)).joins(:post).ids
         else
-          Post.pluck(:message_id)
+          Post.ids
         end
         remote_message_ids = @server.message_ids(newsgroups.map(&:name))
         message_ids_to_destroy = local_message_ids - remote_message_ids
@@ -50,7 +50,7 @@ module NNTP
 
         if message_ids_to_destroy.any?
           puts "Deleting #{message_ids_to_destroy.size} posts" if $in_rake
-          Post.where(message_id: message_ids_to_destroy).destroy_all
+          Post.where(id: message_ids_to_destroy).destroy_all
         end
 
         puts "Importing #{message_ids_to_import.size} posts" if $in_rake

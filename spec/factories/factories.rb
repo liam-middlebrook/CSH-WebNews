@@ -16,11 +16,11 @@ FactoryGirl.define do
   end
 
   factory :post do
+    id { "#{Faker::Lorem.characters(12)}@#{Faker::Internet.domain_name}" }
     subject { Faker::Lorem.sentence }
     author_name { Faker::Name.name }
     author_email { Faker::Internet.email }
     author_raw { "\"#{author_name}\" <#{author_email}>" }
-    message_id { "#{Faker::Lorem.characters(12)}@#{Faker::Internet.domain_name}" }
     headers File.read(Rails.root.join('spec', 'support', 'dummy_headers.txt'))
     body { Faker::Lorem.paragraphs(2).join("\n\n") }
 

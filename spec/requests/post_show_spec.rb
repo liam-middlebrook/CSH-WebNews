@@ -31,7 +31,6 @@ RSpec.describe 'Post show' do
       id: post.id,
       created_at: post.created_at.iso8601,
       subject: post.subject,
-      message_id: post.message_id,
       headers: post.headers,
       body: post.body,
       author: {
@@ -79,17 +78,8 @@ RSpec.describe 'Post show' do
     [1, 3, 4].each{ |num| expect(response_json[:descendants][num][:child_ids]).to eq [] }
   end
 
-  it 'can retrieve a post by its Message-ID attribute' do
-    post = create(:post)
-
-    get post_path(post.message_id)
-
-    expect(response.status).to be 200
-    expect(response_json[:post][:id]).to eq post.id
-  end
-
   it 'returns an appropriate status code when given a nonexistent post ID' do
-    get post_path(1)
+    get post_path('nope@nothing.here')
 
     expect(response.status).to be 404
   end

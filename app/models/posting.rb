@@ -4,7 +4,7 @@
 #
 #  id           :integer          not null, primary key
 #  newsgroup_id :integer
-#  post_id      :integer
+#  post_id      :text
 #  number       :integer
 #  top_level    :boolean          default(FALSE)
 #

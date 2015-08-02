@@ -12,7 +12,7 @@ module NNTP
 
     def to_mail
       mail = super
-      mail.subject = mail.header['Control'] = "cancel <#{post.message_id}>"
+      mail.subject = mail.header['Control'] = "cancel <#{post.id}>"
       mail.header['Newsgroups'] = post_message.header['Newsgroups']
 
       mail.body = body

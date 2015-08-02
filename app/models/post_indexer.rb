@@ -46,7 +46,7 @@ class PostIndexer
 
     if as_threads && !only_roots
       ancestor_ids = matched_posts.pluck(:ancestry)
-        .compact.map{ |a| a.split('/') }.flatten.map(&:to_i)
+        .compact.map{ |a| a.split('/') }.flatten
       threads_scope = Post.where(id: matched_ids + ancestor_ids)
 
       if newsgroup_ids.any?

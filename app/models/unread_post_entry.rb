@@ -4,7 +4,7 @@
 #
 #  id             :integer          not null, primary key
 #  user_id        :integer
-#  post_id        :integer
+#  post_id        :text
 #  personal_level :integer
 #  user_created   :boolean          default(FALSE)
 #

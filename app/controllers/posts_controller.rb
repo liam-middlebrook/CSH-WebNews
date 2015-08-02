@@ -60,12 +60,7 @@ class PostsController < BaseController
   end
 
   def post
-    post = if params[:id].include?('@')
-      Post.find_by!(message_id: params[:id])
-    else
-      Post.find(params[:id])
-    end
-
+    post = Post.find(params[:id])
     threading? ? post.root : post
   end
 

@@ -10,7 +10,6 @@ class PostSerializer < ActiveModel::Serializer
     :is_dethreaded,
     :is_starred,
     :had_attachments,
-    :message_id,
     :newsgroup_ids,
     :personal_level,
     :sticky,
@@ -36,7 +35,7 @@ class PostSerializer < ActiveModel::Serializer
       if posting.nil?
         match
       else
-        'news:' + posting.post.message_id
+        'news:' + posting.post.id
       end
     end
   end

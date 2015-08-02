@@ -2,11 +2,10 @@
 #
 # Table name: posts
 #
-#  id                    :integer          not null, primary key
+#  id                    :text             not null, primary key
 #  subject               :text
 #  author_raw            :text
 #  created_at            :datetime
-#  message_id            :text
 #  had_attachments       :boolean          default(FALSE)
 #  sticky_user_id        :integer
 #  sticky_expires_at     :datetime
@@ -26,7 +25,6 @@
 #  index_posts_on_author_raw             (author_raw)
 #  index_posts_on_created_at             (created_at)
 #  index_posts_on_followup_newsgroup_id  (followup_newsgroup_id)
-#  index_posts_on_message_id             (message_id) UNIQUE
 #  index_posts_on_sticky_expires_at      (sticky_expires_at)
 #  index_posts_on_sticky_user_id         (sticky_user_id)
 #
@@ -48,8 +46,7 @@ class Post < ActiveRecord::Base
   has_ancestry orphan_strategy: :adopt
   before_destroy :mark_children_dethreaded
 
-  validates! :author_raw, :headers, :message_id, :subject, presence: true
-  validates! :message_id, uniqueness: true
+  validates! :author_raw, :headers, :subject, presence: true
   validates! :postings, length: { minimum: 1 }
 
   def self.with_top_level_postings
