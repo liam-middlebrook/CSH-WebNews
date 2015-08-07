@@ -16,7 +16,7 @@ class Newsgroup < ActiveRecord::Base
     assoc.has_many :subscriptions
   end
 
-  has_many :unread_post_entries, through: :posts
+  has_many :unreads, through: :posts
 
   def self.cancel
     find('control.cancel')

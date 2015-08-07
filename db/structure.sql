@@ -337,10 +337,10 @@ ALTER SEQUENCE subscriptions_id_seq OWNED BY subscriptions.id;
 
 
 --
--- Name: unread_post_entries; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: unreads; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE unread_post_entries (
+CREATE TABLE unreads (
     id integer NOT NULL,
     user_id integer NOT NULL,
     post_id text NOT NULL,
@@ -350,10 +350,10 @@ CREATE TABLE unread_post_entries (
 
 
 --
--- Name: unread_post_entries_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: unreads_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE unread_post_entries_id_seq
+CREATE SEQUENCE unreads_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -362,10 +362,10 @@ CREATE SEQUENCE unread_post_entries_id_seq
 
 
 --
--- Name: unread_post_entries_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- Name: unreads_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE unread_post_entries_id_seq OWNED BY unread_post_entries.id;
+ALTER SEQUENCE unreads_id_seq OWNED BY unreads.id;
 
 
 --
@@ -454,7 +454,7 @@ ALTER TABLE ONLY subscriptions ALTER COLUMN id SET DEFAULT nextval('subscription
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY unread_post_entries ALTER COLUMN id SET DEFAULT nextval('unread_post_entries_id_seq'::regclass);
+ALTER TABLE ONLY unreads ALTER COLUMN id SET DEFAULT nextval('unreads_id_seq'::regclass);
 
 
 --
@@ -537,11 +537,11 @@ ALTER TABLE ONLY subscriptions
 
 
 --
--- Name: unread_post_entries_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: unreads_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
 
-ALTER TABLE ONLY unread_post_entries
-    ADD CONSTRAINT unread_post_entries_pkey PRIMARY KEY (id);
+ALTER TABLE ONLY unreads
+    ADD CONSTRAINT unreads_pkey PRIMARY KEY (id);
 
 
 --
@@ -714,24 +714,24 @@ CREATE INDEX index_subscriptions_on_user_id ON subscriptions USING btree (user_i
 
 
 --
--- Name: index_unread_post_entries_on_post_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_unreads_on_post_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE INDEX index_unread_post_entries_on_post_id ON unread_post_entries USING btree (post_id);
-
-
---
--- Name: index_unread_post_entries_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_unread_post_entries_on_user_id ON unread_post_entries USING btree (user_id);
+CREATE INDEX index_unreads_on_post_id ON unreads USING btree (post_id);
 
 
 --
--- Name: index_unread_post_entries_on_user_id_and_post_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_unreads_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE UNIQUE INDEX index_unread_post_entries_on_user_id_and_post_id ON unread_post_entries USING btree (user_id, post_id);
+CREATE INDEX index_unreads_on_user_id ON unreads USING btree (user_id);
+
+
+--
+-- Name: index_unreads_on_user_id_and_post_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE UNIQUE INDEX index_unreads_on_user_id_and_post_id ON unreads USING btree (user_id, post_id);
 
 
 --
@@ -816,7 +816,7 @@ ALTER TABLE ONLY posts
 -- Name: fk_rails_e5e103b303; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY unread_post_entries
+ALTER TABLE ONLY unreads
     ADD CONSTRAINT fk_rails_e5e103b303 FOREIGN KEY (post_id) REFERENCES posts(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
@@ -824,7 +824,7 @@ ALTER TABLE ONLY unread_post_entries
 -- Name: fk_rails_eb7f55478c; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY unread_post_entries
+ALTER TABLE ONLY unreads
     ADD CONSTRAINT fk_rails_eb7f55478c FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE;
 
 
@@ -927,4 +927,6 @@ INSERT INTO schema_migrations (version) VALUES ('20150807215342');
 INSERT INTO schema_migrations (version) VALUES ('20150807220949');
 
 INSERT INTO schema_migrations (version) VALUES ('20150807231013');
+
+INSERT INTO schema_migrations (version) VALUES ('20150807232205');
 

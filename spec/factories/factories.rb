@@ -37,7 +37,7 @@ FactoryGirl.define do
       end
 
       if evaluator.unread_for.present?
-        post.unread_post_entries << build(:unread_post_entry, post: post, user: evaluator.unread_for)
+        post.unreads << build(:unread, post: post, user: evaluator.unread_for)
       end
 
       if evaluator.starred_by.present?
@@ -57,7 +57,7 @@ FactoryGirl.define do
     user
   end
 
-  factory :unread_post_entry do
+  factory :unread do
     post
     user
     personal_level 0

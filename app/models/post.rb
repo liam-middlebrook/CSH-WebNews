@@ -34,13 +34,13 @@ class Post < ActiveRecord::Base
 
   with_options dependent: :destroy do |assoc|
     assoc.has_many :postings
-    assoc.has_many :unread_post_entries
+    assoc.has_many :unreads
     assoc.has_many :stars
   end
 
   has_many :newsgroups, through: :postings
   belongs_to :followup_newsgroup, class_name: Newsgroup
-  has_many :unread_users, through: :unread_post_entries, source: :user
+  has_many :unread_users, through: :unreads, source: :user
   has_many :starred_users, through: :stars, source: :user
 
   has_ancestry orphan_strategy: :adopt
@@ -152,7 +152,7 @@ class Post < ActiveRecord::Base
   end
 
   def self.unread_for(user, min_personal_level: 0)
-    joins(:unread_post_entries).where(unread_post_entries: {
+    joins(:unreads).where(unreads: {
       user_id: user.id,
       personal_level: (min_personal_level..(PERSONAL_LEVELS.size - 1)).to_a
     })
@@ -163,7 +163,7 @@ class Post < ActiveRecord::Base
   end
 
   def unread_class_for(user)
-    entry = user.unread_post_entries.find_by_post_id(self)
+    entry = user.unreads.find_by_post_id(self)
     if entry.present?
       if entry.user_created
         :manual

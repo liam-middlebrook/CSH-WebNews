@@ -57,7 +57,7 @@ module NNTP
           email_level = subscriptions.where.not(email_level: nil).minimum(:email_level)
           email_level ||= user.default_subscription.email_level
 
-          potential_unread = UnreadPostEntry.new(user: user, post: post)
+          potential_unread = Unread.new(user: user, post: post)
           personal_level = potential_unread.personal_level
 
           if personal_level >= unread_level

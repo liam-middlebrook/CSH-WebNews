@@ -8,8 +8,8 @@ RSpec.describe 'Newsgroups index' do
     first_post = create(:post, created_at: 5.years.ago, newsgroups: [first_group])
     second_post = create(:post, created_at: 2.months.ago, newsgroups: [first_group, third_group])
     third_post = create(:post, created_at: 9.days.ago, newsgroups: [first_group])
-    create(:unread_post_entry, user: oauth_user, post: second_post, personal_level: 1)
-    create(:unread_post_entry, user: oauth_user, post: third_post, personal_level: 2)
+    create(:unread, user: oauth_user, post: second_post, personal_level: 1)
+    create(:unread, user: oauth_user, post: third_post, personal_level: 2)
     allow(Flag).to receive(:last_full_news_sync_at).and_return(2.minutes.ago)
 
     get newsgroups_path

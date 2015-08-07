@@ -15,9 +15,9 @@
 #
 
 class User < ActiveRecord::Base
-  has_many :unread_post_entries, dependent: :destroy
+  has_many :unreads, dependent: :destroy
   has_many :stars, dependent: :destroy
-  has_many :unread_posts, through: :unread_post_entries, source: :post
+  has_many :unread_posts, through: :unreads, source: :post
   has_many :starred_posts, through: :stars, source: :post
   has_many :subscriptions, autosave: true, dependent: :destroy
   has_one :default_subscription, -> { where(newsgroup_id: nil) }, class_name: Subscription

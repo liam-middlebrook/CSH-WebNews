@@ -3,7 +3,7 @@ class NewsgroupSerializer < ActiveModel::Serializer
     :unread_count, :max_unread_level, :newest_post_at, :oldest_post_at
 
   def max_unread_level
-    scoped_unread_post_entries.maximum(:personal_level)
+    scoped_unreads.maximum(:personal_level)
   end
 
   # FIXME: Remove `in_time_zone` if the below PR ever gets merged
@@ -25,12 +25,12 @@ class NewsgroupSerializer < ActiveModel::Serializer
   end
 
   def unread_count
-    scoped_unread_post_entries.count
+    scoped_unreads.count
   end
 
   private
 
-  def scoped_unread_post_entries
-    object.unread_post_entries.merge(scope.unread_post_entries)
+  def scoped_unreads
+    object.unreads.merge(scope.unreads)
   end
 end
