@@ -801,7 +801,7 @@ ALTER TABLE ONLY subscriptions
 --
 
 ALTER TABLE ONLY posts
-    ADD CONSTRAINT fk_rails_afdb33f423 FOREIGN KEY (followup_newsgroup_id) REFERENCES newsgroups(id) ON UPDATE CASCADE ON DELETE CASCADE;
+    ADD CONSTRAINT fk_rails_afdb33f423 FOREIGN KEY (followup_newsgroup_id) REFERENCES newsgroups(id) ON UPDATE CASCADE ON DELETE SET NULL;
 
 
 --
@@ -923,4 +923,6 @@ INSERT INTO schema_migrations (version) VALUES ('20150802212832');
 INSERT INTO schema_migrations (version) VALUES ('20150802215840');
 
 INSERT INTO schema_migrations (version) VALUES ('20150807215342');
+
+INSERT INTO schema_migrations (version) VALUES ('20150807220949');
 
