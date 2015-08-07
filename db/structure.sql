@@ -757,6 +757,14 @@ ALTER TABLE ONLY postings
 
 
 --
+-- Name: fk_rails_510b95ed0a; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY stars
+    ADD CONSTRAINT fk_rails_510b95ed0a FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE;
+
+
+--
 -- Name: fk_rails_5111e9b262; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -781,6 +789,14 @@ ALTER TABLE ONLY stars
 
 
 --
+-- Name: fk_rails_933bdff476; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY subscriptions
+    ADD CONSTRAINT fk_rails_933bdff476 FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE;
+
+
+--
 -- Name: fk_rails_afdb33f423; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -789,11 +805,27 @@ ALTER TABLE ONLY posts
 
 
 --
+-- Name: fk_rails_d533f6a7d5; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY posts
+    ADD CONSTRAINT fk_rails_d533f6a7d5 FOREIGN KEY (sticky_user_id) REFERENCES users(id) ON DELETE SET NULL;
+
+
+--
 -- Name: fk_rails_e5e103b303; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY unread_post_entries
     ADD CONSTRAINT fk_rails_e5e103b303 FOREIGN KEY (post_id) REFERENCES posts(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: fk_rails_eb7f55478c; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY unread_post_entries
+    ADD CONSTRAINT fk_rails_eb7f55478c FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE;
 
 
 --
@@ -889,4 +921,6 @@ INSERT INTO schema_migrations (version) VALUES ('20150519000937');
 INSERT INTO schema_migrations (version) VALUES ('20150802212832');
 
 INSERT INTO schema_migrations (version) VALUES ('20150802215840');
+
+INSERT INTO schema_migrations (version) VALUES ('20150807215342');
 
