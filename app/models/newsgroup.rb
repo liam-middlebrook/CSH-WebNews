@@ -13,7 +13,7 @@ class Newsgroup < ActiveRecord::Base
   with_options dependent: :destroy do |assoc|
     assoc.has_many :postings
     assoc.has_many :posts, through: :postings
-    assoc.has_many :subscriptions, foreign_key: :newsgroup_name, primary_key: :name
+    assoc.has_many :subscriptions
   end
 
   has_many :unread_post_entries, through: :posts

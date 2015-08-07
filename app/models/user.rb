@@ -19,16 +19,14 @@ class User < ActiveRecord::Base
   has_many :stars, dependent: :destroy
   has_many :unread_posts, through: :unread_post_entries, source: :post
   has_many :starred_posts, through: :stars, source: :post
-  has_one :default_subscription, -> { where(newsgroup_name: nil) },
-    class_name: Subscription, autosave: true, dependent: :destroy
-  has_many :subscriptions, -> { where.not(newsgroup_name: nil) },
-    autosave: true, dependent: :destroy
+  has_many :subscriptions, autosave: true, dependent: :destroy
+  has_one :default_subscription, -> { where(newsgroup_id: nil) }, class_name: Subscription
   has_many :oauth_applications, class_name: Doorkeeper::Application, as: :owner
 
   validates! :username, :display_name, presence: true
   validates! :username, uniqueness: true
 
-  before_save :ensure_subscriptions
+  after_create :ensure_subscriptions
 
   serialize :preferences, Hash
 
@@ -59,10 +57,9 @@ class User < ActiveRecord::Base
   private
 
   def ensure_subscriptions
-    if !default_subscription.present?
-      subscriptions.destroy_all
+    if subscriptions.none?
       NEW_USER_SUBSCRIPTIONS.each do |attrs|
-        subscriptions << Subscription.new(attrs)
+        Subscription.create!(attrs.merge(user: self))
       end
     end
   end

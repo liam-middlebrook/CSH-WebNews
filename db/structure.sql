@@ -308,7 +308,7 @@ ALTER SEQUENCE stars_id_seq OWNED BY stars.id;
 CREATE TABLE subscriptions (
     id integer NOT NULL,
     user_id integer,
-    newsgroup_name text,
+    newsgroup_id text,
     unread_level integer,
     email_level integer,
     digest_type text,
@@ -693,17 +693,17 @@ CREATE UNIQUE INDEX index_stars_on_user_id_and_post_id ON stars USING btree (use
 
 
 --
--- Name: index_subscriptions_on_newsgroup_name; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_subscriptions_on_newsgroup_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE INDEX index_subscriptions_on_newsgroup_name ON subscriptions USING btree (newsgroup_name);
+CREATE INDEX index_subscriptions_on_newsgroup_id ON subscriptions USING btree (newsgroup_id);
 
 
 --
--- Name: index_subscriptions_on_newsgroup_name_and_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_subscriptions_on_newsgroup_id_and_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE UNIQUE INDEX index_subscriptions_on_newsgroup_name_and_user_id ON subscriptions USING btree (newsgroup_name, user_id);
+CREATE UNIQUE INDEX index_subscriptions_on_newsgroup_id_and_user_id ON subscriptions USING btree (newsgroup_id, user_id);
 
 
 --
@@ -754,6 +754,14 @@ CREATE UNIQUE INDEX unique_schema_migrations ON schema_migrations USING btree (v
 
 ALTER TABLE ONLY postings
     ADD CONSTRAINT fk_rails_00479cb6ab FOREIGN KEY (newsgroup_id) REFERENCES newsgroups(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: fk_rails_5111e9b262; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY subscriptions
+    ADD CONSTRAINT fk_rails_5111e9b262 FOREIGN KEY (newsgroup_id) REFERENCES newsgroups(id);
 
 
 --
@@ -879,4 +887,6 @@ INSERT INTO schema_migrations (version) VALUES ('20150203012242');
 INSERT INTO schema_migrations (version) VALUES ('20150519000937');
 
 INSERT INTO schema_migrations (version) VALUES ('20150802212832');
+
+INSERT INTO schema_migrations (version) VALUES ('20150802215840');
 

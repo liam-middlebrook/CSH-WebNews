@@ -67,5 +67,10 @@ FactoryGirl.define do
   factory :user do
     username { Faker::Internet.user_name + rand(1000).to_s }
     display_name { Faker::Name.name }
+
+    after(:build) do |user|
+      # FIXME: Default "test" subscriptions should probably have email_level 0
+      user.subscriptions << Subscription.new(NEW_USER_SUBSCRIPTIONS.first.merge(user: user))
+    end
   end
 end
