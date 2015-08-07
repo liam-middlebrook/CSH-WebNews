@@ -3,15 +3,15 @@
 # Table name: posts
 #
 #  id                    :text             not null, primary key
-#  subject               :text
-#  author_raw            :text
+#  subject               :text             not null
+#  author_raw            :text             not null
 #  created_at            :datetime
-#  had_attachments       :boolean          default(FALSE)
+#  had_attachments       :boolean          default(FALSE), not null
 #  sticky_user_id        :integer
 #  sticky_expires_at     :datetime
-#  headers               :text
+#  headers               :text             not null
 #  body                  :text
-#  is_dethreaded         :boolean          default(FALSE)
+#  is_dethreaded         :boolean          default(FALSE), not null
 #  followup_newsgroup_id :text
 #  ancestry              :text
 #  author_email          :text

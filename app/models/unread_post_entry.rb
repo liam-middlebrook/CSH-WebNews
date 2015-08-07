@@ -3,9 +3,9 @@
 # Table name: unread_post_entries
 #
 #  id             :integer          not null, primary key
-#  user_id        :integer
-#  post_id        :text
-#  personal_level :integer
+#  user_id        :integer          not null
+#  post_id        :text             not null
+#  personal_level :integer          not null
 #  user_created   :boolean          default(FALSE)
 #
 # Indexes
@@ -18,9 +18,6 @@
 class UnreadPostEntry < ActiveRecord::Base
   belongs_to :user
   belongs_to :post
-
-  validates! :user, :post, presence: true
-  validates! :user_id, uniqueness: { scope: :post_id }
 
   after_initialize :assign_personal_level
   before_save :assign_personal_level

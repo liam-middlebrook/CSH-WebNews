@@ -3,10 +3,10 @@
 # Table name: postings
 #
 #  id           :integer          not null, primary key
-#  newsgroup_id :text
-#  post_id      :text
-#  number       :integer
-#  top_level    :boolean          default(FALSE)
+#  newsgroup_id :text             not null
+#  post_id      :text             not null
+#  number       :integer          not null
+#  top_level    :boolean          default(FALSE), not null
 #
 # Indexes
 #
@@ -19,8 +19,7 @@ class Posting < ActiveRecord::Base
   belongs_to :newsgroup
   belongs_to :post
 
-  validates! :newsgroup, :post, :number, presence: true
-  validates! :newsgroup_id, uniqueness: { scope: :post_id }
+  validates! :number, presence: true
 
   before_save :update_top_level
 

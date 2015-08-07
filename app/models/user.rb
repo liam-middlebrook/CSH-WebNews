@@ -3,8 +3,8 @@
 # Table name: users
 #
 #  id           :integer          not null, primary key
-#  username     :text
-#  display_name :text
+#  username     :text             not null
+#  display_name :text             not null
 #  preferences  :text
 #  created_at   :datetime
 #  updated_at   :datetime
@@ -24,7 +24,6 @@ class User < ActiveRecord::Base
   has_many :oauth_applications, class_name: Doorkeeper::Application, as: :owner
 
   validates! :username, :display_name, presence: true
-  validates! :username, uniqueness: true
 
   after_create :ensure_subscriptions
 

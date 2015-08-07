@@ -213,10 +213,10 @@ ALTER SEQUENCE oauth_applications_id_seq OWNED BY oauth_applications.id;
 
 CREATE TABLE postings (
     id integer NOT NULL,
-    newsgroup_id text,
-    post_id text,
-    number integer,
-    top_level boolean DEFAULT false
+    newsgroup_id text NOT NULL,
+    post_id text NOT NULL,
+    number integer NOT NULL,
+    top_level boolean DEFAULT false NOT NULL
 );
 
 
@@ -245,15 +245,15 @@ ALTER SEQUENCE postings_id_seq OWNED BY postings.id;
 
 CREATE TABLE posts (
     id text NOT NULL,
-    subject text,
-    author_raw text,
+    subject text NOT NULL,
+    author_raw text NOT NULL,
     created_at timestamp without time zone,
-    had_attachments boolean DEFAULT false,
+    had_attachments boolean DEFAULT false NOT NULL,
     sticky_user_id integer,
     sticky_expires_at timestamp without time zone,
-    headers text,
+    headers text NOT NULL,
     body text,
-    is_dethreaded boolean DEFAULT false,
+    is_dethreaded boolean DEFAULT false NOT NULL,
     followup_newsgroup_id text,
     ancestry text,
     author_email text,
@@ -276,8 +276,8 @@ CREATE TABLE schema_migrations (
 
 CREATE TABLE stars (
     id integer NOT NULL,
-    user_id integer,
-    post_id text,
+    user_id integer NOT NULL,
+    post_id text NOT NULL,
     created_at timestamp without time zone
 );
 
@@ -307,7 +307,7 @@ ALTER SEQUENCE stars_id_seq OWNED BY stars.id;
 
 CREATE TABLE subscriptions (
     id integer NOT NULL,
-    user_id integer,
+    user_id integer NOT NULL,
     newsgroup_id text,
     unread_level integer,
     email_level integer,
@@ -342,9 +342,9 @@ ALTER SEQUENCE subscriptions_id_seq OWNED BY subscriptions.id;
 
 CREATE TABLE unread_post_entries (
     id integer NOT NULL,
-    user_id integer,
-    post_id text,
-    personal_level integer,
+    user_id integer NOT NULL,
+    post_id text NOT NULL,
+    personal_level integer NOT NULL,
     user_created boolean DEFAULT false
 );
 
@@ -374,8 +374,8 @@ ALTER SEQUENCE unread_post_entries_id_seq OWNED BY unread_post_entries.id;
 
 CREATE TABLE users (
     id integer NOT NULL,
-    username text,
-    display_name text,
+    username text NOT NULL,
+    display_name text NOT NULL,
     preferences text,
     created_at timestamp without time zone,
     updated_at timestamp without time zone
@@ -925,4 +925,6 @@ INSERT INTO schema_migrations (version) VALUES ('20150802215840');
 INSERT INTO schema_migrations (version) VALUES ('20150807215342');
 
 INSERT INTO schema_migrations (version) VALUES ('20150807220949');
+
+INSERT INTO schema_migrations (version) VALUES ('20150807231013');
 

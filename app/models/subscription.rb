@@ -3,7 +3,7 @@
 # Table name: subscriptions
 #
 #  id           :integer          not null, primary key
-#  user_id      :integer
+#  user_id      :integer          not null
 #  newsgroup_id :text
 #  unread_level :integer
 #  email_level  :integer
@@ -24,7 +24,6 @@ class Subscription < ActiveRecord::Base
   belongs_to :user
   belongs_to :newsgroup
 
-  validates :user, presence: true
   validates :newsgroup_id, uniqueness: { scope: :user_id, message: 'is duplicated' }
   validates :unread_level, :email_level, numericality: {
     greater_than_or_equal_to: 0, less_than: PERSONAL_LEVELS.length, allow_nil: true
