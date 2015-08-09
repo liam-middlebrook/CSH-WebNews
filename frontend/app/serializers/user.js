@@ -1,10 +1,10 @@
-import DS from 'ember-data';
+import { ActiveModelSerializer } from 'active-model-adapter';
 
-export default DS.ActiveModelSerializer.extend({
-  normalizeHash: {
-    user: (hash) => {
-      hash.id = 'current';
-      return hash;
-    }
+export default ActiveModelSerializer.extend({
+  isNewSerializerAPI: true,
+
+  normalize: function(modelClass, hash, property) {
+    hash.id = 'current';
+    return this._super(modelClass, hash, property);
   }
 });
