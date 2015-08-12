@@ -31,7 +31,7 @@ class PostSerializer < ActiveModel::Serializer
     object.body.gsub(%r(#{LEGACY_URL_BASE}/#!/(\S+)/index)) do
       'news:' + $1
     end.gsub(%r(#{LEGACY_URL_BASE}/#!/(\S+)/(\d+))) do |match|
-      posting = Newsgroup.find_by(name: $1).try(:postings).try(:find_by, number: $2)
+      posting = Newsgroup.find_by(id: $1).try(:postings).try(:find_by, number: $2)
       if posting.nil?
         match
       else
