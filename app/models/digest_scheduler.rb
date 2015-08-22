@@ -2,7 +2,7 @@ class DigestScheduler
   def self.send
     User.find_each do |user|
       Time.use_zone(user.time_zone) do
-        now = Time.now
+        now = Time.current
 
         if now.between?(now.beginning_of_day + 30.minutes, now.beginning_of_day + 90.minutes)
           Mailer.posts_digest(
