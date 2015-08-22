@@ -4,7 +4,8 @@ class BaseController < ActionController::Base
     :require_accept_type,
     :require_content_type,
     :require_no_maintenance,
-    :respect_user_time_zone
+    :respect_user_time_zone,
+    :update_last_access_at
   serialization_scope :current_user
 
   rescue_from StandardError do |error|
@@ -68,5 +69,9 @@ class BaseController < ActionController::Base
     # with Chronic, see https://github.com/mojombo/chronic/pull/214 and related
     Time.zone = current_user.time_zone
     Chronic.time_class = Time.zone
+  end
+
+  def update_last_access_at
+    current_user.update_column(:last_access_at, Time.current)
   end
 end

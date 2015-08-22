@@ -2,12 +2,13 @@
 #
 # Table name: users
 #
-#  id           :integer          not null, primary key
-#  username     :text             not null
-#  display_name :text             not null
-#  preferences  :text
-#  created_at   :datetime
-#  updated_at   :datetime
+#  id             :integer          not null, primary key
+#  username       :text             not null
+#  display_name   :text             not null
+#  preferences    :text
+#  created_at     :datetime
+#  updated_at     :datetime
+#  last_access_at :datetime
 #
 # Indexes
 #
@@ -30,15 +31,11 @@ class User < ActiveRecord::Base
   serialize :preferences, Hash
 
   def self.active
-    where('updated_at >= ?', 3.months.ago)
+    where('last_access_at >= ?', 4.months.ago)
   end
 
   def self.inactive
-    where('updated_at < ?', 3.months.ago)
-  end
-
-  def inactive?
-    updated_at < 3.months.ago
+    where('last_access_at < ?', 4.months.ago)
   end
 
   def admin?

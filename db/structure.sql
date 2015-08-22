@@ -378,7 +378,8 @@ CREATE TABLE users (
     display_name text NOT NULL,
     preferences text,
     created_at timestamp without time zone,
-    updated_at timestamp without time zone
+    updated_at timestamp without time zone,
+    last_access_at timestamp without time zone
 );
 
 
@@ -929,4 +930,6 @@ INSERT INTO schema_migrations (version) VALUES ('20150807220949');
 INSERT INTO schema_migrations (version) VALUES ('20150807231013');
 
 INSERT INTO schema_migrations (version) VALUES ('20150807232205');
+
+INSERT INTO schema_migrations (version) VALUES ('20150822174635');
 
