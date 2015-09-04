@@ -25,7 +25,7 @@ class AuthorsMatcher < Matcher
   end
 
   def authors
-    @authors ||= authors.split(',').map(&:strip)
+    @authors ||= @authors_string.split(',').map(&:strip)
   end
 
   def exact_authors
