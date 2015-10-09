@@ -1,1 +1,50 @@
-<h2 id="title">{{fa-icon 'home'}} Welcome {{currentUser.model.displayName}}</h2>
+{{! new user or old user greeting }}
+
+<div id="toolbar">
+  <div class="user_info">
+    <img src="{{currentUser.model.avatarUrl}}" class="avatar" width="28" height="28">
+    <a title="Show all my posts" href="#">
+      <span class="real_name">{{currentUser.model.displayName}}</span>
+      <span class="username">({{currentUser.model.username}})</span>
+    </a>
+    {{#if currentUser.model.isAdmin}}<span class="role_badge">Admin</span>{{/if}}
+    <span class="buttons">
+      <a id="settings_button" class="button" title="Settings" href="#">{{fa-icon 'cog'}}</a>
+      <a id="about_button" class="button blue" title="About WebNews" href="#">{{fa-icon 'question'}}</a>
+    </span>
+  </div>
+  <div class="buttons">
+    <h1>{{#link-to 'index'}}WebNews{{/link-to}}</h1>
+    <a id="home_button" class="button" href="#">{{fa-icon 'home'}}</a>
+    <a id="search_button" class="button" href="#">{{fa-icon 'search'}} Search</a>
+    <a id="starred_button" class="button" href="#">{{fa-icon 'star'}} Starred</a>
+    <a id="next_unread" class="button" href="#">{{fa-icon 'arrow-right'}} Next Unread</a>
+    <a id="mark_all_read_button" class="button mark_read" data-scope="all" href="#"
+      data-confirm="Really mark all posts read?">{{fa-icon 'check'}} Read All</a>
+    <a class="button yellow resume_draft" href="#">{{fa-icon 'chevron-down'}} Resume Draft</a>
+  </div>
+</div>
+
+<div id="groups_list">
+  <h2>Newsgroups</h2>
+  {{! sync warning }}
+  <nav>
+    {{! newsgroups index }}
+  </nav>
+</div>
+
+<div id="group_view">
+  {{! dashboard }}
+</div>
+
+<div id="post_view">
+</div>
+
+<div id="external_links">
+  Computer Science House
+  <br>
+  <a href="https://members.csh.rit.edu/">Members</a> &ndash;
+  <a href="https://wiki.csh.rit.edu/">Wiki</a> &ndash;
+  <a href="https://gallery.csh.rit.edu/">Gallery</a> &ndash;
+  <a href="http://tinyurl.com/cshcalendar">Calendar</a>
+</div>
