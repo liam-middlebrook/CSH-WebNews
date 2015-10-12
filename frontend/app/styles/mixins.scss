@@ -7,7 +7,7 @@
 }
 
 @mixin highlights {
-  &.selected { background-color: $bg_row_selected !important; }
+  &.active { background-color: $bg_row_selected !important; }
   &:hover { background-color: $bg_row_hover; cursor: pointer; }
 }
 

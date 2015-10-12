@@ -15,7 +15,7 @@
   </div>
   <div class="buttons">
     <h1>{{#link-to 'index'}}WebNews{{/link-to}}</h1>
-    <a id="home_button" class="button" href="#">{{fa-icon 'home'}}</a>
+    {{#link-to 'index' id="home_button" class="button"}}{{fa-icon 'home'}}{{/link-to}}
     <a id="search_button" class="button" href="#">{{fa-icon 'search'}} Search</a>
     <a id="starred_button" class="button" href="#">{{fa-icon 'star'}} Starred</a>
     <a id="next_unread" class="button" href="#">{{fa-icon 'arrow-right'}} Next Unread</a>

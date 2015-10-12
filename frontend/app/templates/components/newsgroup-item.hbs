@@ -1,4 +1,6 @@
-{{model.id}}
-{{#if model.unreadCount}}
-  ({{model.unreadCount}})
-{{/if}}
+{{#link-to 'newsgroup' model tagName="li" classNameBindings="personalClass model.unreadCount:unread model.postingAllowed::read_only"}}
+  {{model.id}}
+  {{#if model.unreadCount}}
+    ({{model.unreadCount}})
+  {{/if}}
+{{/link-to}}

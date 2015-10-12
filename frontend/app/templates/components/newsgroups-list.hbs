@@ -1,19 +1,21 @@
-<h2>Newsgroups</h2>
-{{#if model}}
-  {{#if syncIsStale}}
-    <div id="sync_warning">
-      <b>Warning:</b> Last sync with the news server was {{moment-from-now lastSyncAt}}.
-    </div>
+<div id="groups_list">
+  <h2>Newsgroups</h2>
+  {{#if model}}
+    {{#if syncIsStale}}
+      <div id="sync_warning">
+        <b>Warning:</b> Last sync with the news server was {{moment-from-now lastSyncAt}}.
+      </div>
+    {{/if}}
+    <nav>
+      {{#each newsgroupGroups as |newsgroups|}}
+        <ul>
+          {{#each newsgroups as |newsgroup|}}
+            {{newsgroup-item model=newsgroup}}
+          {{/each}}
+        </ul>
+      {{/each}}
+    </nav>
+  {{else}}
+    <p>Loading...</p>
   {{/if}}
-  <nav>
-    {{#each newsgroupGroups as |newsgroups|}}
-      <ul>
-        {{#each newsgroups as |newsgroup|}}
-          {{newsgroup-item model=newsgroup}}
-        {{/each}}
-      </ul>
-    {{/each}}
-  </nav>
-{{else}}
-  <p>Loading...</p>
-{{/if}}
+</div>

@@ -3,7 +3,7 @@ import moment from 'moment';
 const { computed } = Ember;
 
 export default Ember.Component.extend({
-  elementId: 'groups_list',
+  tagName: '',
   model: null,
 
   newsgroupSorting: ['id'],
