@@ -25,7 +25,35 @@ RSpec.describe 'Post create' do
     })
 
     expect(response.status).to be 201
-    expect(response.headers['Location']).to eq post_url(Post.last.id)
+    expect(response.headers['Location']).to eq post_url('dummy@post.here')
+  end
+
+  it 'submits a reply to an existing news post' do
+    newsgroup = create(:newsgroup, status: 'y')
+    post = create(:post, id: 'dummy@post.here', newsgroups: [newsgroup])
+    allow_nntp_server.to receive(:post).and_return('dummy@reply.here')
+    allow_nntp_server.to receive(:message_ids).and_return(['dummy@reply.here'])
+    allow_nntp_server.to receive(:article).and_return(<<-ARTICLE.strip_heredoc
+      Subject: test reply
+      From: #{oauth_user.display_name} <#{oauth_user.email}>
+      References: dummy@post.here
+      Message-ID: dummy@reply.here
+      Newsgroups: #{newsgroup.id}
+      Xref: news.example #{newsgroup.id}:42
+
+      here is my reply everypeople
+    ARTICLE
+    )
+
+    post(posts_path, {
+      subject: 'test reply',
+      body: 'here is my reply everypeople',
+      newsgroup_ids: newsgroup.id,
+      parent_id: post.id
+    })
+
+    expect(response.status).to be 201
+    expect(response.headers['Location']).to eq post_url('dummy@reply.here')
   end
 
   it 'returns error information when given invalid parameters' do

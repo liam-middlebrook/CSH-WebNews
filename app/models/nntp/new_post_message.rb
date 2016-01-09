@@ -3,7 +3,7 @@ module NNTP
     attribute :body, type: String, default: ''
     attribute :followup_newsgroup_id, type: String
     attribute :newsgroup_ids, type: String, default: ''
-    attribute :parent_id, type: Integer, default: nil
+    attribute :parent_id, type: String, default: nil
     attribute :subject, type: String
 
     validates :newsgroup_ids, :subject, presence: true
@@ -24,7 +24,11 @@ module NNTP
       end
 
       if parent.present?
-        mail.references = [parent_message.references, parent_message.id].flatten
+        # Mail gem does not automatically wrap Message-IDs in brackets
+        mail.references = [
+          parent_message.references,
+          parent_message.message_id
+        ].flatten.compact.map{ |message_id| "<#{message_id}>" }
       end
 
       mail
