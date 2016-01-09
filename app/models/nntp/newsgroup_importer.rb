@@ -40,7 +40,8 @@ module NNTP
     def sync!(newsgroups = [])
       Flag.with_news_sync_lock do
         local_message_ids = if newsgroups.any?
-          Posting.where(newsgroup_id: newsgroups.map(&:id)).joins(:post).ids
+          Post.joins(:postings)
+            .where(postings: { newsgroup_id: newsgroups.map(&:id) }).ids
         else
           Post.ids
         end
