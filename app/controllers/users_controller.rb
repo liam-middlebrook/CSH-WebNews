@@ -7,7 +7,7 @@ class UsersController < ApplicationController
     render json: {
       user: @current_user.as_json(only: [:username, :real_name, :created_at]).
         merge(is_admin: @current_user.admin?).
-        merge(preferences: @current_user.preferences.slice(:thread_mode, :time_zone))
+        merge(preferences: @current_user.preferences.slice(:thread_mode, :time_zone, :display_mode))
     }
   end
 
@@ -47,7 +47,7 @@ class UsersController < ApplicationController
       :id, :_destroy, :newsgroup_name, :unread_level, :email_level, :digest_type
     ]
     params.require(:user).permit(
-      preferences: [:theme, :thread_mode, :time_zone],
+      preferences: [:theme, :thread_mode, :time_zone, :display_mode],
       default_subscription_attributes: subscription_attributes,
       subscriptions_attributes: subscription_attributes
     )

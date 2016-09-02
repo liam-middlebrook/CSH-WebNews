@@ -56,6 +56,10 @@ class User < ActiveRecord::Base
     preferences[:thread_mode].try(:to_sym) || :normal
   end
 
+  def display_mode
+    preferences[:display_mode].try(:to_sym) || :normal
+  end
+
   def ensure_subscriptions
     if !default_subscription.present?
       subscriptions.destroy_all

@@ -27,6 +27,13 @@
             <% end %>
           </div>
           <div class="form_element aligned_field">
+            <span class="label">Display Settings:</span>
+            <%= p.radio_button :display_mode, 'normal', checked: @current_user.display_mode == :normal %>
+            <%= p.label :display_mode, 'WebNews Classic', value: 'normal' %>
+            <%= p.radio_button :display_mode, 'markdown', checked: @current_user.display_mode == :markdown %>
+            <%= p.label :display_mode, 'Markdown (experimental)', value: 'markdown' %>
+          </div>
+          <div class="form_element aligned_field">
             <span class="label">Newsgroup view:</span>
             <%= p.radio_button :thread_mode, 'normal', checked: @current_user.thread_mode == :normal %>
             <%= p.label :thread_mode, 'Threaded', value: 'normal' %>

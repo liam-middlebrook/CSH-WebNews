@@ -141,6 +141,7 @@ module ApplicationHelper
     parent = post.parent
     html_body = ''
     quote_collapse &&= parent
+    render_as_markdown = (@current_user.display_mode == :markdown)
 
     # Warning: Even I barely understand this, and I wrote it. --grantovich
 
