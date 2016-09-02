@@ -15,6 +15,7 @@ gem 'thoughtafter-nntp', require: 'nntp'
 gem 'rfc2047', github: 'ConradIrwin/rfc2047-ruby'
 gem 'exception_notification'
 gem 'dotenv-rails'
+gem 'redcarpet'
 
 # Asset template engines
 gem 'sass-rails'

@@ -135,7 +135,8 @@ module ApplicationHelper
     { 'Stickies' => stickies }.merge(breakout).reject{ |_, items| items.empty? }
   end
 
-  def post_html_body(post, quote_collapse = true)
+  # TODO: Add UI option for rendering as markdown to be optional
+  def post_html_body(post, quote_collapse = true, render_as_markdown = true)
     pre_body = post.body.dup
     parent = post.parent
     html_body = ''
@@ -165,7 +166,7 @@ module ApplicationHelper
 
     # This structure tends to cause problems when the replacements are done
     if pre_body[/#{MARK_STRING}3.*#{MARK_STRING}1.*#{MARK_STRING}4/m]
-      return post_html_body(post, false)
+      return post_html_body(post, false, render_as_markdown)
     end
 
     html_body = html_escape(pre_body)
@@ -174,7 +175,7 @@ module ApplicationHelper
       quoted = html_body[/#{MARK_STRING}1\n.*#{MARK_STRING}2/m].try(:gsub, /#{MARK_STRING}\d\n/, '')
       # If the text that would be collapsed is trivially short, forget it
       if quoted and quoted.length <= 800 and quoted.scan("\n").length <= 10
-        return post_html_body(post, false)
+        return post_html_body(post, false, render_as_markdown)
       else
         if @api_access
           html_body.gsub!("#{MARK_STRING}1\n", '<div class="quoted_text">')
@@ -194,15 +195,21 @@ module ApplicationHelper
 
     # Definitely shouldn't have any leftover MARK_STRING at this point
     if quote_collapse and html_body[MARK_STRING]
-      return post_html_body(post, false)
+      return post_html_body(post, false, render_as_markdown)
     end
 
-    # gsub doesn't work with this regex, unfortunately
-    {} while html_body.sub!(
-      /(\[\d+\])(?!<\/a>)(.*\n {0,3}\1[^\n]*?(https?:[^\s]+).*?(\n|\z))/m,
-      '<a href="\\3">\\1</a>\\2'
-    )
-    html_body = auto_link(html_body, link: :urls, sanitize: false)
+    if render_as_markdown
+        # Let's do some markdown now?
+        renderer = Redcarpet::Render::HTML.new(prettify: true)
+        html_body = Redcarpet::Markdown.new(renderer, autolink: true).render(html_body)
+    else
+        # gsub doesn't work with this regex, unfortunately
+        {} while html_body.sub!(
+          /(\[\d+\])(?!<\/a>)(.*\n {0,3}\1[^\n]*?(https?:[^\s]+).*?(\n|\z))/m,
+          '<a href="\\3">\\1</a>\\2'
+        )
+        html_body = auto_link(html_body, link: :urls, sanitize: false)
+    end
 
     return html_body
   end
