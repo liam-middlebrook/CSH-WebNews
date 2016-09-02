@@ -203,6 +203,11 @@ module ApplicationHelper
         # Let's do some markdown now?
         renderer = Redcarpet::Render::HTML.new(prettify: true)
         html_body = Redcarpet::Markdown.new(renderer, autolink: true).render(html_body)
+
+	# EmojiTown4lyfe
+	html_body = EmojiParser.parse_tokens(html_body) do |emoji|
+          %Q(<img src="/emoji/#{emoji.image_filename}" alt=":#{emoji.name}:">).html_safe
+        end
     else
         # gsub doesn't work with this regex, unfortunately
         {} while html_body.sub!(
