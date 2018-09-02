@@ -3,7 +3,7 @@ class PagesController < ApplicationController
   before_filter :get_newsgroup, only: :check_new
   before_filter :get_post, only: :check_new
   before_filter :allow_cross_origin_access, only: :home
-  skip_before_filter :check_auth, :get_or_create_user, only:
+  #skip_before_filter :check_auth, :get_or_create_user, only:
 
   def home
     if params[:no_user_override]
