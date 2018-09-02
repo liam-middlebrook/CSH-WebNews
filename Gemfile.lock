@@ -162,3 +162,4 @@ DEPENDENCIES
   thoughtafter-nntp
   uglifier
   whenever
+  openid_connect
