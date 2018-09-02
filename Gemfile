@@ -21,6 +21,7 @@ gem 'sass-rails'
 gem 'coffee-rails'
 gem 'uglifier'
 
+gem 'openid_connect'
 group :development do
   gem 'pry-rails'
   gem 'pry-byebug'
