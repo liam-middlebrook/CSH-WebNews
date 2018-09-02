@@ -19,8 +19,6 @@ class ApplicationController < ActionController::Base
           end
         elsif not DEVELOPMENT_MODE and not params[:api_key]
           respond_to do |wants|
-            wants.html { render 'shared/authenticate', layout: false }
-            wants.js { render 'shared/unauthenticated' }
             wants.any { generic_error :unauthorized, 'api_key_missing',
               "API access requires a key to be provided in the 'api_key' parameter" }
           end

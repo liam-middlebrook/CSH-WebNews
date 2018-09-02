@@ -1,7 +1,5 @@
 Rails.application.routes.draw do
   root to: 'pages#home'
-  get '/authenticate', to: 'pages#authenticate'
-
   get '/home',      to: 'pages#home'
   get '/activity',  to: 'pages#home'
   get '/check_new', to: 'pages#check_new'
