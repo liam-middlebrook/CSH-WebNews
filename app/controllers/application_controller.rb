@@ -6,6 +6,9 @@ class ApplicationController < ActionController::Base
   private
 
     def check_auth
+      OpenIDConnect.debug!
+      OpenIDConnect.logger = Rails.logger
+      client = OpenIDConncet::Client.new(identifier: 'liam-test', secret: ENV["CLIENT_SECRET"], redirect_uri: '/oauth2/authorize', host: 'seekret-liam-test.a.csh.rit.edu')
       if not Newsgroup.select(true).first
         @no_script = true
         render 'shared/no_groups'
