@@ -14,7 +14,7 @@ WIKI_URL = 'https://wiki.csh.rit.edu/wiki/'
 WIKI_USER_URL = WIKI_URL + 'User:'
 
 # Server variables that provide the user's username and real name
-ENV_USERNAME = 'WEBAUTH_USER'
+ENV_USERNAME = 'HTTP_WEBAUTH_USER'
 ENV_REALNAME = 'WEBAUTH_LDAP_CN'
 
 # Date formats (SHORT is used in the dashboard feeds)
