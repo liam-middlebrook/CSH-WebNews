@@ -18,6 +18,7 @@ gem 'dotenv-rails'
 
 # Asset template engines
 gem 'sass-rails'
+gem 'sass', '3.2.19'
 gem 'coffee-rails'
 gem 'uglifier'
 
