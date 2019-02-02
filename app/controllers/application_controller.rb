@@ -7,7 +7,7 @@ class ApplicationController < ActionController::Base
 
     def get_client(params = nil)
         oidc = OpenIDConnect::Client.new('https://sso.csh.rit.edu/auth/realms/csh', 'liam-test', ENV["CLIENT_SECRET"])
-        oidc.redirect_url = 'http://webnews.csh.rit.edu/auth_redirect'
+        oidc.redirect_url = 'http://seekret-liam-test.a.csh.rit.edu/auth_redirect'
         oidc.scopes = 'openid email profile'
 
         if not params
