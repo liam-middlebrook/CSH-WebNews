@@ -1,5 +1,6 @@
 Rails.application.routes.draw do
   root to: 'pages#home'
+  get '/auth_redirect', to: 'pages:auth_redirect'
   get '/home',      to: 'pages#home'
   get '/activity',  to: 'pages#home'
   get '/check_new', to: 'pages#check_new'
@@ -8,7 +9,7 @@ Rails.application.routes.draw do
   get '/status',      to: 'pages#status'
   get '/new_user',    to: 'pages#new_user'
   get '/old_user',    to: 'pages#old_user'
-  get '/rss_caution', to: 'pages#rss_caution'
+  get '/rss_caution', to: 'application#rss_caution'
 
   get '/user',          to: 'users#show',          as: :user
   get '/settings',      to: 'users#edit',          as: :edit_user

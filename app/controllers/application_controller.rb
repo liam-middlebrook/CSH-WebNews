@@ -5,10 +5,33 @@ class ApplicationController < ActionController::Base
 
   private
 
+    def get_client(params = nil)
+        oidc = OpenIDConnect::Client.new('https://sso.csh.rit.edu/auth/realms/csh', 'liam-test', ENV["CLIENT_SECRET"])
+        oidc.redirect_url = 'http://webnews.csh.rit.edu/auth_redirect'
+        oidc.scopes = 'openid email profile'
+
+        if not params
+            oidc.authorize()
+            session[:state] = oidc.state
+            redirect_to(oidc.auth_endpoint)
+        end
+
+        oidc.state = session[:state]
+
+        oidc.params = params if params
+
+        oidc
+    end
+
+    def auth_redirect
+        oidc = get_client(params)
+        oidc.authenticate()
+    end
+
     def check_auth
-      OpenIDConnect.debug!
-      OpenIDConnect.logger = Rails.logger
-      client = OpenIDConncet::Client.new(identifier: 'liam-test', secret: ENV["CLIENT_SECRET"], redirect_uri: '/oauth2/authorize', host: 'seekret-liam-test.a.csh.rit.edu')
+      oidc = get_client()
+      if not oidc.authorize()
+          render 'shared/no_users'
       if not Newsgroup.select(true).first
         @no_script = true
         render 'shared/no_groups'
