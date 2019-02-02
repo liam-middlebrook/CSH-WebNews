@@ -194,7 +194,7 @@ DEPENDENCIES
   jquery-rails
   mousetrap-rails
   nested_form
-  openid_connect
+  openid_connect_client
   pg
   pry-byebug
   pry-rails
