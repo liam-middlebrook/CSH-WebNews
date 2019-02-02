@@ -23,6 +23,7 @@ gem 'coffee-rails'
 gem 'uglifier'
 
 gem 'openid_connect_client'
+gem 'curb'
 group :development do
   gem 'pry-rails'
   gem 'pry-byebug'
