@@ -22,7 +22,7 @@ gem 'sass', '3.2.19'
 gem 'coffee-rails'
 gem 'uglifier'
 
-gem 'openid_connect'
+gem 'openid_connect_client'
 group :development do
   gem 'pry-rails'
   gem 'pry-byebug'

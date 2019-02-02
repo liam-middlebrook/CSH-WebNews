@@ -97,16 +97,7 @@ GEM
     nested_form (0.3.2)
     nokogiri (1.8.4)
       mini_portile2 (~> 2.3.0)
-    openid_connect (1.1.6)
-      activemodel
-      attr_required (>= 1.0.0)
-      json-jwt (>= 1.5.0)
-      rack-oauth2 (>= 1.6.1)
-      swd (>= 1.0.0)
-      tzinfo
-      validate_email
-      validate_url
-      webfinger (>= 1.0.1)
+    openid_connect_client (0.1.6)
     pg (1.1.2)
     pry (0.11.3)
       coderay (~> 1.1.0)
